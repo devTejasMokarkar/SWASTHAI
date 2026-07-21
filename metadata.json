@@ -1,0 +1,6 @@
+{
+  "name": "Swasth AI",
+  "description": "An AI-powered Swasth AI assistant and wellness companion that tracks vitals, scans medical files, schedules checking reminders, and provides personalized health insights.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

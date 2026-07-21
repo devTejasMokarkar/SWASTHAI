@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-container: var(--primary-container);
+  --color-secondary: var(--secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-tertiary: var(--tertiary);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-inverse-surface: var(--inverse-surface);
+}
+
+:root {
+  --primary: #4f46e5;
+  --primary-container: #3730a3;
+  --secondary: #db2777;
+  --secondary-container: #9d174d;
+  --tertiary: #0d9488;
+  --on-surface: #0f172a;
+  --on-surface-variant: #475569;
+  --inverse-surface: #020617;
+}
+
+.dark {
+  --primary: #818cf8;
+  --primary-container: #4f46e5;
+  --secondary: #f472b6;
+  --secondary-container: #db2777;
+  --tertiary: #2dd4bf;
+  --on-surface: #f8fafc;
+  --on-surface-variant: #94a3b8;
+  --inverse-surface: #f8fafc;
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+@keyframes scan {
+  0%, 100% {
+    top: 5%;
+    opacity: 0.1;
+  }
+  50% {
+    top: 95%;
+    opacity: 1;
+  }
+}
+
+/* Custom glass card layout */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.dark .glass-card {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
