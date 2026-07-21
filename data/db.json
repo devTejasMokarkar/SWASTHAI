@@ -10,7 +10,7 @@
       "dietaryPreferences": [
         "No Preferences"
       ],
-      "credits": 149,
+      "credits": 148,
       "vitalityScoreUp": 12,
       "sleepRecovery": "7h 45m"
     }
@@ -4763,7 +4763,18 @@
   "chats": [
     {
       "userId": "sarah-session-token",
-      "messages": []
+      "messages": [
+        {
+          "sender": "user",
+          "text": "hi",
+          "timestamp": "2026-07-21T06:50:30.496Z"
+        },
+        {
+          "sender": "ai",
+          "text": "Good afternoon, Sarah! It's great to connect with you today.\n\nI see from your health records that you're currently on a course of Amoxicillin, which is an antibiotic used to treat bacterial infections. It's important to complete the full course as prescribed, even if you start feeling better before the medication is finished. \n\nGiven your recent chest X-ray results, it's reassuring that no acute abnormalities were detected. However, if you're experiencing any respiratory symptoms like a persistent cough or difficulty breathing, it's best to consult your physician for a thorough evaluation. \n\nAs for your daily routine, your step count is impressive, and you've burned a good amount of calories! Maintaining an active lifestyle is beneficial for overall health. \n\nHere's a quick dietary suggestion for the evening: Consider a balanced dinner with whole-wheat chapatis, a light vegetable curry, and some rice. This meal can provide a good source of carbohydrates and essential nutrients. \n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. If you have any concerns about your medication or symptoms, please seek professional advice promptly.\n\n**RAG Citation:**\n- Amoxicillin Prescription\n- Chest X-Ray_Left\n- Medications: Lisinopril, Metformin, Atorvastatin",
+          "timestamp": "2026-07-21T06:50:37.713Z"
+        }
+      ]
     }
   ],
   "scans": [
@@ -4878,6 +4889,64 @@
     }
   ],
   "agentCalls": [
+    {
+      "id": "call-77997bb4-094d-4038-8322-4e990d417ef3",
+      "userId": "sarah-session-token",
+      "query": "hi",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Amoxicillin Prescription.png",
+            "similarity": 0.9933978226847748,
+            "aiInsight": "Course: 250mg, 3x daily. Ends in 3 days."
+          },
+          {
+            "name": "Chest X-Ray_Left.dicom",
+            "similarity": 0.9496691299472938,
+            "aiInsight": "No acute abnormalities detected. Comparison to 2022 stable."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": 0.8998117115612907,
+            "aiInsight": "Tetanus booster due in 18 months."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "Good afternoon, Sarah! It's great to connect with you today.\n\nI see from your health records that you're currently on a course of Amoxicillin, which is an antibiotic used to treat bacterial infections. It's important to complete the full course as prescribed, even if you start feeling better before the medication is finished. \n\nGiven your recent chest X-ray results, it's reassuring that no acute abnormalities were detected. However, if you're experiencing any respiratory symptoms like a persistent cough or difficulty breathing, it's best to consult your physician for a thorough evaluation. \n\nAs for your daily routine, your step count is impressive, and you've burned a good amount of calories! Maintaining an active lifestyle is beneficial for overall health. \n\nHere's a quick dietary suggestion for the evening: Consider a balanced dinner with whole-wheat chapatis, a light vegetable curry, and some rice. This meal can provide a good source of carbohydrates and essential nutrients. \n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. If you have any concerns about your medication or symptoms, please seek professional advice promptly.\n\n**RAG Citation:**\n- Amoxicillin Prescription\n- Chest X-Ray_Left\n- Medications: Lisinopril, Metformin, Atorvastatin",
+      "safetyWarnings": [],
+      "timestamp": "2026-07-21T06:50:37.713Z"
+    },
     {
       "id": "call-348578fa-40ac-4203-a4f8-1bba7d3e415f",
       "userId": "sarah-session-token",
@@ -6104,6 +6173,14 @@
     }
   ],
   "creditLogs": [
+    {
+      "id": "log-029a11db-5a47-4aec-8ca0-237abb27687a",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"hi\"",
+      "timestamp": "2026-07-21T06:50:30.496Z",
+      "remaining": 148
+    },
     {
       "id": "log-c29ca3ce-5e6a-4003-a013-284dfb8137f8",
       "userId": "sarah-session-token",

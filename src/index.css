@@ -72,3 +72,39 @@
   -webkit-backdrop-filter: blur(30px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* Premium Global Scrollbar Styling */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.2);
+    border-radius: 20px;
+    transition: background 0.3s ease;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 0.4);
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.2);
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.4);
+  }
+  
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(71, 85, 105, 0.2) transparent;
+  }
+}
