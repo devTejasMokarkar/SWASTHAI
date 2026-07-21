@@ -816,7 +816,7 @@ app.post("/api/files/add", authenticate, async (req: any, res) => {
   let aiInsight = "Processing document through health engines...";
   if (ai) {
     try {
-      const model = "gemini-3.5-flash";
+      const model = "gemini-2.0-flash";
       const prompt = `You are an expert AI Health Assistant. Provide a realistic, extremely brief (1-2 sentences, max 15 words) medical AI summary or insight for a document named "${name}" under the category "${category}". It should sound professional, helpful, and specific. Example: "Vitamin D levels are optimal. Slight decrease in Ferritin noted."`;
       const result = await generateContentWithRetry({
         model,
@@ -895,7 +895,7 @@ app.post("/api/medications/add", authenticate, async (req: any, res) => {
   if (ai && userMeds.length > 0) {
     try {
       const currentMedNames = userMeds.map((m: any) => `${m.name} (${m.strength})`).join(", ");
-      const model = "gemini-3.5-flash";
+      const model = "gemini-2.0-flash";
       const prompt = `You are a clinical pharmacologist. Check if adding "${name}" has any severe drug-drug interactions with current medications: [${currentMedNames}]. Respond in JSON with format:
       {
         "conflict": true/false,
@@ -1149,7 +1149,7 @@ app.post("/api/vitals/readings", authenticate, async (req: any, res) => {
   // 2. TRIGGER LIVE AI GENERATION IF API IS AVAILABLE
   if (ai) {
     try {
-      const model = "gemini-3.5-flash";
+      const model = "gemini-2.0-flash";
       const user = db.users.find((u: any) => u.id === req.userId);
       const prompt = `You are Swasth-AI Health Companion, analyzing a newly logged vital reading.
       
@@ -1208,6 +1208,8 @@ app.post("/api/vitals/readings", authenticate, async (req: any, res) => {
   if (!db.vitalsReadings) {
     db.vitalsReadings = [];
   }
+  newReading.severity = severity;
+  newReading.rangeStatus = rangeStatus;
   db.vitalsReadings.unshift(newReading);
 
   // Add this reading & AI commentary to their chat history for continuity!
@@ -1310,7 +1312,7 @@ app.post("/api/gemini/scan", authenticate, async (req: any, res) => {
 
   if (ai) {
     try {
-      const model = "gemini-3.5-flash";
+      const model = "gemini-2.0-flash";
       const currentMedList = userMeds.map((m: any) => m.name).join(", ");
 
       let contents: any[] = [];

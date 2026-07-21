@@ -129,6 +129,19 @@ export default function AIChat({
   const [searchAuditQuery, setSearchAuditQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const handleViewport = () => {
+      const vh = window.innerHeight;
+      const vp = window.visualViewport?.height || vh;
+      const diff = vh - vp;
+      setKeyboardHeight(diff > 0 ? diff : 0);
+    };
+    handleViewport();
+    window.visualViewport?.addEventListener("resize", handleViewport);
+    return () => window.visualViewport?.removeEventListener("resize", handleViewport);
+  }, []);
 
   const [auditTab, setAuditTab] = useState<"logs" | "diagnostics">("logs");
   const [diagnosticResult, setDiagnosticResult] = useState<any>(null);
@@ -139,7 +152,7 @@ export default function AIChat({
     setRunningDiagnostics(true);
     setDiagnosticError(null);
     try {
-      const token = localStorage.getItem("swasth_auth_token") || "sarah-session-token";
+      const token = localStorage.getItem("health_companion_token") || "sarah-session-token";
       const res = await fetch("/api/gemini/diagnostics/run", {
         method: "POST",
         headers: {
@@ -220,7 +233,11 @@ export default function AIChat({
   });
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 max-w-7xl mx-auto h-[calc(100vh-14rem)] md:h-[calc(100vh-12rem)] relative" id="ai-chat-view-container">
+    <div
+      className="flex flex-col md:flex-row gap-6 max-w-7xl mx-auto relative"
+      id="ai-chat-view-container"
+      style={{ height: keyboardHeight > 0 ? `calc(100vh - ${keyboardHeight}px)` : undefined }}
+    >
       {/* Primary Chat Interface */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
@@ -326,7 +343,7 @@ export default function AIChat({
 
                   {/* Client-side Clinical Safety Validator Warning Banner */}
                   {isAI && clientSafetyIssues.length > 0 && (
-                    <div className="mb-3.5 p-3 bg-amber-50 dark:bg-amber-955/20 border-l-4 border-amber-500 rounded-r-xl shadow-sm flex flex-col gap-2">
+                    <div className="mb-3.5 p-3 bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 rounded-r-xl shadow-sm flex flex-col gap-2">
                       <div className="flex items-center gap-1.5 text-xs text-amber-800 dark:text-amber-300 font-extrabold uppercase tracking-wide">
                         <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
                         <span>Client Safety Detector</span>
@@ -451,7 +468,7 @@ export default function AIChat({
 
         {/* Suggested Quick Queries list */}
         {chatHistory.length <= 1 && (
-          <div className="px-5 py-2 overflow-x-auto shrink-0 flex gap-2 no-scrollbar border-t border-slate-50 dark:border-slate-800" id="suggested-queries-bar">
+          <div className="px-5 py-2 overflow-x-auto shrink-0 flex gap-2 border-t border-slate-50 dark:border-slate-800" id="suggested-queries-bar">
             {suggestions.map((sug, idx) => (
               <button
                 key={idx}
@@ -838,7 +855,7 @@ export default function AIChat({
                   <Database className="w-4 h-4 text-primary" />
                   <div>
                     <h4 className="font-bold text-xs uppercase tracking-wider">Transparency Panel</h4>
-                    <p className="text-[9px] text-slate-400">Agent Audit Logs & Grounding (Mobile)</p>
+                    <p className="text-[9px] text-slate-400 font-semibold">Agent Audit Logs & Grounding</p>
                   </div>
                 </div>
                 <button 

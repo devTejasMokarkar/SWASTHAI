@@ -611,7 +611,7 @@ export default function Dashboard({
             <Heart className="w-6 h-6 fill-red-500/80 dark:fill-red-500 group-hover:animate-ping" />
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Heart Rate</p>
-          <p className="text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
+          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
             {vitals.heartRate} <span className="text-sm font-bold text-slate-400">BPM</span>
           </p>
         </div>
@@ -622,7 +622,7 @@ export default function Dashboard({
             <Footprints className="w-6 h-6 text-primary group-hover:animate-bounce" />
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Steps</p>
-          <p className="text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
+          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
             {vitals.steps.toLocaleString()}
           </p>
         </div>
@@ -633,7 +633,7 @@ export default function Dashboard({
             <Moon className="w-6 h-6 fill-secondary/80 dark:fill-secondary group-hover:rotate-12 transition-transform" />
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sleep</p>
-          <p className="text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
+          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
             {vitals.sleep}
           </p>
         </div>
@@ -644,7 +644,7 @@ export default function Dashboard({
             <Flame className="w-6 h-6 fill-tertiary/80 dark:fill-tertiary" />
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Calories</p>
-          <p className="text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
+          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
             {vitals.calories} <span className="text-sm font-bold text-slate-400">kcal</span>
           </p>
         </div>
@@ -660,7 +660,7 @@ export default function Dashboard({
           setLogCalories(vitals.calories);
           setShowLogModal(true);
         }}
-        className="fixed right-6 bottom-24 w-14 h-14 bg-primary text-white rounded-2xl shadow-xl hover:shadow-primary/35 flex items-center justify-center active:scale-95 transition-all hover:scale-105 z-40"
+        className="fixed right-6 bottom-28 md:bottom-24 w-14 h-14 bg-primary text-white rounded-2xl shadow-xl hover:shadow-primary/35 flex items-center justify-center active:scale-95 transition-all hover:scale-105 z-40"
         title="Quick Log Metrics"
         id="quick-log-fab"
       >

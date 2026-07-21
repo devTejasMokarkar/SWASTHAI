@@ -25,7 +25,7 @@ export default function Medications({
   const [newStrength, setNewStrength] = useState("");
   const [newForm, setNewForm] = useState("Tablet");
   const [newFrequency, setNewFrequency] = useState("Daily");
-  const [newTime, setNewTime] = useState("09:00 AM");
+  const [newTime, setNewTime] = useState("09:00");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addConflictWarn, setAddConflictWarn] = useState<string | null>(null);
 
@@ -84,9 +84,13 @@ export default function Medications({
 
     // Call backend scan endpoint
     try {
+      const token = localStorage.getItem("health_companion_token");
       const response = await fetch("/api/gemini/scan", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ drugNameInput: drugName }),
       });
       const data = await response.json();
@@ -563,7 +567,7 @@ export default function Medications({
                       Due Time
                     </label>
                     <input 
-                      type="text"
+                      type="time"
                       placeholder="e.g. 09:00 AM"
                       value={newTime}
                       onChange={(e) => setNewTime(e.target.value)}

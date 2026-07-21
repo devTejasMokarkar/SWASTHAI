@@ -644,7 +644,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-on-surface dark:text-slate-100 font-sans antialiased pb-32 transition-colors duration-300">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-on-surface dark:text-slate-100 font-sans antialiased transition-colors duration-300">
       {/* AUTHENTICATION GATE */}
       {!token ? (
         <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
@@ -763,17 +763,17 @@ export default function App() {
         </div>
       ) : (
         /* CORE APPLICATION CHASSIS */
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col pb-32">
           {/* TOP HEADER */}
-          <header className="fixed top-0 w-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 z-50 flex justify-between items-center px-6 md:px-12 h-16 shadow-sm transition-colors duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+          <header className="fixed top-0 w-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 z-50 flex justify-between items-center px-4 md:px-12 h-16 shadow-sm transition-colors duration-300">
+            <div className="flex items-center gap-2 md:gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                 <Activity className="w-5 h-5 animate-pulse" />
               </div>
-              <h1 className="text-xl font-extrabold tracking-tight text-primary">Swasth AI</h1>
+              <h1 className="text-xl font-extrabold tracking-tight text-primary truncate">Swasth AI</h1>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
               {/* Profile setup reminder helper */}
               {user && (
                 <div className="hidden md:flex bg-primary/10 px-4 py-1.5 rounded-full border border-primary/10 shadow-sm">
@@ -784,11 +784,11 @@ export default function App() {
               {/* Export Data Button */}
               <button 
                 onClick={handleExportData}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 dark:bg-primary/20 hover:bg-primary/15 text-primary rounded-xl text-xs font-black transition-all hover:scale-[1.02] cursor-pointer shadow-sm border border-primary/10"
+                className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 bg-primary/10 dark:bg-primary/20 hover:bg-primary/15 text-primary rounded-xl text-xs font-black transition-all hover:scale-[1.02] cursor-pointer shadow-sm border border-primary/10"
                 title="Export Health Data Report"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Export Report</span>
+                <span className="hidden sm:inline">Export Report</span>
               </button>
 
               {/* Theme Toggle Button */}
@@ -821,7 +821,7 @@ export default function App() {
           </header>
 
           {/* MAIN DYNAMIC CANVAS */}
-          <main className="pt-24 px-6 md:px-12 max-w-[1440px] w-full mx-auto flex-1">
+          <main className="pt-24 px-4 md:px-12 max-w-[1440px] w-full mx-auto flex-1">
             <AnimatePresence mode="wait">
               {user ? (
                 <div key={activeTab}>
@@ -841,7 +841,7 @@ export default function App() {
           <nav className="fixed bottom-0 left-0 w-full z-40 flex justify-around items-center h-20 px-4 pb-safe bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-xl rounded-t-2xl transition-colors duration-300">
             <button 
               onClick={() => setActiveTab("today")}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer ${
+              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${
                 activeTab === "today" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
               }`}
             >
@@ -851,7 +851,7 @@ export default function App() {
 
             <button 
               onClick={() => setActiveTab("chat")}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer ${
+              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${
                 activeTab === "chat" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
               }`}
             >
@@ -861,7 +861,7 @@ export default function App() {
 
             <button 
               onClick={() => setActiveTab("files")}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer ${
+              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${
                 activeTab === "files" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
               }`}
             >
@@ -871,7 +871,7 @@ export default function App() {
 
             <button 
               onClick={() => setActiveTab("profile")}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer ${
+              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${
                 activeTab === "profile" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
               }`}
             >

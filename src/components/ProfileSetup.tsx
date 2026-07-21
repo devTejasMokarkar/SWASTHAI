@@ -118,8 +118,8 @@ export default function ProfileSetup({
           </span>
         </div>
         <div className="flex gap-2">
-          <div className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${step >= 1 ? "bg-primary" : "bg-slate-200 dark:bg-slate-850"}`}></div>
-          <div className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${step >= 2 ? "bg-primary" : "bg-slate-200 dark:bg-slate-850"}`}></div>
+          <div className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${step >= 1 ? "bg-primary" : "bg-slate-200 dark:bg-slate-800"}`}></div>
+          <div className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${step >= 2 ? "bg-primary" : "bg-slate-200 dark:bg-slate-800"}`}></div>
         </div>
       </div>
 
@@ -229,28 +229,28 @@ export default function ProfileSetup({
                 Blood Sugar Unit Preference
               </label>
               <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSugarUnitPreference("mg/dL")}
-                  className={`h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-xs transition-all cursor-pointer ${
-                    sugarUnitPreference === "mg/dL"
-                      ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
-                      : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
-                  }`}
-                >
-                  mg/dL (US/India standard)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSugarUnitPreference("mmol/L")}
-                  className={`h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-xs transition-all cursor-pointer ${
-                    sugarUnitPreference === "mmol/L"
-                      ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
-                      : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
-                  }`}
-                >
-                  mmol/L (UK/Europe standard)
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setSugarUnitPreference("mg/dL")}
+                    className={`h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-[11px] md:text-xs transition-all cursor-pointer ${
+                      sugarUnitPreference === "mg/dL"
+                        ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
+                        : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
+                    }`}
+                  >
+                    mg/dL (US)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSugarUnitPreference("mmol/L")}
+                    className={`h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-[11px] md:text-xs transition-all cursor-pointer ${
+                      sugarUnitPreference === "mmol/L"
+                        ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
+                        : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
+                    }`}
+                  >
+                    mmol/L (UK/EU)
+                  </button>
               </div>
             </div>
           </div>
@@ -490,7 +490,7 @@ export default function ProfileSetup({
       </div>
 
       {/* Subtle Visual Context Bento graphics */}
-      <div className="hidden lg:grid grid-cols-3 gap-6 w-full max-w-[1200px] pt-8 opacity-75">
+      <div className="hidden md:grid grid-cols-3 gap-6 w-full max-w-[1200px] pt-8 opacity-75">
         <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl flex flex-col gap-3 shadow-sm">
           <img 
             className="w-full h-32 rounded-xl object-cover" 

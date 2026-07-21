@@ -176,15 +176,15 @@ export default function HealthFiles({
     const headers = ["Type", "Date/Time", "Sugar Value", "Sugar Unit", "Context", "Systolic (mmHg)", "Diastolic (mmHg)", "Pulse (BPM)", "Severity", "Analysis"];
     const rows = vitalsReadings.map(r => [
       r.type,
-      new Date(r.createdAt).toLocaleString(),
-      r.type === "blood_sugar" ? r.sugarVal : "",
+      new Date(r.timestamp).toLocaleString(),
+      r.type === "blood_sugar" ? r.sugarValue : "",
       r.type === "blood_sugar" ? (r.sugarUnit || "mg/dL") : "",
       r.type === "blood_sugar" ? (r.sugarContext || "Random") : "",
       r.type === "blood_pressure" ? r.systolic : "",
       r.type === "blood_pressure" ? r.diastolic : "",
       r.type === "blood_pressure" && r.pulse ? r.pulse : "",
       r.severity || "normal",
-      (r.clinicalTags || []).join("; ")
+      (r.rangeStatus || "").replace(/"/g, '""')
     ]);
     const csvContent = [headers.join(","), ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -235,14 +235,14 @@ export default function HealthFiles({
 
     return vitalsReadings
       .filter(r => r.type === "blood_sugar")
-      .filter(r => new Date(r.createdAt) >= cutoffDate)
+      .filter(r => new Date(r.timestamp) >= cutoffDate)
       .filter(r => vitalsContextFilter === "All" || r.sugarContext === vitalsContextFilter)
       .map(r => ({
         ...r,
-        formattedDate: new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " " + new Date(r.createdAt).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }),
-        sugarVal: Number(r.sugarVal)
+        formattedDate: new Date(r.timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " " + new Date(r.timestamp).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }),
+        sugarValue: Number(r.sugarValue)
       }))
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   };
 
   const getFilteredBPData = () => {
@@ -254,14 +254,14 @@ export default function HealthFiles({
 
     return vitalsReadings
       .filter(r => r.type === "blood_pressure")
-      .filter(r => new Date(r.createdAt) >= cutoffDate)
+      .filter(r => new Date(r.timestamp) >= cutoffDate)
       .map(r => ({
         ...r,
-        formattedDate: new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " " + new Date(r.createdAt).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }),
+        formattedDate: new Date(r.timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " " + new Date(r.timestamp).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }),
         systolic: Number(r.systolic),
         diastolic: Number(r.diastolic)
       }))
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   };
 
   // Helper for calendar days
@@ -277,7 +277,7 @@ export default function HealthFiles({
     // We want the calendar days to highlight when there is a vitals log
     const getReadingsForDay = (day: number) => {
       return vitalsReadings.filter((r) => {
-        const rDate = new Date(r.createdAt);
+        const rDate = new Date(r.timestamp);
         return (
           rDate.getFullYear() === year &&
           rDate.getMonth() === month &&
@@ -366,7 +366,7 @@ export default function HealthFiles({
                     setSelectedDate(new Date(year, month, dayNum));
                   }
                 }}
-                className={`py-1.5 relative rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer group h-10 ${
+                className={`py-1.5 relative rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer group h-11 md:h-10 ${
                   isSelected
                     ? "bg-pink-500 text-white font-black shadow-md shadow-pink-500/10"
                     : hasReadings
@@ -473,7 +473,7 @@ export default function HealthFiles({
                 </div>
 
                 {/* Sugar Context Filter Dropdown */}
-                <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 py-1.5 px-3 rounded-xl border border-slate-250/40 dark:border-slate-800/40">
+                <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 py-1.5 px-3 rounded-xl border border-slate-200/40 dark:border-slate-800/40">
                   <Filter className="w-3.5 h-3.5 text-slate-400" />
                   <select
                     value={vitalsContextFilter}
@@ -503,7 +503,7 @@ export default function HealthFiles({
                       />
                       <Line 
                         type="monotone" 
-                        dataKey="sugarVal" 
+                        dataKey="sugarValue" 
                         name="Blood Sugar" 
                         stroke="#ec4899" 
                         strokeWidth={3} 
@@ -652,7 +652,7 @@ export default function HealthFiles({
                           className={`text-[10px] font-bold px-2 py-1 rounded-md transition-all cursor-pointer ${
                             rem.active !== false
                               ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                              : "bg-slate-150 dark:bg-slate-800 text-slate-400"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-400"
                           }`}
                         >
                           {rem.active !== false ? "Active" : "Paused"}
@@ -696,7 +696,7 @@ export default function HealthFiles({
                     </span>
                     <span className="text-xs text-slate-400 font-bold">
                       ({vitalsReadings.filter((r) => {
-                        const rDate = new Date(r.createdAt);
+                        const rDate = new Date(r.timestamp);
                         return (
                           rDate.getFullYear() === selectedDate.getFullYear() &&
                           rDate.getMonth() === selectedDate.getMonth() &&
@@ -719,18 +719,18 @@ export default function HealthFiles({
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider font-bold">
-                      <th className="py-2">Date/Time</th>
-                      <th className="py-2">Vitals Type</th>
-                      <th className="py-2 text-right">Value Recorded</th>
-                      <th className="py-2 text-right">Pulse/Context</th>
-                      <th className="py-2 text-center">AI Classification</th>
+                      <th className="py-2 w-[35%] min-w-[100px]">Date/Time</th>
+                      <th className="py-2 w-[15%]">Vitals Type</th>
+                      <th className="py-2 text-right w-[20%]">Value Recorded</th>
+                      <th className="py-2 text-right w-[15%]">Pulse/Context</th>
+                      <th className="py-2 text-center w-[15%]">AI Classification</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100/50 dark:divide-slate-800/40 text-xs">
                     {(() => {
                       const displayedReadings = selectedDate
                         ? vitalsReadings.filter((r) => {
-                            const rDate = new Date(r.createdAt);
+                            const rDate = new Date(r.timestamp);
                             return (
                               rDate.getFullYear() === selectedDate.getFullYear() &&
                               rDate.getMonth() === selectedDate.getMonth() &&
@@ -742,14 +742,14 @@ export default function HealthFiles({
                       return displayedReadings.slice(0, 20).map((r) => (
                         <tr key={r.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/20">
                           <td className="py-2.5 text-[10px] font-bold text-slate-500">
-                            {new Date(r.createdAt).toLocaleString()}
+                            {new Date(r.timestamp).toLocaleString()}
                           </td>
                           <td className="py-2.5 font-bold text-on-surface dark:text-slate-200 uppercase text-[10px]">
                             {r.type === "blood_sugar" ? "Glucose" : "Pressure"}
                           </td>
                           <td className="py-2.5 text-right font-black text-on-surface dark:text-slate-100">
                             {r.type === "blood_sugar" 
-                              ? `${r.sugarVal} ${r.sugarUnit || "mg/dL"}`
+                              ? `${r.sugarValue} ${r.sugarUnit || "mg/dL"}`
                               : `${r.systolic}/${r.diastolic} mmHg`
                             }
                           </td>
@@ -767,7 +767,7 @@ export default function HealthFiles({
                                 ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
                                 : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                             }`}>
-                              {r.severity === "crisis" ? "Urgent" : (r.clinicalTags && r.clinicalTags[0]) || "Normal"}
+                              {r.severity === "crisis" ? "Urgent" : r.rangeStatus || "Normal"}
                             </span>
                           </td>
                         </tr>
@@ -802,11 +802,11 @@ export default function HealthFiles({
                     <Bell className="w-5 h-5 text-pink-500 animate-pulse" />
                     Set Vitals Reminder
                   </h4>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddReminderModal(false)}
-                    className="p-1 hover:bg-slate-150 dark:hover:bg-slate-800 rounded-lg text-slate-400"
-                  >
+                    <button
+                      type="button"
+                      onClick={() => setShowAddReminderModal(false)}
+                      className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 cursor-pointer"
+                    >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -991,25 +991,25 @@ export default function HealthFiles({
       <div className="flex border-b border-slate-100 dark:border-slate-800 pb-1 mb-4 w-full justify-start overflow-x-auto gap-2">
         <button
           onClick={() => setHealthTab("files")}
-          className={`flex items-center gap-2 px-5 py-3 border-b-2 font-black text-xs md:text-sm tracking-tight transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-3 md:px-5 py-3 border-b-2 font-black text-[11px] md:text-sm tracking-tight transition-all cursor-pointer whitespace-nowrap ${
             healthTab === "files"
               ? "border-primary text-primary"
               : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
           }`}
         >
           <FolderOpen className="w-4 h-4" />
-          <span>Clinical Documents & Logs</span>
+          <span>Documents & Logs</span>
         </button>
         <button
           onClick={() => setHealthTab("medications")}
-          className={`flex items-center gap-2 px-5 py-3 border-b-2 font-black text-xs md:text-sm tracking-tight transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-3 md:px-5 py-3 border-b-2 font-black text-[11px] md:text-sm tracking-tight transition-all cursor-pointer whitespace-nowrap ${
             healthTab === "medications"
               ? "border-primary text-primary"
               : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
           }`}
         >
           <Pill className="w-4 h-4" />
-          <span>Pill Tracker & Scanner</span>
+          <span>Medications</span>
         </button>
       </div>
 
@@ -1080,7 +1080,7 @@ export default function HealthFiles({
                 : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
             }`}
           >
-            Vitals Trends & Reminders
+            Vitals
           </button>
         </div>
 
@@ -1186,7 +1186,7 @@ export default function HealthFiles({
           {/* Floating Add File button */}
           <button 
             onClick={() => setShowAddModal(true)}
-            className="fixed bottom-24 right-6 w-16 h-16 rounded-2xl bg-primary text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-40 group"
+            className="fixed bottom-28 md:bottom-24 right-6 w-16 h-16 rounded-2xl bg-primary text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-40 group"
             title="Upload Health Record"
             id="add-file-fab"
           >
