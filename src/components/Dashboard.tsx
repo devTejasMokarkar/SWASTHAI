@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User, SmartActions, Vitals } from "../types";
-import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert } from "lucide-react";
+import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import SkeletonCard from "./SkeletonCard";
 import confetti from "canvas-confetti";
@@ -83,6 +83,7 @@ export default function Dashboard({
 }: DashboardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
   const [logSteps, setLogSteps] = useState(vitals.steps);
   const [logHeartRate, setLogHeartRate] = useState(vitals.heartRate);
   const [logCalories, setLogCalories] = useState(vitals.calories);
@@ -168,7 +169,7 @@ export default function Dashboard({
     greetingSubtext = `Your vitality score is up by ${user.vitalityScoreUp || 12}% today. Ensure you're drinking water to stay hydrated! Your hydration progress is logged below.`;
   } else if (currentHour >= 17 && currentHour < 21) {
     greeting = "Good evening";
-    greetingSubtext = `Your vitality score is up by ${user.vitalityScoreUp || 12}% today. Wind down with some deep breathing exercises. Your Atorvastatin medication is scheduled for 08:00 PM.`;
+    greetingSubtext = "";
   } else {
     greeting = "Good night";
     greetingSubtext = `Your vitality score is up by ${user.vitalityScoreUp || 12}% today. Prioritize restful sleep to recover. The system has paused active notifications until morning.`;
@@ -340,7 +341,7 @@ export default function Dashboard({
       </AnimatePresence>
 
       {/* Flash Greeting Section */}
-      <section className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6 relative" id="greeting-section">
+      <section className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6 relative overflow-hidden" id="greeting-section">
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
         <div className="relative z-10">
           <motion.h1 
@@ -366,14 +367,14 @@ export default function Dashboard({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex flex-col md:items-end gap-2 shrink-0 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 px-5 py-4 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] md:self-center hover:scale-105 transition-transform duration-300"
+          className="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-2 shrink-0 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 px-3 py-2 md:px-5 md:py-4 rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] md:self-center hover:scale-105 transition-transform duration-300"
         >
-          <div className="flex items-center gap-2.5 text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">
-            <Calendar className="w-4 h-4 text-primary" />
+          <div className="flex items-center gap-1.5 md:gap-2.5 text-[10px] md:text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider md:tracking-widest">
+            <Calendar className="w-3 h-3 md:w-4 md:h-4 text-primary" />
             <span>{formattedDate}</span>
           </div>
-          <div className="flex items-center gap-2.5 text-base font-black text-on-surface dark:text-slate-100 tracking-wider">
-            <Clock className="w-5 h-5 text-secondary animate-pulse" />
+          <div className="flex items-center gap-1.5 md:gap-2.5 text-xs md:text-base font-black text-on-surface dark:text-slate-100 tracking-wider">
+            <Clock className="w-3.5 h-3.5 md:w-5 md:h-5 text-secondary animate-pulse" />
             <span className="font-mono bg-gradient-to-r from-slate-800 to-slate-500 dark:from-slate-100 dark:to-slate-400 bg-clip-text text-transparent">{formattedTime}</span>
           </div>
         </motion.div>
@@ -496,7 +497,7 @@ export default function Dashboard({
                 </div>
               </div>
               <button 
-                className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all duration-300 text-sm font-black shadow-sm ${
+                className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all duration-300 font-black shadow-sm shrink-0 ${
                   smartActions.waterLoggedMl >= smartActions.waterGoalMl 
                     ? "border-emerald-500 bg-gradient-to-br from-emerald-400 to-emerald-500 text-white shadow-emerald-500/30" 
                     : "border-primary/30 group-hover:border-primary text-primary group-hover:bg-primary/5"
@@ -508,7 +509,7 @@ export default function Dashboard({
 
             {/* Visual Progress Bar */}
             <div className="w-full">
-              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
                 <span>Hydration Goal</span>
                 <span className={smartActions.waterLoggedMl >= smartActions.waterGoalMl ? "text-emerald-500" : "text-primary"}>
                   {Math.round(Math.min((smartActions.waterLoggedMl / smartActions.waterGoalMl) * 100, 100))}%
@@ -545,7 +546,7 @@ export default function Dashboard({
               </div>
             </div>
             <button 
-              className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all duration-300 text-sm font-black shadow-sm ${
+              className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all duration-300 font-black shadow-sm shrink-0 ${
                 smartActions.vitaminD 
                   ? "border-secondary bg-gradient-to-br from-secondary to-purple-600 text-white shadow-secondary/30" 
                   : "border-secondary/30 group-hover:border-secondary text-secondary group-hover:bg-secondary/5"
@@ -571,7 +572,7 @@ export default function Dashboard({
               </div>
             </div>
             <button 
-              className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all duration-300 text-sm font-black shadow-sm ${
+              className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all duration-300 font-black shadow-sm shrink-0 ${
                 smartActions.breathing 
                   ? "border-tertiary bg-gradient-to-br from-tertiary to-orange-600 text-white shadow-tertiary/30" 
                   : "border-tertiary/30 group-hover:border-tertiary text-tertiary group-hover:bg-tertiary/5"
@@ -596,7 +597,7 @@ export default function Dashboard({
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">Sugar, pressure, or pulse</p>
               </div>
             </div>
-            <button className="w-8 h-8 rounded-xl border-2 border-pink-500/30 group-hover:border-pink-500 text-pink-500 flex items-center justify-center font-black text-sm transition-colors group-hover:bg-pink-500/5">
+            <button className="w-10 h-10 rounded-xl border-2 border-pink-500/30 group-hover:border-pink-500 text-pink-500 flex items-center justify-center font-black transition-colors group-hover:bg-pink-500/5 shrink-0">
               +
             </button>
           </div>
@@ -612,7 +613,7 @@ export default function Dashboard({
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Heart Rate</p>
           <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
-            {vitals.heartRate} <span className="text-sm font-bold text-slate-400">BPM</span>
+            {vitals.heartRate} <span className="text-sm font-bold text-slate-400 dark:text-slate-500">BPM</span>
           </p>
         </div>
 
@@ -645,27 +646,80 @@ export default function Dashboard({
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Calories</p>
           <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
-            {vitals.calories} <span className="text-sm font-bold text-slate-400">kcal</span>
+            {vitals.calories} <span className="text-sm font-bold text-slate-400 dark:text-slate-500">kcal</span>
           </p>
         </div>
       </section>
 
       {/* Activity Trends Section Removed */}
 
-      {/* Floating Action Button (FAB) and Dialog for metric additions */}
-      <button 
-        onClick={() => {
-          setLogSteps(vitals.steps);
-          setLogHeartRate(vitals.heartRate);
-          setLogCalories(vitals.calories);
-          setShowLogModal(true);
-        }}
-        className="fixed right-6 bottom-28 md:bottom-24 w-14 h-14 bg-primary text-white rounded-2xl shadow-xl hover:shadow-primary/35 flex items-center justify-center active:scale-95 transition-all hover:scale-105 z-40"
-        title="Quick Log Metrics"
-        id="quick-log-fab"
-      >
-        <Plus className="w-6 h-6" />
-      </button>
+      {/* Floating Heart FAB – expands radially */}
+      <div className="fixed right-6 bottom-28 md:bottom-24 z-40">
+        <AnimatePresence>
+          {fabOpen && (
+            <>
+              <motion.button
+                key="sugar"
+                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                animate={{ opacity: 1, scale: 1, x: 0, y: -75 }}
+                exit={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                transition={{ type: "spring", stiffness: 280, damping: 22, delay: 0 }}
+                onClick={() => { setVitalsType("blood_sugar"); setShowVitalsLogModal(true); setFabOpen(false); }}
+                className="absolute w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer group"
+                title="Blood Sugar"
+              >
+                <Candy className="w-5 h-5" />
+                <span className="absolute right-full mr-2 px-2 py-0.5 rounded-lg bg-slate-900/90 text-white text-[10px] font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  Sugar
+                </span>
+              </motion.button>
+              <motion.button
+                key="bp"
+                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                animate={{ opacity: 1, scale: 1, x: -55, y: -55 }}
+                exit={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                transition={{ type: "spring", stiffness: 280, damping: 22, delay: 0.07 }}
+                onClick={() => { setVitalsType("blood_pressure"); setShowVitalsLogModal(true); setFabOpen(false); }}
+                className="absolute w-11 h-11 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer group"
+                title="Blood Pressure"
+              >
+                <Activity className="w-5 h-5" />
+                <span className="absolute right-full mr-2 px-2 py-0.5 rounded-lg bg-slate-900/90 text-white text-[10px] font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  BP
+                </span>
+              </motion.button>
+              <motion.button
+                key="spo2"
+                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                animate={{ opacity: 1, scale: 1, x: -75, y: 0 }}
+                exit={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                transition={{ type: "spring", stiffness: 280, damping: 22, delay: 0.14 }}
+                onClick={() => { setVitalsType("spo2"); setShowVitalsLogModal(true); setFabOpen(false); }}
+                className="absolute w-11 h-11 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer group"
+                title="SpO2"
+              >
+                <Wind className="w-5 h-5" />
+                <span className="absolute right-full mr-2 px-2 py-0.5 rounded-lg bg-slate-900/90 text-white text-[10px] font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  SpO2
+                </span>
+              </motion.button>
+            </>
+          )}
+        </AnimatePresence>
+
+        <motion.button
+          onClick={() => setFabOpen(!fabOpen)}
+          className="w-14 h-14 rounded-full bg-primary text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer relative"
+          title={fabOpen ? "Close" : "Log Vitals"}
+          id="heart-fab"
+          animate={{ rotate: fabOpen ? 90 : 0 }}
+          transition={{ type: "spring", stiffness: 280, damping: 22 }}
+        >
+          <span className="text-lg leading-none select-none">
+            {fabOpen ? <X className="w-6 h-6" /> : <Heart className="w-6 h-6 fill-current" />}
+          </span>
+        </motion.button>
+      </div>
 
       {/* Quick Log Modal Overlay */}
       <AnimatePresence>
@@ -908,7 +962,7 @@ export default function Dashboard({
                               className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
                                 sugarUnit === "mg/dL"
                                   ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                                  : "text-slate-400"
+                                  : "text-slate-400 dark:text-slate-500"
                               }`}
                             >
                               mg/dL
@@ -919,7 +973,7 @@ export default function Dashboard({
                               className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
                                 sugarUnit === "mmol/L"
                                   ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                                  : "text-slate-400"
+                                  : "text-slate-400 dark:text-slate-500"
                               }`}
                             >
                               mmol/L
@@ -993,7 +1047,7 @@ export default function Dashboard({
 
                       <div>
                         <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">
-                          Pulse Rate (BPM) <span className="text-[10px] text-slate-400 lowercase">(optional)</span>
+                          Pulse Rate (BPM) <span className="text-[10px] text-slate-400 dark:text-slate-500 lowercase">(optional)</span>
                         </label>
                         <input
                           type="number"
@@ -1018,7 +1072,7 @@ export default function Dashboard({
                               className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
                                 tempUnit === "F"
                                   ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                                  : "text-slate-400"
+                                  : "text-slate-400 dark:text-slate-500"
                               }`}
                             >
                               °F
@@ -1029,7 +1083,7 @@ export default function Dashboard({
                               className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
                                 tempUnit === "C"
                                   ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                                  : "text-slate-400"
+                                  : "text-slate-400 dark:text-slate-500"
                               }`}
                             >
                               °C

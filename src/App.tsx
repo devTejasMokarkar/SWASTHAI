@@ -654,7 +654,7 @@ export default function App() {
           <div className="absolute top-4 right-4 z-20">
             <button 
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant transition-colors cursor-pointer"
+              className="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant transition-colors cursor-pointer"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {darkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-600" />}
@@ -794,7 +794,7 @@ export default function App() {
               {/* Theme Toggle Button */}
               <button 
                 onClick={() => setDarkMode(!darkMode)}
-                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary rounded-lg transition-colors cursor-pointer"
+                className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary rounded-lg transition-colors cursor-pointer"
                 title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
               >
                 {darkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-600" />}
@@ -812,7 +812,7 @@ export default function App() {
               {/* Logout button */}
               <button 
                 onClick={handleLogout}
-                className="p-1.5 hover:bg-red-50 dark:hover:bg-red-950/30 text-on-surface-variant hover:text-red-500 rounded-lg transition-colors cursor-pointer"
+                className="p-3 hover:bg-red-50 dark:hover:bg-red-950/30 text-on-surface-variant hover:text-red-500 rounded-lg transition-colors cursor-pointer"
                 title="Sign Out Securely"
               >
                 <LogOut className="w-5 h-5" />

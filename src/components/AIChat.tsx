@@ -392,7 +392,7 @@ export default function AIChat({
                       if (tLine.startsWith("Disclaimer:") || tLine.startsWith("⚠️ **Disclaimer**:")) {
                         return (
                           <p key={lIdx} className="text-[9px] text-slate-500 dark:text-slate-400 font-medium italic mt-2 bg-slate-100/50 dark:bg-slate-900/50 p-2 rounded-lg">
-                            <Info className="w-3 h-3 inline-block mr-1 text-slate-400" />
+                            <Info className="w-3 h-3 inline-block mr-1 text-slate-400 dark:text-slate-500" />
                             {tLine.replace("⚠️ **Disclaimer**:", "").replace("Disclaimer:", "").trim()}
                           </p>
                         );
@@ -436,7 +436,7 @@ export default function AIChat({
                                 </div>
                               ))
                             ) : (
-                              <p className="italic text-slate-400">No semantically matched files were found above the relevance threshold.</p>
+                              <p className="italic text-slate-400 dark:text-slate-500">No semantically matched files were found above the relevance threshold.</p>
                             )}
                           </div>
                         </div>
@@ -541,12 +541,12 @@ export default function AIChat({
                 </div>
                 <div>
                   <h4 className="font-bold text-xs uppercase tracking-wider">Transparency Panel</h4>
-                  <p className="text-[9px] text-slate-400 font-semibold">Agent Audit Logs & Grounding</p>
+                  <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold">Agent Audit Logs & Grounding</p>
                 </div>
               </div>
               <button 
                 onClick={() => setShowAudit(false)}
-                className="text-slate-400 hover:text-white p-1 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                className="text-slate-400 dark:text-slate-500 hover:text-white p-1 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -559,7 +559,7 @@ export default function AIChat({
                 className={`flex-1 py-3 text-center border-b-2 transition-all cursor-pointer ${
                   auditTab === "logs" 
                     ? "border-primary text-primary bg-slate-900/60" 
-                    : "border-transparent text-slate-400 hover:text-slate-200"
+                    : "border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-200"
                 }`}
               >
                 Audit Trails
@@ -569,7 +569,7 @@ export default function AIChat({
                 className={`flex-1 py-3 text-center border-b-2 transition-all cursor-pointer ${
                   auditTab === "diagnostics" 
                     ? "border-primary text-primary bg-slate-900/60" 
-                    : "border-transparent text-slate-400 hover:text-slate-200"
+                    : "border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-200"
                 }`}
               >
                 RAG Diagnostics
@@ -581,7 +581,7 @@ export default function AIChat({
                 {/* Live Search bar */}
                 <div className="p-4 bg-slate-900 border-b border-slate-800 shrink-0">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-3.5 h-3.5" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 w-3.5 h-3.5" />
                     <input 
                       type="text"
                       placeholder="Filter audit logs..."
@@ -612,7 +612,7 @@ export default function AIChat({
                               <p className="text-xs font-bold text-slate-200 truncate">
                                 Query: "{log.query}"
                               </p>
-                              <span className="text-[9px] text-slate-500 block font-semibold">
+                              <span className="text-[9px] text-slate-500 dark:text-slate-400 block font-semibold">
                                 {new Date(log.timestamp).toLocaleString()}
                               </span>
                             </div>
@@ -626,7 +626,7 @@ export default function AIChat({
                                   Alert
                                 </span>
                               )}
-                              {isExpanded ? <ChevronDown className="w-3.5 h-3.5 text-slate-400" /> : <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
+                              {isExpanded ? <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" /> : <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />}
                             </div>
                           </div>
 
@@ -659,10 +659,10 @@ export default function AIChat({
                                     log.retrievedContext.files.map((f: any, fIdx: number) => (
                                       <div key={fIdx} className="bg-slate-900/60 p-2 border border-slate-800 rounded-lg flex justify-between items-start gap-2 text-slate-300">
                                         <div className="flex gap-1.5 items-start">
-                                          <FileText className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" />
+                                          <FileText className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 mt-0.5 shrink-0" />
                                           <div>
                                             <p className="font-bold text-slate-200">{f.name}</p>
-                                            <p className="text-[9px] text-slate-500 italic mt-0.5">"{f.aiInsight}"</p>
+                                            <p className="text-[9px] text-slate-500 dark:text-slate-400 italic mt-0.5">"{f.aiInsight}"</p>
                                           </div>
                                         </div>
                                         <span className="text-secondary font-bold shrink-0">
@@ -671,7 +671,7 @@ export default function AIChat({
                                       </div>
                                     ))
                                   ) : (
-                                    <p className="text-slate-500 italic font-semibold pl-1">No health reports matches above threshold.</p>
+                                    <p className="text-slate-500 dark:text-slate-400 italic font-semibold pl-1">No health reports matches above threshold.</p>
                                   )}
                                 </div>
                               </div>
@@ -702,8 +702,8 @@ export default function AIChat({
                       );
                     })
                   ) : (
-                    <div className="text-center py-12 text-slate-500 space-y-2">
-                      <Database className="w-10 h-10 text-slate-700 mx-auto" />
+                    <div className="text-center py-12 text-slate-500 dark:text-slate-400 space-y-2">
+                      <Database className="w-10 h-10 text-slate-700 dark:text-slate-500 mx-auto" />
                       <p className="text-xs font-semibold">No audit logs match criteria.</p>
                     </div>
                   )}
@@ -717,7 +717,7 @@ export default function AIChat({
                     <Cpu className="w-4 h-4 text-primary" />
                     RAG Integrity Diagnostics
                   </h5>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed">
                     Execute a diagnostic routine to verify that **Tier 1 (deterministic)** and **Tier 2 (semantic)** health record parameters are correctly resolved, injected, and audited in the Swasth-AI context before calling the LLM generation stage.
                   </p>
                   <button
@@ -764,7 +764,7 @@ export default function AIChat({
 
                     {/* Steps timeline */}
                     <div className="space-y-3">
-                      <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block">Verification Pipeline:</span>
+                      <span className="text-[9px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Verification Pipeline:</span>
                       {diagnosticResult.steps?.map((step: any, sIdx: number) => (
                         <div 
                           key={sIdx}
@@ -780,9 +780,9 @@ export default function AIChat({
                           <div className="space-y-1 flex-1 min-w-0">
                             <div className="flex justify-between items-center">
                               <p className="text-xs font-extrabold text-slate-200 leading-normal truncate">{step.name}</p>
-                              <span className="text-[9px] font-mono text-slate-500 font-bold shrink-0">{step.durationMs}ms</span>
+                              <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400 font-bold shrink-0">{step.durationMs}ms</span>
                             </div>
-                            <p className="text-[10px] text-slate-400 leading-normal font-semibold">{step.details}</p>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-normal font-semibold">{step.details}</p>
                           </div>
                         </div>
                       ))}
@@ -808,7 +808,7 @@ export default function AIChat({
                               <p key={mIdx}>• {m.name} ({m.strength}) - {m.frequency}</p>
                             ))
                           ) : (
-                            <p className="text-slate-500 italic">No medication found in test context</p>
+                            <p className="text-slate-500 dark:text-slate-400 italic">No medication found in test context</p>
                           )}
                         </div>
                         <div className="pt-2">
@@ -818,7 +818,7 @@ export default function AIChat({
                               <p key={fIdx}>• "{f.name}" (Cosine Similarity: {(f.similarity * 100).toFixed(1)}%)</p>
                             ))
                           ) : (
-                            <p className="text-slate-500 italic">No matching reports found</p>
+                            <p className="text-slate-500 dark:text-slate-400 italic">No matching reports found</p>
                           )}
                         </div>
                       </div>
@@ -826,8 +826,8 @@ export default function AIChat({
                   </div>
                 ) : (
                   !runningDiagnostics && (
-                    <div className="text-center py-10 text-slate-500 space-y-2 border border-dashed border-slate-800 rounded-2xl bg-slate-950/20">
-                      <CheckSquare className="w-8 h-8 text-slate-700 mx-auto" />
+                    <div className="text-center py-10 text-slate-500 dark:text-slate-400 space-y-2 border border-dashed border-slate-800 rounded-2xl bg-slate-950/20">
+                      <CheckSquare className="w-8 h-8 text-slate-700 dark:text-slate-500 mx-auto" />
                       <p className="text-xs font-semibold">Test suite has not been executed yet.</p>
                     </div>
                   )
@@ -855,12 +855,12 @@ export default function AIChat({
                   <Database className="w-4 h-4 text-primary" />
                   <div>
                     <h4 className="font-bold text-xs uppercase tracking-wider">Transparency Panel</h4>
-                    <p className="text-[9px] text-slate-400 font-semibold">Agent Audit Logs & Grounding</p>
+                  <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold">Agent Audit Logs & Grounding</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setShowAudit(false)}
-                  className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg cursor-pointer"
+                  className="p-1 text-slate-400 dark:text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -869,7 +869,7 @@ export default function AIChat({
               {/* Mobile Search */}
               <div className="p-3 bg-slate-900 border-b border-slate-800 shrink-0">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-3.5 h-3.5" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 w-3.5 h-3.5" />
                   <input 
                     type="text"
                     placeholder="Search logs..."
@@ -896,7 +896,7 @@ export default function AIChat({
                           <p className="text-xs font-bold text-slate-200 truncate max-w-[180px]">
                             Query: "{log.query}"
                           </p>
-                          <span className="text-[8px] text-slate-500 font-semibold">
+                          <span className="text-[8px] text-slate-500 dark:text-slate-400 font-semibold">
                             {new Date(log.timestamp).toLocaleTimeString()}
                           </span>
                         </div>
@@ -910,7 +910,7 @@ export default function AIChat({
                               Alert
                             </span>
                           )}
-                          {isExpanded ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+                          {isExpanded ? <ChevronDown className="w-4 h-4 text-slate-400 dark:text-slate-500" /> : <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />}
                         </div>
                       </div>
 
@@ -930,7 +930,7 @@ export default function AIChat({
                                 <p key={idx}>• {f.name} (Match: {(f.similarity * 100).toFixed(0)}%)</p>
                               ))
                             ) : (
-                              <p className="text-slate-500 italic">None matched.</p>
+                              <p className="text-slate-500 dark:text-slate-400 italic">None matched.</p>
                             )}
                           </div>
 

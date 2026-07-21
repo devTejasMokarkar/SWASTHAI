@@ -330,7 +330,7 @@ export default function HealthFiles({
         </div>
 
         {/* Days grid */}
-        <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400">
+        <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 dark:text-slate-500">
           {weekdays.map((wd) => (
             <div key={wd} className="py-1">
               {wd}
@@ -620,7 +620,7 @@ export default function HealthFiles({
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${rem.type === "blood_sugar" ? "bg-pink-500" : "bg-rose-500"}`}></span>
                           <p className="text-xs font-extrabold text-on-surface dark:text-slate-100 truncate" title={rem.label}>{rem.label}</p>
                         </div>
-                        <span className="text-[10px] text-slate-400 font-bold flex flex-wrap items-center gap-1.5 leading-none">
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold flex flex-wrap items-center gap-1.5 leading-none">
                           <Clock className="w-3 h-3 shrink-0" />
                           <span>{rem.time}</span>
                           <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -628,7 +628,7 @@ export default function HealthFiles({
                           {rem.frequency === "weekly" && rem.days && rem.days.length < 7 && (
                             <>
                               <span className="text-slate-300 dark:text-slate-700">•</span>
-                              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[90px]" title={rem.days.join(", ")}>
+                              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[140px]" title={rem.days.join(", ")}>
                                 {rem.days.join(", ")}
                               </span>
                             </>
@@ -662,7 +662,7 @@ export default function HealthFiles({
                         <button
                           type="button"
                           onClick={() => onDeleteReminder && onDeleteReminder(rem.id)}
-                          className="p-1 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                          className="p-1 text-slate-400 dark:text-slate-500 hover:text-red-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -694,7 +694,7 @@ export default function HealthFiles({
                     <span className="text-xs font-bold text-pink-600 dark:text-pink-400">
                       Filtered: {selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
-                    <span className="text-xs text-slate-400 font-bold">
+                          <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">
                       ({vitalsReadings.filter((r) => {
                         const rDate = new Date(r.timestamp);
                         return (
@@ -718,7 +718,7 @@ export default function HealthFiles({
               <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">
                       <th className="py-2 w-[35%] min-w-[100px]">Date/Time</th>
                       <th className="py-2 w-[15%]">Vitals Type</th>
                       <th className="py-2 text-right w-[20%]">Value Recorded</th>
@@ -813,7 +813,7 @@ export default function HealthFiles({
 
                 <form onSubmit={handleCreateReminderSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
+                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
                       Vitals Parameter Check
                     </label>
                     <div className="flex p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/40 rounded-xl">
@@ -843,7 +843,7 @@ export default function HealthFiles({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
+                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
                       Check Schedule Time
                     </label>
                     <input
@@ -856,7 +856,7 @@ export default function HealthFiles({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
+                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
                       Recurrence Frequency
                     </label>
                     <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/40 rounded-xl">
@@ -915,7 +915,7 @@ export default function HealthFiles({
 
                   {newReminderFrequency === "monthly" && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
+                      <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
                         Day of Month
                       </label>
                       <select
@@ -941,7 +941,7 @@ export default function HealthFiles({
                   )}
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
+                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
                       Custom Friendly Name <span className="text-[10px] text-slate-400 lowercase">(optional)</span>
                     </label>
                     <input
@@ -1128,7 +1128,7 @@ export default function HealthFiles({
                     <div className="relative">
                       <button 
                         onClick={() => setActiveMenuId(activeMenuId === file.id ? null : file.id)}
-                        className="text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200 p-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                        className="text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                       >
                         <MoreVertical className="w-5 h-5" />
                       </button>
