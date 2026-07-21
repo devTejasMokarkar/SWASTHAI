@@ -10,17 +10,18 @@
       "dietaryPreferences": [
         "No Preferences"
       ],
-      "credits": 147,
+      "credits": 145,
       "vitalityScoreUp": 12,
-      "sleepRecovery": "7h 45m"
+      "sleepRecovery": "7h 45m",
+      "sugarUnitPreference": "mg/dL"
     }
   ],
   "smartActions": {
     "sarah-session-token": {
       "waterLoggedMl": 1500,
       "waterGoalMl": 2500,
-      "vitaminD": false,
-      "breathing": false
+      "vitaminD": true,
+      "breathing": true
     }
   },
   "vitals": {
@@ -4766,33 +4767,23 @@
       "messages": [
         {
           "sender": "user",
-          "text": "hi",
-          "timestamp": "2026-07-21T06:50:30.496Z"
+          "text": "Suggest Vegetarian and Gluten-Free recipes",
+          "timestamp": "2026-07-21T14:57:36.619Z"
         },
         {
           "sender": "ai",
-          "text": "Good afternoon, Sarah! It's great to connect with you today.\n\nI see from your health records that you're currently on a course of Amoxicillin, which is an antibiotic used to treat bacterial infections. It's important to complete the full course as prescribed, even if you start feeling better before the medication is finished. \n\nGiven your recent chest X-ray results, it's reassuring that no acute abnormalities were detected. However, if you're experiencing any respiratory symptoms like a persistent cough or difficulty breathing, it's best to consult your physician for a thorough evaluation. \n\nAs for your daily routine, your step count is impressive, and you've burned a good amount of calories! Maintaining an active lifestyle is beneficial for overall health. \n\nHere's a quick dietary suggestion for the evening: Consider a balanced dinner with whole-wheat chapatis, a light vegetable curry, and some rice. This meal can provide a good source of carbohydrates and essential nutrients. \n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. If you have any concerns about your medication or symptoms, please seek professional advice promptly.\n\n**RAG Citation:**\n- Amoxicillin Prescription\n- Chest X-Ray_Left\n- Medications: Lisinopril, Metformin, Atorvastatin",
-          "timestamp": "2026-07-21T06:50:37.713Z"
+          "text": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood Evening, Sarah! I'm He-Co, here to help you with some healthy and delicious vegetarian gluten-free dinner ideas. \n\nGiven your request and the time of day, I'd be happy to suggest a nutritious dinner option. For a balanced vegetarian and gluten-free meal, you could try:\n\n- **Gluten-Free Chapati**: You can make these using a mix of rice flour, sorghum flour, and water. \n - **Lentil Curry**: A hearty lentil curry made with spices, onions, tomatoes, and a variety of vegetables like carrots, beans, and spinach. \n - **Rice**: Opt for brown rice for added fiber and nutrients. \n\nThis meal provides a good balance of carbohydrates, proteins, and essential vitamins and minerals. Remember to listen to your body and adjust portion sizes accordingly. \n\nSince you're taking Metformin, it's important to maintain a balanced diet and monitor your blood sugar levels. Always consult a healthcare professional or a registered dietitian for personalized dietary advice, especially if you have specific health concerns or conditions. \n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. \n\n**RAG Citation:**\n- Medications: Lisinopril, Metformin, Atorvastatin\n- Files: \"Full Blood Panel.pdf\"",
+          "timestamp": "2026-07-21T14:57:46.426Z"
         },
         {
           "sender": "user",
           "text": "hi",
-          "timestamp": "2026-07-21T10:14:06.716Z"
+          "timestamp": "2026-07-21T15:05:56.631Z"
         },
         {
           "sender": "ai",
-          "text": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood afternoon, Sarah! I'm here to offer some pre-consultation support and wellness advice. \n\nIt's great to see that you're staying active, as evidenced by your impressive step count and calorie burn. Keeping up this level of physical activity is an excellent way to maintain your health. \n\nRegarding your diet, especially with your history of Metformin use, it's important to be mindful of your blood sugar levels. For dinner, I recommend a balanced meal that includes whole-wheat chapatis, a light vegetable curry, and some rice. This combination provides a good balance of carbohydrates and nutrients without causing a significant spike in blood glucose levels. \n\nFor now, I encourage you to focus on natural remedies and lifestyle adjustments. If you're experiencing any symptoms or have concerns about your medication, it's always best to consult your physician. \n\nRAG Citation: \n- Amoxicillin Prescription\n- Chest X-Ray_Left\n- Medications: Lisinopril, Metformin, Atorvastatin\n\n⚠️ **Disclaimer**: Swasth-AI acts as a pre-consultation health companion and home-remedy suggestor for minor issues. It does not replace a physical physician or provide formal medical diagnoses. For any major, severe, or persistent symptoms, please seek professional care or consult a doctor immediately.",
-          "timestamp": "2026-07-21T10:14:12.974Z"
-        },
-        {
-          "sender": "user",
-          "text": "📊 [Quick Log] Logged Blood Sugar: 130 mg/dL (Random)",
-          "timestamp": "2026-07-21T10:31:44.959Z"
-        },
-        {
-          "sender": "ai",
-          "text": "### Vitals Analysis (Normal Blood Sugar)\n* **Status:** This reading is **within standard reference limits** (Normal Blood Sugar).\n* **Trend:** Your blood sugar has decreased (-12 mg/dL equivalent) compared to your previous log of 142 mg/dL taken on 7/20/2026.\n* **Actionable Lifestyle Note:** Great reading! Consistent hydration with pure water supports insulin sensitivity and smooth energy delivery.\n\n*Disclaimer: This feedback is provided for general information and educational purposes only. It is not a medical diagnosis, treatment recommendation, or prescription change. Please consult with your physician or a qualified healthcare provider for personalized clinical plans.*",
-          "timestamp": "2026-07-21T10:31:44.960Z"
+          "text": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood Evening, Sarah! It's great to hear from you again. \n\nFor dinner, I'd be delighted to offer some healthy and tasty vegetarian gluten-free options, especially considering your dietary preferences and medical context. \n\n- **Gluten-Free Flatbread**: You can prepare these using a blend of rice flour and sorghum flour, which are naturally gluten-free. This ensures a safe and tasty alternative to traditional wheat-based flatbreads. \n\n- **Spiced Lentil Stew**: A warm and comforting dish, this lentil stew can be made with a variety of lentils (like red or green lentils) cooked with aromatic spices, garlic, and ginger. Add some chopped tomatoes and a mix of vegetables such as carrots, peas, and cauliflower for added flavor and nutrition. \n\n- **Brown Rice**: As a side dish, brown rice is an excellent source of complex carbohydrates and fiber. It complements the meal and helps maintain stable blood sugar levels, which is particularly important for individuals with diabetes or those taking medications like Metformin. \n\nThis dinner suggestion aligns with your dietary needs and provides a balanced meal. Remember, it's always best to consult a healthcare professional or a dietitian for personalized advice, especially if you have specific health goals or concerns. \n\n**RAG Citation**:\n- Medications: Lisinopril, Metformin, Atorvastatin\n- Files: \"Amoxicillin Prescription.png\", \"Chest X-Ray_Left.dicom\", \"Immunization Record.pdf\"\n\n⚠️ **Disclaimer**: Swasth-AI acts as a pre-consultation health companion and home-remedy suggestor for minor issues. It does not replace a physical physician or provide formal medical diagnoses. For any major, severe, or persistent symptoms, please seek professional care or consult a doctor immediately.",
+          "timestamp": "2026-07-21T15:06:04.598Z"
         }
       ]
     }
@@ -4920,6 +4911,126 @@
     }
   ],
   "agentCalls": [
+    {
+      "id": "call-261fda2c-af8d-4621-b9d7-48a6b12cef14",
+      "userId": "sarah-session-token",
+      "query": "hi",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Amoxicillin Prescription.png",
+            "similarity": 0.9933978226847748,
+            "aiInsight": "Course: 250mg, 3x daily. Ends in 3 days."
+          },
+          {
+            "name": "Chest X-Ray_Left.dicom",
+            "similarity": 0.9496691299472938,
+            "aiInsight": "No acute abnormalities detected. Comparison to 2022 stable."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": 0.8998117115612907,
+            "aiInsight": "Tetanus booster due in 18 months."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood Evening, Sarah! It's great to hear from you again. \n\nFor dinner, I'd be delighted to offer some healthy and tasty vegetarian gluten-free options, especially considering your dietary preferences and medical context. \n\n- **Gluten-Free Flatbread**: You can prepare these using a blend of rice flour and sorghum flour, which are naturally gluten-free. This ensures a safe and tasty alternative to traditional wheat-based flatbreads. \n\n- **Spiced Lentil Stew**: A warm and comforting dish, this lentil stew can be made with a variety of lentils (like red or green lentils) cooked with aromatic spices, garlic, and ginger. Add some chopped tomatoes and a mix of vegetables such as carrots, peas, and cauliflower for added flavor and nutrition. \n\n- **Brown Rice**: As a side dish, brown rice is an excellent source of complex carbohydrates and fiber. It complements the meal and helps maintain stable blood sugar levels, which is particularly important for individuals with diabetes or those taking medications like Metformin. \n\nThis dinner suggestion aligns with your dietary needs and provides a balanced meal. Remember, it's always best to consult a healthcare professional or a dietitian for personalized advice, especially if you have specific health goals or concerns. \n\n**RAG Citation**:\n- Medications: Lisinopril, Metformin, Atorvastatin\n- Files: \"Amoxicillin Prescription.png\", \"Chest X-Ray_Left.dicom\", \"Immunization Record.pdf\"\n\n⚠️ **Disclaimer**: Swasth-AI acts as a pre-consultation health companion and home-remedy suggestor for minor issues. It does not replace a physical physician or provide formal medical diagnoses. For any major, severe, or persistent symptoms, please seek professional care or consult a doctor immediately.",
+      "safetyWarnings": [
+        "Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves."
+      ],
+      "timestamp": "2026-07-21T15:06:04.598Z"
+    },
+    {
+      "id": "call-3a2d3d29-0e54-421f-af5d-0bd2e09b5adf",
+      "userId": "sarah-session-token",
+      "query": "Suggest Vegetarian and Gluten-Free recipes",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Full Blood Panel.pdf",
+            "similarity": 0.5262097580082393,
+            "aiInsight": "Vitamin D levels are optimal. Slight decrease in Ferritin noted."
+          },
+          {
+            "name": "ECG-Resting-12-Lead.png",
+            "similarity": 0.4089932400211825,
+            "aiInsight": "Normal Sinus Rhythm. Avg HR: 64 BPM."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": -0.27602311770800786,
+            "aiInsight": "Tetanus booster due in 18 months."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood Evening, Sarah! I'm He-Co, here to help you with some healthy and delicious vegetarian gluten-free dinner ideas. \n\nGiven your request and the time of day, I'd be happy to suggest a nutritious dinner option. For a balanced vegetarian and gluten-free meal, you could try:\n\n- **Gluten-Free Chapati**: You can make these using a mix of rice flour, sorghum flour, and water. \n - **Lentil Curry**: A hearty lentil curry made with spices, onions, tomatoes, and a variety of vegetables like carrots, beans, and spinach. \n - **Rice**: Opt for brown rice for added fiber and nutrients. \n\nThis meal provides a good balance of carbohydrates, proteins, and essential vitamins and minerals. Remember to listen to your body and adjust portion sizes accordingly. \n\nSince you're taking Metformin, it's important to maintain a balanced diet and monitor your blood sugar levels. Always consult a healthcare professional or a registered dietitian for personalized dietary advice, especially if you have specific health concerns or conditions. \n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. \n\n**RAG Citation:**\n- Medications: Lisinopril, Metformin, Atorvastatin\n- Files: \"Full Blood Panel.pdf\"",
+      "safetyWarnings": [
+        "Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves."
+      ],
+      "timestamp": "2026-07-21T14:57:46.426Z"
+    },
     {
       "id": "call-95653786-a43d-4ea2-9340-8757aa1d9bd9",
       "userId": "sarah-session-token",
@@ -6264,6 +6375,22 @@
     }
   ],
   "creditLogs": [
+    {
+      "id": "log-99c031fb-2650-40ad-8af1-196eb139ccef",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"hi\"",
+      "timestamp": "2026-07-21T15:05:56.631Z",
+      "remaining": 145
+    },
+    {
+      "id": "log-d0ba89aa-f246-42c0-a118-04dc62ff8c74",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"Suggest Vegetarian and Gluten-...\"",
+      "timestamp": "2026-07-21T14:57:36.619Z",
+      "remaining": 146
+    },
     {
       "id": "log-29fcc70e-f881-47a1-bdc8-2cdbeb616beb",
       "userId": "sarah-session-token",

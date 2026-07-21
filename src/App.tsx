@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { User, SmartActions, Vitals, FileRecord, Medication, ChatMessage } from "./types";
-import { 
-  Heart, Calendar, FolderOpen, MessageSquare, User as UserIcon, Sparkles, 
+import {
+  Heart, Calendar, FolderOpen, MessageSquare, User as UserIcon, Sparkles,
   ShieldAlert, CheckCircle2, LogOut, Menu, X, Lock, Key, AlertCircle, Activity,
   Sun, Moon, Download, Home
 } from "lucide-react";
@@ -261,7 +261,7 @@ export default function App() {
       });
       if (res.ok) {
         const data = await res.json();
-        
+
         // Reload chat history if we logged a vital reading to see it in the thread
         const chatsRes = await fetch("/api/gemini/chat", { headers: { Authorization: `Bearer ${token}` } });
         if (chatsRes.ok) {
@@ -273,7 +273,7 @@ export default function App() {
         if (data.reading) {
           setVitalsReadings(prev => [data.reading, ...prev]);
         }
-        
+
         // Update vitals steps or heartRate if returned or relevant
         if (data.reading && data.reading.pulse) {
           setVitals(prev => ({ ...prev, heartRate: data.reading.pulse }));
@@ -549,7 +549,7 @@ export default function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: msg,
           clientDateTime: new Date().toISOString()
         }),
@@ -588,7 +588,7 @@ export default function App() {
     switch (activeTab) {
       case "today":
         return (
-          <Dashboard 
+          <Dashboard
             user={user}
             smartActions={smartActions}
             vitals={vitals}
@@ -600,7 +600,7 @@ export default function App() {
         );
       case "files":
         return (
-          <HealthFiles 
+          <HealthFiles
             files={files}
             onAddFile={handleAddFile}
             onDeleteFile={handleDeleteFile}
@@ -618,7 +618,7 @@ export default function App() {
         );
       case "chat":
         return (
-          <AIChat 
+          <AIChat
             chatHistory={chatHistory}
             onSendMessage={handleSendMessage}
             onClearChat={handleClearChat}
@@ -630,7 +630,7 @@ export default function App() {
         );
       case "profile":
         return (
-          <ProfileSetup 
+          <ProfileSetup
             user={user}
             onSaveProfile={handleSaveProfile}
             onFinishOnboarding={() => setActiveTab("today")}
@@ -652,7 +652,7 @@ export default function App() {
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10 animate-pulse"></div>
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl -z-10 animate-pulse"></div>
           <div className="absolute top-4 right-4 z-20">
-            <button 
+            <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant transition-colors cursor-pointer"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
@@ -661,7 +661,7 @@ export default function App() {
             </button>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             className="w-full max-w-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-xl shadow-slate-900/5 dark:shadow-black/20 relative"
@@ -690,7 +690,7 @@ export default function App() {
                   <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">
                     Full Name
                   </label>
-                  <input 
+                  <input
                     type="text"
                     required
                     placeholder="e.g. Sarah"
@@ -705,7 +705,7 @@ export default function App() {
                 <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">
                   Email Address
                 </label>
-                <input 
+                <input
                   type="email"
                   required
                   placeholder="sarah@companion.com"
@@ -719,7 +719,7 @@ export default function App() {
                 <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">
                   Password
                 </label>
-                <input 
+                <input
                   type="password"
                   required
                   placeholder="••••••••"
@@ -729,7 +729,7 @@ export default function App() {
                 />
               </div>
 
-              <button 
+              <button
                 type="submit"
                 disabled={authLoading}
                 className="w-full h-12 bg-primary hover:bg-primary-container text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/15 transition-all disabled:opacity-50 active:scale-95"
@@ -739,7 +739,7 @@ export default function App() {
             </form>
 
             <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs">
-              <button 
+              <button
                 type="button"
                 onClick={() => setIsLoginView(!isLoginView)}
                 className="text-primary font-bold hover:underline"
@@ -763,7 +763,7 @@ export default function App() {
         </div>
       ) : (
         /* CORE APPLICATION CHASSIS */
-        <div className="min-h-screen flex flex-col pb-32">
+        <div className="h-dvh flex flex-col pb-32 overflow-hidden">
           {/* TOP HEADER */}
           <header className="fixed top-0 w-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 z-50 flex justify-between items-center px-4 md:px-12 h-16 shadow-sm transition-colors duration-300">
             <div className="flex items-center gap-2 md:gap-3 min-w-0">
@@ -782,9 +782,9 @@ export default function App() {
               )}
 
               {/* Export Data Button */}
-              <button 
+              <button
                 onClick={handleExportData}
-                className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 bg-primary/10 dark:bg-primary/20 hover:bg-primary/15 text-primary rounded-xl text-xs font-black transition-all hover:scale-[1.02] cursor-pointer shadow-sm border border-primary/10"
+                className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-transparent hover:bg-primary/5 text-primary border-2 border-primary/30 hover:border-primary rounded-xl text-xs font-black transition-all hover:scale-[1.02] cursor-pointer shadow-sm"
                 title="Export Health Data Report"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -792,7 +792,7 @@ export default function App() {
               </button>
 
               {/* Theme Toggle Button */}
-              <button 
+              <button
                 onClick={() => setDarkMode(!darkMode)}
                 className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary rounded-lg transition-colors cursor-pointer"
                 title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
@@ -801,7 +801,7 @@ export default function App() {
               </button>
 
               {/* User Profile Button */}
-              <div 
+              <div
                 onClick={() => setActiveTab("profile")}
                 className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner cursor-pointer hover:border-primary transition-all relative group flex items-center justify-center bg-slate-50 dark:bg-slate-800"
                 title="Profile Settings"
@@ -810,7 +810,7 @@ export default function App() {
               </div>
 
               {/* Logout button */}
-              <button 
+              <button
                 onClick={handleLogout}
                 className="p-3 hover:bg-red-50 dark:hover:bg-red-950/30 text-on-surface-variant hover:text-red-500 rounded-lg transition-colors cursor-pointer"
                 title="Sign Out Securely"
@@ -821,10 +821,10 @@ export default function App() {
           </header>
 
           {/* MAIN DYNAMIC CANVAS */}
-          <main className="pt-24 px-4 md:px-12 max-w-[1440px] w-full mx-auto flex-1">
+          <main className="pt-24 px-4 md:px-12 max-w-[1440px] w-full mx-auto flex-1 flex flex-col min-h-0 overflow-y-auto">
             <AnimatePresence mode="wait">
               {user ? (
-                <div key={activeTab}>
+                <div key={activeTab} className="flex-1 flex flex-col min-h-0">
                   <ErrorBoundary>
                     {renderContent()}
                   </ErrorBoundary>
@@ -839,41 +839,37 @@ export default function App() {
 
           {/* BOTTOM RESPONSIVE NAVIGATION BAR */}
           <nav className="fixed bottom-0 left-0 w-full z-40 flex justify-around items-center h-20 px-4 pb-safe bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-xl rounded-t-2xl transition-colors duration-300">
-            <button 
+            <button
               onClick={() => setActiveTab("today")}
-              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${
-                activeTab === "today" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
-              }`}
+              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "today" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
+                }`}
             >
               <Home className="w-5 h-5" />
               <span className="text-[10px] font-bold mt-1">Home</span>
             </button>
 
-            <button 
+            <button
               onClick={() => setActiveTab("chat")}
-              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${
-                activeTab === "chat" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
-              }`}
+              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "chat" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
+                }`}
             >
               <MessageSquare className="w-5 h-5" />
               <span className="text-[10px] font-bold mt-1">Chat</span>
             </button>
 
-            <button 
+            <button
               onClick={() => setActiveTab("files")}
-              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${
-                activeTab === "files" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
-              }`}
+              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "files" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
+                }`}
             >
               <FolderOpen className="w-5 h-5" />
               <span className="text-[10px] font-bold mt-1">Health Files</span>
             </button>
 
-            <button 
+            <button
               onClick={() => setActiveTab("profile")}
-              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${
-                activeTab === "profile" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
-              }`}
+              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "profile" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
+                }`}
             >
               <UserIcon className="w-5 h-5" />
               <span className="text-[10px] font-bold mt-1">Profile</span>

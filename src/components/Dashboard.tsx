@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User, SmartActions, Vitals } from "../types";
-import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy } from "lucide-react";
+import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import SkeletonCard from "./SkeletonCard";
 import confetti from "canvas-confetti";
@@ -163,16 +163,12 @@ export default function Dashboard({
   let greetingSubtext = "";
   if (currentHour >= 5 && currentHour < 12) {
     greeting = "Good morning";
-    greetingSubtext = `Your vitality score is up by ${user.vitalityScoreUp || 12}% today. The AI recommends a light morning stretch based on your deep sleep recovery of ${user.sleepRecovery || "7h 45m"}.`;
   } else if (currentHour >= 12 && currentHour < 17) {
     greeting = "Good afternoon";
-    greetingSubtext = `Your vitality score is up by ${user.vitalityScoreUp || 12}% today. Ensure you're drinking water to stay hydrated! Your hydration progress is logged below.`;
   } else if (currentHour >= 17 && currentHour < 21) {
     greeting = "Good evening";
-    greetingSubtext = "";
   } else {
     greeting = "Good night";
-    greetingSubtext = `Your vitality score is up by ${user.vitalityScoreUp || 12}% today. Prioritize restful sleep to recover. The system has paused active notifications until morning.`;
   }
 
   const formattedDate = currentDateTime.toLocaleDateString("en-US", {
@@ -341,7 +337,7 @@ export default function Dashboard({
       </AnimatePresence>
 
       {/* Flash Greeting Section */}
-      <section className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6 relative overflow-hidden" id="greeting-section">
+      <section className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 relative overflow-hidden" id="greeting-section">
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
         <div className="relative z-10">
           <motion.h1 
@@ -385,17 +381,17 @@ export default function Dashboard({
         {/* Featured Insight Card: AI Diet Recommendation */}
         <div className="md:col-span-8 relative rounded-[2rem] p-[1px] overflow-hidden group hover:shadow-[0_20px_60px_-15px_rgba(59,130,246,0.3)] transition-all duration-500" id="ai-diet-recommendation-card">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-secondary/30 to-emerald-400/50 opacity-50 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
-          <div className="relative h-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2rem] p-7 md:p-8 flex flex-col justify-between border border-white/40 dark:border-slate-700/50">
-            <div className="relative z-10 flex flex-col h-full justify-between">
+          <div className="relative h-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2rem] p-5 md:p-8 flex flex-col gap-6 border border-white/40 dark:border-slate-700/50">
+            <div className="relative z-10 flex flex-col gap-6">
               <div>
-                <div className="flex justify-between items-start mb-6">
+                <div className="flex justify-between items-start">
                   <div>
                     <div className="flex flex-wrap gap-2.5 mb-3">
                       <span className="bg-gradient-to-r from-primary to-blue-500 text-white text-[10px] px-3.5 py-1.5 rounded-full font-black uppercase tracking-widest shadow-md">
                         Daily Analysis
                       </span>
                       <span className="bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] px-3.5 py-1.5 rounded-full font-black uppercase tracking-widest flex items-center gap-1 border border-amber-200 dark:border-amber-500/30">
-                        ⚡ 1 Credit/Day Auto-Deducted
+                        <Zap className="w-3 h-3" /> 1 Credit/Day Auto-Deducted
                       </span>
                       <span className={`text-[10px] px-3.5 py-1.5 rounded-full font-black uppercase tracking-widest shadow-sm border ${currentHour >= 5 && currentHour < 17 ? "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30" : "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30"}`}>
                         {user.dietaryPreferences?.some(p => p.toLowerCase().includes("diabet") || p.toLowerCase().includes("sugar") || p.toLowerCase().includes("glucose") || p.toLowerCase().includes("metformin")) ? "Diabetic Protocol" : "Balanced Protocol"}
@@ -420,18 +416,21 @@ export default function Dashboard({
                           <span className="text-xs font-black text-primary uppercase block mb-2 tracking-wide">Breakfast suggestion</span>
                           {user.dietaryPreferences?.some(p => p.toLowerCase().includes("diabet") || p.toLowerCase().includes("sugar") || p.toLowerCase().includes("glucose") || p.toLowerCase().includes("metformin")) ? (
                             <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
-                              🥣 Warm steel-cut oatmeal topped with sugar-free walnuts and chia seeds. <span className="text-rose-500 dark:text-rose-400 font-bold font-mono text-[11px] block mt-2 bg-rose-50 dark:bg-rose-500/10 p-2 rounded-lg border border-rose-100 dark:border-rose-500/20">⚠️ Glycemic spike control: No sweet fruits!</span>
+                              <Utensils className="w-4 h-4 inline-block mr-1 text-primary" />
+                              Warm steel-cut oatmeal topped with sugar-free walnuts and chia seeds. <span className="text-rose-500 dark:text-rose-400 font-bold font-mono text-[11px] block mt-2 bg-rose-50 dark:bg-rose-500/10 p-2 rounded-lg border border-rose-100 dark:border-rose-500/20"><ShieldAlert className="w-3 h-3 inline-block mr-1" />Glycemic spike control: No sweet fruits!</span>
                             </p>
                           ) : (
                             <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
-                              🍎 Fresh Whole Apple or sliced pear accompanied by simple high-fiber grains and mixed raw nuts.
+                              <Apple className="w-4 h-4 inline-block mr-1 text-primary" />
+                              Fresh Whole Apple or sliced pear accompanied by simple high-fiber grains and mixed raw nuts.
                             </p>
                           )}
                         </div>
                         <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/80 dark:to-slate-900/80 p-5 border border-slate-200/60 dark:border-slate-700/60 rounded-3xl shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
                           <span className="text-xs font-black text-secondary uppercase block mb-2 tracking-wide">Lunch suggestion</span>
                           <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
-                            🍛 Complete vegetarian balanced lunch: 2-3 soft whole-wheat chapatis, protein-packed lentil dal, seasonal dry curry, and a small portion of steamed brown rice.
+                              <Utensils className="w-4 h-4 inline-block mr-1 text-secondary" />
+                              Complete vegetarian balanced lunch: 2-3 soft whole-wheat chapatis, protein-packed lentil dal, seasonal dry curry, and a small portion of steamed brown rice.
                           </p>
                         </div>
                       </div>
@@ -442,26 +441,19 @@ export default function Dashboard({
                       <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/80 dark:to-slate-900/80 p-5 border border-slate-200/60 dark:border-slate-700/60 rounded-3xl shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
                         <span className="text-xs font-black text-primary uppercase block mb-2 tracking-wide">Dinner suggestion</span>
                         <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
-                          🍛 Light Evening Dinner: 1-2 soft chapatis paired with a healthy seasonal dry vegetable curry, nutritious warm dal, and a light portion of steamed rice. Take at least 2 hours before resting.
+                            <Utensils className="w-4 h-4 inline-block mr-1 text-primary" />
+                            Light Evening Dinner: 1-2 soft chapatis paired with a healthy seasonal dry vegetable curry, nutritious warm dal, and a light portion of steamed rice. Take at least 2 hours before resting.
                         </p>
                       </div>
                     </>
                   )}
                 </div>
-
-                {/* Home Remedy / Safety clause prioritization */}
-                <div className="mt-6 flex gap-3.5 items-start bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 p-4 rounded-2xl">
-                  <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-semibold">
-                    <span className="text-blue-600 dark:text-blue-400 font-black">Clinical Care Note:</span> Always prioritize proven supportive home remedies (such as solid physical rest, deep steam inhalation, warm salt-water gargling, and robust hydration) for minor self-limiting symptoms before seeking in-person clinical physician appointments.
-                  </p>
-                </div>
               </div>
-              
-              <div className="mt-8 flex flex-wrap gap-4 items-center">
+
+              <div className="mt-6 flex flex-wrap gap-4 items-center">
                 <button 
                   onClick={() => setShowFullReport(true)}
-                  className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary-container hover:to-blue-600 text-white px-7 py-3.5 rounded-2xl font-bold shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95 text-sm flex items-center gap-2.5 cursor-pointer w-full sm:w-auto justify-center"
+                  className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary-container hover:to-blue-600 text-white px-5 py-3 md:px-7 md:py-3.5 rounded-2xl font-bold shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95 text-sm flex items-center gap-2.5 cursor-pointer w-full sm:w-auto justify-center"
                   id="btn-view-report"
                 >
                   View Full Dietary Report
@@ -474,14 +466,14 @@ export default function Dashboard({
 
         {/* Smart Actions List */}
         <div className="md:col-span-4 flex flex-col justify-between gap-5" id="smart-actions-panel">
-          <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2">
+          <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2 pb-1.5">
             Smart Actions
           </h3>
 
           {/* Water log action */}
           <div 
             onClick={() => onUpdateWater(500)}
-            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-blue-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-[2rem] flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-1"
+            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-blue-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-5 rounded-[2rem] flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-1"
             id="action-water"
           >
             <div className="flex justify-between items-center w-full">
@@ -582,70 +574,51 @@ export default function Dashboard({
             </button>
           </div>
 
-          {/* Vitals Log Quick Action Card */}
-          <div 
-            onClick={() => setShowVitalsLogModal(true)}
-            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-pink-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-pink-100 dark:border-pink-900/30 p-5 rounded-[2rem] flex justify-between items-center group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(236,72,153,0.3)] hover:-translate-y-1"
-            id="action-log-vitals"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-100 to-pink-200 dark:from-pink-500/20 dark:to-pink-600/10 text-pink-500 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner group-hover:rotate-12">
-                <Heart className="w-6 h-6 fill-pink-500/20 dark:fill-pink-500/40" />
-              </div>
-              <div>
-                <p className="font-extrabold text-on-surface dark:text-white text-base">Log Vitals Reading</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">Sugar, pressure, or pulse</p>
-              </div>
-            </div>
-            <button className="w-10 h-10 rounded-xl border-2 border-pink-500/30 group-hover:border-pink-500 text-pink-500 flex items-center justify-center font-black transition-colors group-hover:bg-pink-500/5 shrink-0">
-              +
-            </button>
-          </div>
         </div>
       </div>
 
       {/* Health Insights Grid */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-6" id="vitals-grid">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" id="vitals-grid">
         {/* Heart Rate */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(239,68,68,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-heart-rate">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-100 to-red-200 dark:from-red-500/20 dark:to-red-600/10 text-red-600 flex items-center justify-center mb-5 shadow-inner group-hover:scale-110 transition-transform duration-300">
+        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 md:p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(239,68,68,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-heart-rate">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-100 to-red-200 dark:from-red-500/20 dark:to-red-600/10 text-red-600 flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
             <Heart className="w-6 h-6 fill-red-500/80 dark:fill-red-500 group-hover:animate-ping" />
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Heart Rate</p>
-          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
+          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-2 flex items-baseline gap-1">
             {vitals.heartRate} <span className="text-sm font-bold text-slate-400 dark:text-slate-500">BPM</span>
           </p>
         </div>
 
         {/* Steps */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-steps">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center mb-5 shadow-inner group-hover:scale-110 transition-transform duration-300">
+        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 md:p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-steps">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
             <Footprints className="w-6 h-6 text-primary group-hover:animate-bounce" />
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Steps</p>
-          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
+          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-2 flex items-baseline gap-1">
             {vitals.steps.toLocaleString()}
           </p>
         </div>
 
         {/* Sleep */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-sleep">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-secondary flex items-center justify-center mb-5 shadow-inner group-hover:scale-110 transition-transform duration-300">
-            <Moon className="w-6 h-6 fill-secondary/80 dark:fill-secondary group-hover:rotate-12 transition-transform" />
+        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 md:p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-sleep">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <Moon className="w-6 h-6 fill-purple-500/80 dark:fill-purple-400 group-hover:rotate-12 transition-transform" />
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sleep</p>
-          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
+          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-2 flex items-baseline gap-1">
             {vitals.sleep}
           </p>
         </div>
 
         {/* Calories */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(249,115,22,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-calories">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-tertiary flex items-center justify-center mb-5 shadow-inner group-hover:scale-110 transition-transform duration-300">
-            <Flame className="w-6 h-6 fill-tertiary/80 dark:fill-tertiary" />
+        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 md:p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(249,115,22,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-calories">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <Flame className="w-6 h-6 fill-orange-500/80 dark:fill-orange-400" />
           </div>
           <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Calories</p>
-          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1.5 flex items-baseline gap-1">
+          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-2 flex items-baseline gap-1">
             {vitals.calories} <span className="text-sm font-bold text-slate-400 dark:text-slate-500">kcal</span>
           </p>
         </div>
@@ -709,7 +682,7 @@ export default function Dashboard({
 
         <motion.button
           onClick={() => setFabOpen(!fabOpen)}
-          className="w-14 h-14 rounded-full bg-primary text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer relative"
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-xl hover:shadow-rose-500/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer relative"
           title={fabOpen ? "Close" : "Log Vitals"}
           id="heart-fab"
           animate={{ rotate: fabOpen ? 90 : 0 }}

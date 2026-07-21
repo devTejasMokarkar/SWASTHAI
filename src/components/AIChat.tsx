@@ -56,6 +56,16 @@ interface SafetyIssue {
   type: string;
 }
 
+function renderBold(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i} className="font-black text-on-surface dark:text-slate-100">{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
 function runClientClinicalSafetyValidator(text: string, user: User, meds: Medication[]): SafetyIssue[] {
   const issues: SafetyIssue[] = [];
   const lowerText = text.toLowerCase();
@@ -129,6 +139,7 @@ export default function AIChat({
   const [searchAuditQuery, setSearchAuditQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
@@ -136,7 +147,7 @@ export default function AIChat({
       const vh = window.innerHeight;
       const vp = window.visualViewport?.height || vh;
       const diff = vh - vp;
-      setKeyboardHeight(diff > 0 ? diff : 0);
+      setKeyboardHeight(diff > 50 ? diff : 0);
     };
     handleViewport();
     window.visualViewport?.addEventListener("resize", handleViewport);
@@ -195,6 +206,7 @@ export default function AIChat({
 
   const handleSuggestedQuery = async (query: string) => {
     setUserInput(query);
+    inputRef.current?.focus();
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -234,9 +246,8 @@ export default function AIChat({
 
   return (
     <div
-      className="flex flex-col md:flex-row gap-6 max-w-7xl mx-auto relative"
+      className="flex flex-col md:flex-row gap-6 max-w-7xl mx-auto relative flex-1 min-h-0"
       id="ai-chat-view-container"
-      style={{ height: keyboardHeight > 0 ? `calc(100vh - ${keyboardHeight}px)` : undefined }}
     >
       {/* Primary Chat Interface */}
       <motion.div
@@ -248,32 +259,32 @@ export default function AIChat({
         id="ai-chat-view"
       >
         {/* Companion Title Header */}
-        <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-transparent border-b border-slate-100 dark:border-slate-800 p-5 flex items-center gap-3 shrink-0">
-          <div className="w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/10">
-            <Sparkles className="w-5 h-5 fill-white/20 animate-pulse" />
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-4 md:px-5 py-3 md:py-4 flex items-center gap-3 shrink-0">
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-white flex items-center justify-center shadow-lg shadow-primary/20">
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 fill-white/20" />
           </div>
-          <div>
-            <h3 className="font-bold text-sm text-on-surface dark:text-slate-100 flex items-center gap-1.5">
+          <div className="min-w-0">
+            <h3 className="font-bold text-sm md:text-base text-on-surface dark:text-slate-100 truncate">
               He-Co • Clinical Companion
             </h3>
-            <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1 mt-0.5">
-              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
-              Online • HIPAA Secure Proxy
+            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+              Online • HIPAA Secure
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => setShowAudit(!showAudit)}
-            className={`ml-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+            className={`ml-auto flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-3.5 md:py-2 rounded-xl text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer shrink-0 ${
               showAudit 
                 ? "bg-primary text-white shadow-md shadow-primary/25" 
-                : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:scale-105 active:scale-95"
+                : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:scale-105 active:scale-95"
             }`}
             id="btn-toggle-rag-audit"
           >
             <Database className="w-3.5 h-3.5" />
-            <span>RAG Audit Trails</span>
+            <span className="hidden sm:inline">Audit</span>
             {auditLogs.length > 0 && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${showAudit ? "bg-white/20 text-white" : "bg-primary/10 text-primary"}`}>
                 {auditLogs.length}
@@ -283,7 +294,33 @@ export default function AIChat({
         </div>
 
         {/* Message History area */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-5 space-y-4 min-h-0" id="chat-messages-container">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-3 md:px-5 py-4 md:py-5 space-y-3 md:space-y-4 min-h-0 scroll-smooth" id="chat-messages-container">
+          {chatHistory.length === 0 && !isLoading && (
+            <div className="flex flex-col items-center justify-center h-full text-center px-6 py-12">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-blue-500/10 text-primary flex items-center justify-center mb-5 shadow-inner">
+                <Sparkles className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-black text-on-surface dark:text-slate-100 mb-2">Ask me anything</h3>
+              <p className="text-sm text-on-surface-variant dark:text-slate-400 max-w-sm mb-8 leading-relaxed">
+                I can check drug interactions, explain lab results, suggest meals, and review your health records.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full max-w-xl">
+                {suggestions.map((sug, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSuggestedQuery(sug.text)}
+                    className="px-4 py-3 bg-slate-50 dark:bg-slate-950 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary hover:border-primary/30 border border-slate-200 dark:border-slate-800 text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer text-on-surface dark:text-slate-300 text-left leading-relaxed"
+                  >
+                    {sug.type === "conflict" && "💊 "}
+                    {sug.type === "report" && "📋 "}
+                    {sug.type === "diet" && "🥗 "}
+                    {sug.text}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {chatHistory.map((msg, index) => {
             const isAI = msg.sender === "ai";
             const text = msg.text || "";
@@ -301,8 +338,11 @@ export default function AIChat({
               }
             }
 
-            // Client-side clinical safety validation check
+            // Client-side clinical safety validation check — skip issues already flagged by server
             const clientSafetyIssues = isAI ? runClientClinicalSafetyValidator(regularContent, user, medications) : [];
+            const uniqueClientIssues = isSafetyAlert 
+              ? clientSafetyIssues.filter(i => !alertContent.toLowerCase().includes(i.type))
+              : clientSafetyIssues;
 
             // Find matching audit log for debug mode
             const precedingUserMsg = isAI && index > 0 ? chatHistory[index - 1] : null;
@@ -316,14 +356,19 @@ export default function AIChat({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className={`flex ${isAI ? "justify-start" : "justify-end"}`}
+                className={`flex items-end gap-2 md:gap-3 ${isAI ? "justify-start" : "justify-end"}`}
                 id={`chat-bubble-${index}`}
               >
+                {isAI && (
+                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white flex items-center justify-center shadow-md shrink-0 mb-1">
+                    <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 fill-white/20" />
+                  </div>
+                )}
                 <div 
-                  className={`max-w-[85%] p-4 rounded-2xl shadow-sm text-xs leading-relaxed ${
+                  className={`max-w-[85%] md:max-w-[75%] px-3.5 py-3 md:px-4 md:py-3.5 rounded-2xl shadow-sm text-xs md:text-sm leading-relaxed ${
                     isAI 
-                      ? "bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 text-on-surface dark:text-slate-200 rounded-tl-sm font-medium" 
-                      : "bg-primary text-white rounded-tr-sm font-semibold"
+                      ? "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-on-surface dark:text-slate-200 rounded-bl-sm font-medium" 
+                      : "bg-primary text-white rounded-br-sm font-semibold"
                   }`}
                 >
                   {/* Server-side Clinical Safety Alerts */}
@@ -342,14 +387,14 @@ export default function AIChat({
                   )}
 
                   {/* Client-side Clinical Safety Validator Warning Banner */}
-                  {isAI && clientSafetyIssues.length > 0 && (
+                  {isAI && uniqueClientIssues.length > 0 && (
                     <div className="mb-3.5 p-3 bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 rounded-r-xl shadow-sm flex flex-col gap-2">
                       <div className="flex items-center gap-1.5 text-xs text-amber-800 dark:text-amber-300 font-extrabold uppercase tracking-wide">
                         <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
                         <span>Client Safety Detector</span>
                       </div>
                       <div className="space-y-1.5 pl-5 text-[10px] leading-relaxed text-amber-900 dark:text-amber-200">
-                        {clientSafetyIssues.map((issue, idx) => (
+                        {uniqueClientIssues.map((issue, idx) => (
                           <div key={idx}>
                             <span className="font-extrabold">⚠️ {issue.alert}</span>
                             <span className="ml-1 opacity-80">{issue.action}</span>
@@ -367,14 +412,16 @@ export default function AIChat({
                       
                       // Filter out redundant disclaimer spam
                       if (tLine.includes("[Clinical Advice Disclaimer & Wellness Role]") || 
-                          tLine.includes("Always seek professional medical guidance. Swasth-AI is a wellness companion")) {
+                          tLine.includes("Always seek professional medical guidance. Swasth-AI is a wellness companion") ||
+                          tLine.includes("Swasth-AI provides pre-consultation information") ||
+                          tLine.includes("Swasth-AI is a wellness companion") ||
+                          tLine === "Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care.") {
                         return null;
                       }
                       
                       // Format RAG Citations nicely
-                      if (tLine.startsWith("RAG Citation:") || tLine.startsWith("*Swasth-AI Citations")) {
-                        const citationText = tLine.replace("RAG Citation:", "").replace("*Swasth-AI Citations*", "").trim();
-                        // Extract bracketed items
+                      if (tLine.startsWith("RAG Citation:") || tLine.startsWith("*Swasth-AI Citations") || tLine.startsWith("**RAG Citation:**")) {
+                        const citationText = tLine.replace("**RAG Citation:**", "").replace("RAG Citation:", "").replace("*Swasth-AI Citations*", "").trim();
                         const matches = citationText.match(/\[(.*?)\]/g) || [citationText];
                         return (
                           <div key={lIdx} className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/60">
@@ -398,7 +445,29 @@ export default function AIChat({
                         );
                       }
 
-                      return <p key={lIdx} className="leading-relaxed text-sm">{line}</p>;
+                      // Greeting line (Good Morning/Afternoon/Evening)
+                      if (/^(Good\s+(Morning|Afternoon|Evening))/i.test(tLine)) {
+                        const rest = tLine.replace(/^(Good\s+(Morning|Afternoon|Evening)[,!.]?)\s*/i, "");
+                        return (
+                          <p key={lIdx} className="leading-relaxed text-sm">
+                            <span className="text-primary font-black">{tLine.match(/^(Good\s+(Morning|Afternoon|Evening))/i)?.[0]}</span>
+                            {rest ? ` ${rest}` : ""}
+                          </p>
+                        );
+                      }
+
+                      // Bullet lines
+                      if (/^[-•*]\s/.test(tLine)) {
+                        const content = tLine.replace(/^[-•*]\s+/, "");
+                        return (
+                          <div key={lIdx} className="flex items-baseline gap-1.5 ml-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                            <span className="leading-relaxed text-sm flex-1">{renderBold(content)}</span>
+                          </div>
+                        );
+                      }
+
+                      return <p key={lIdx} className="leading-relaxed text-sm">{renderBold(line)}</p>;
                     })}
                   </div>
 
@@ -453,12 +522,14 @@ export default function AIChat({
           })}
 
           {isLoading && (
-            <div className="flex justify-start" id="chat-bubble-loading">
-              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl rounded-tl-sm text-xs text-on-surface-variant dark:text-slate-400 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></span>
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]"></span>
-                <span className="font-semibold text-[10px] ml-1 uppercase tracking-widest text-primary">Companion Thinking...</span>
+            <div className="flex items-end gap-3 justify-start" id="chat-bubble-loading">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white flex items-center justify-center shadow-md shrink-0 mb-1">
+                <Sparkles className="w-4 h-4 fill-white/20" />
+              </div>
+              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-4 py-3.5 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0s]"></span>
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.15s]"></span>
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.3s]"></span>
               </div>
             </div>
           )}
@@ -466,57 +537,50 @@ export default function AIChat({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Suggested Quick Queries list */}
-        {chatHistory.length <= 1 && (
-          <div className="px-5 py-2 overflow-x-auto shrink-0 flex gap-2 border-t border-slate-50 dark:border-slate-800" id="suggested-queries-bar">
-            {suggestions.map((sug, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleSuggestedQuery(sug.text)}
-                className="px-3.5 py-2 bg-slate-50 dark:bg-slate-950 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary hover:border-primary/30 border border-slate-200 dark:border-slate-800 text-[10px] font-bold rounded-xl transition-all whitespace-nowrap active:scale-95 cursor-pointer text-on-surface dark:text-slate-300"
-              >
-                {sug.text}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Input query field */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 shrink-0">
-          <div className="flex gap-2">
-            <input 
-              type="text"
-              required
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              onKeyDown={handleInputKeyDown}
-              placeholder="Query dosage rules, file findings, or nutritional advice..."
-              className="flex-1 h-12 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-semibold focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all text-on-surface dark:text-slate-100"
-            />
+        {/* Input Section */}
+        <div className="px-3 md:px-5 py-3 md:py-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="flex-1 relative">
+              <input 
+                type="text"
+                ref={inputRef}
+                required
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={handleInputKeyDown}
+                placeholder="Ask about medications, lab results, or diet..."
+                className="w-full h-11 md:h-12 px-4 pr-10 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-semibold focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600"
+              />
+              {userInput && (
+                <button
+                  type="button"
+                  onClick={() => setUserInput("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
             <button 
               type="button"
               onClick={(e) => void handleSend(e)}
               disabled={!userInput.trim() || isLoading}
-              className="w-12 h-12 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:shadow-primary/35 transition-all disabled:opacity-50 active:scale-95 shrink-0 cursor-pointer"
+              className="w-11 h-11 md:w-12 md:h-12 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:shadow-primary/35 transition-all disabled:opacity-40 active:scale-95 shrink-0 cursor-pointer"
             >
-              <Send className="w-5 h-5 fill-white/10" />
+              <Send className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
 
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1 px-1">
-              <Info className="w-3 h-3 text-on-surface-variant dark:text-slate-400" />
-              <span className="text-[9px] text-on-surface-variant dark:text-slate-400 font-medium">
-                AI medical companion guidance represents supplementary educational analysis. Consult actual physicians for diagnoses.
-              </span>
-            </div>
+          <div className="mt-2.5 flex items-center justify-between gap-2">
+            <p className="text-[9px] md:text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed">
+              AI guidance is educational — always consult your physician for medical decisions.
+            </p>
             <button
               type="button"
               onClick={onClearChat}
-              className="text-[10px] font-bold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-rose-500 hover:border-rose-300 dark:hover:border-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+              className="text-[10px] font-bold px-2.5 py-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors shrink-0 cursor-pointer"
             >
-              Clear Chat
+              Clear
             </button>
           </div>
         </div>
