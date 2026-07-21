@@ -11,6 +11,7 @@ interface AIChatProps {
   chatHistory: ChatMessage[];
   onSendMessage: (msg: string) => Promise<void>;
   onClearChat: () => Promise<void>;
+  onClose?: () => void;
   auditLogs?: any[];
   user: User;
   medications: Medication[];
@@ -60,7 +61,7 @@ function renderBold(text: string): React.ReactNode {
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i} className="font-black text-on-surface dark:text-slate-100">{part.slice(2, -2)}</strong>;
+      return <strong key={i} className="font-bold text-on-surface dark:text-slate-100">{part.slice(2, -2)}</strong>;
     }
     return part;
   });
@@ -127,6 +128,7 @@ export default function AIChat({
   chatHistory, 
   onSendMessage, 
   onClearChat,
+  onClose,
   auditLogs = [],
   user,
   medications,
@@ -255,67 +257,82 @@ export default function AIChat({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
         transition={{ duration: 0.4 }}
-        className={`flex flex-col h-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border border-slate-100 dark:border-slate-800/60 rounded-3xl overflow-hidden shadow-xl transition-all duration-300 flex-1`}
+        className="flex flex-col h-full bg-white dark:bg-slate-950/95 border border-slate-200/80 dark:border-slate-800/60 rounded-3xl overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)] flex-1"
         id="ai-chat-view"
       >
-        {/* Companion Title Header */}
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-4 md:px-5 py-3 md:py-4 flex items-center gap-3 shrink-0">
-          <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-white flex items-center justify-center shadow-lg shadow-primary/20">
-            <Sparkles className="w-4 h-4 md:w-5 md:h-5 fill-white/20" />
+        {/* Header */}
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/60 px-4 py-2 flex items-center gap-2.5 shrink-0">
+          <div className="w-7 h-7 rounded-[14px] bg-gradient-to-br from-primary to-blue-500 text-white flex items-center justify-center shadow-sm shrink-0">
+            <Sparkles className="w-3.5 h-3.5 fill-white/20" />
           </div>
-          <div className="min-w-0">
-            <h3 className="font-bold text-sm md:text-base text-on-surface dark:text-slate-100 truncate">
-              He-Co • Clinical Companion
+          <div className="min-w-0 flex-1">
+            <h3 className="font-bold text-sm text-on-surface dark:text-slate-100 truncate leading-tight">
+              He-Co
             </h3>
-            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 mt-0.5">
-              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-              Online • HIPAA Secure
+            <p className="text-[9px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1 leading-tight mt-0.5">
+              <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
+              HIPAA Secure
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => setShowAudit(!showAudit)}
-            className={`ml-auto flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-3.5 md:py-2 rounded-xl text-[10px] md:text-xs font-bold transition-all duration-200 cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1 px-2 py-1.5 rounded-[14px] text-[10px] font-semibold transition-all duration-200 cursor-pointer shrink-0 ${
               showAudit 
-                ? "bg-primary text-white shadow-md shadow-primary/25" 
-                : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:scale-105 active:scale-95"
+                ? "bg-primary/10 text-primary" 
+                : "text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300"
             }`}
             id="btn-toggle-rag-audit"
+            aria-label="Toggle audit trail"
           >
             <Database className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Audit</span>
             {auditLogs.length > 0 && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${showAudit ? "bg-white/20 text-white" : "bg-primary/10 text-primary"}`}>
+              <span className={`text-[9px] font-bold ${showAudit ? "text-primary" : "text-slate-400 dark:text-slate-500"}`}>
                 {auditLogs.length}
               </span>
             )}
           </button>
+
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-[14px] text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+              title="Close chat"
+              aria-label="Close chat"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
-        {/* Message History area */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-3 md:px-5 py-4 md:py-5 space-y-3 md:space-y-4 min-h-0 scroll-smooth" id="chat-messages-container">
+        {/* Messages */}
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-2 min-h-0 scroll-smooth" id="chat-messages-container">
           {chatHistory.length === 0 && !isLoading && (
-            <div className="flex flex-col items-center justify-center h-full text-center px-6 py-12">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-blue-500/10 text-primary flex items-center justify-center mb-5 shadow-inner">
-                <Sparkles className="w-8 h-8" />
+            <div className="flex flex-col items-center justify-center h-full text-center px-4">
+              <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-primary/10 to-blue-500/10 text-primary flex items-center justify-center mb-4 shadow-inner">
+                <Sparkles className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-black text-on-surface dark:text-slate-100 mb-2">Ask me anything</h3>
-              <p className="text-sm text-on-surface-variant dark:text-slate-400 max-w-sm mb-8 leading-relaxed">
-                I can check drug interactions, explain lab results, suggest meals, and review your health records.
+              <h3 className="text-base font-bold text-on-surface dark:text-slate-100 mb-1.5">Ask me anything</h3>
+              <p className="text-xs text-on-surface-variant dark:text-slate-400 max-w-xs mb-6 leading-relaxed">
+                Drug interactions, lab results, meal plans, and health records.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full max-w-xl">
+              <div className="grid grid-cols-1 gap-2 w-full max-w-sm">
                 {suggestions.map((sug, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleSuggestedQuery(sug.text)}
-                    className="px-4 py-3 bg-slate-50 dark:bg-slate-950 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary hover:border-primary/30 border border-slate-200 dark:border-slate-800 text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer text-on-surface dark:text-slate-300 text-left leading-relaxed"
+                    className="flex items-center gap-2.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-900/80 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary border border-slate-200 dark:border-slate-800 text-xs font-semibold rounded-2xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_2px_8px_-2px_rgba(79,70,229,0.15)] active:scale-[0.98] cursor-pointer text-on-surface dark:text-slate-300 text-left leading-relaxed"
+                    aria-label={sug.text}
                   >
-                    {sug.type === "conflict" && "💊 "}
-                    {sug.type === "report" && "📋 "}
-                    {sug.type === "diet" && "🥗 "}
-                    {sug.text}
+                    <span className="text-base shrink-0">
+                      {sug.type === "conflict" && "💊"}
+                      {sug.type === "report" && "📋"}
+                      {sug.type === "diet" && "🥗"}
+                    </span>
+                    <span className="flex-1">{sug.text}</span>
                   </button>
                 ))}
               </div>
@@ -356,29 +373,29 @@ export default function AIChat({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className={`flex items-end gap-2 md:gap-3 ${isAI ? "justify-start" : "justify-end"}`}
+                className={`flex items-end gap-2 ${isAI ? "justify-start" : "justify-end"}`}
                 id={`chat-bubble-${index}`}
               >
                 {isAI && (
-                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white flex items-center justify-center shadow-md shrink-0 mb-1">
-                    <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 fill-white/20" />
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white flex items-center justify-center shadow-md shrink-0 mb-0.5">
+                    <Sparkles className="w-3 h-3 fill-white/20" />
                   </div>
                 )}
                 <div 
-                  className={`max-w-[85%] md:max-w-[75%] px-3.5 py-3 md:px-4 md:py-3.5 rounded-2xl shadow-sm text-xs md:text-sm leading-relaxed ${
+                  className={`max-w-[88%] md:max-w-[82%] px-3 py-2 rounded-2xl text-xs leading-relaxed shadow-sm ${
                     isAI 
-                      ? "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-on-surface dark:text-slate-200 rounded-bl-sm font-medium" 
+                      ? "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/60 text-on-surface dark:text-slate-200 rounded-bl-sm font-medium" 
                       : "bg-primary text-white rounded-br-sm font-semibold"
                   }`}
                 >
-                  {/* Server-side Clinical Safety Alerts */}
+                  {/* Server Safety Alert */}
                   {isSafetyAlert && (
-                    <div className="mb-3 p-2.5 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl text-[11px] text-red-700 dark:text-red-400 font-semibold flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5 text-xs text-red-800 dark:text-red-300 font-bold uppercase tracking-wider">
-                        <ShieldAlert className="w-3.5 h-3.5 shrink-0 text-red-600" />
-                        <span>Server Safety Alert</span>
+                    <div className="mb-2 p-2 bg-red-50 dark:bg-red-950/20 border-l-[3px] border-red-500 rounded-r-lg text-[10px] text-red-700 dark:text-red-400 font-medium flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-[9px] text-red-800 dark:text-red-300 font-bold uppercase tracking-wider">
+                        <ShieldAlert className="w-3 h-3 shrink-0 text-red-600" />
+                        <span>Safety Alert</span>
                       </div>
-                      <div className="pl-5 text-[10px] opacity-90">
+                      <div className="pl-4 text-[9px] opacity-90 space-y-0.5">
                         {alertContent.split("\n").map((line, lIdx) => (
                           <p key={lIdx} className="leading-relaxed">{line}</p>
                         ))}
@@ -386,14 +403,14 @@ export default function AIChat({
                     </div>
                   )}
 
-                  {/* Client-side Clinical Safety Validator Warning Banner */}
+                  {/* Client Safety Validator */}
                   {isAI && uniqueClientIssues.length > 0 && (
-                    <div className="mb-3.5 p-3 bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 rounded-r-xl shadow-sm flex flex-col gap-2">
-                      <div className="flex items-center gap-1.5 text-xs text-amber-800 dark:text-amber-300 font-extrabold uppercase tracking-wide">
-                        <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                        <span>Client Safety Detector</span>
+                    <div className="mb-2 p-2 bg-amber-50 dark:bg-amber-950/20 border-l-[3px] border-amber-500 rounded-r-lg flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-[9px] text-amber-800 dark:text-amber-300 font-bold uppercase tracking-wide">
+                        <ShieldAlert className="w-3 h-3 shrink-0 text-amber-600 dark:text-amber-400" />
+                        <span>Safety Detector</span>
                       </div>
-                      <div className="space-y-1.5 pl-5 text-[10px] leading-relaxed text-amber-900 dark:text-amber-200">
+                      <div className="space-y-1 pl-4 text-[9px] leading-relaxed text-amber-900 dark:text-amber-200">
                         {uniqueClientIssues.map((issue, idx) => (
                           <div key={idx}>
                             <span className="font-extrabold">⚠️ {issue.alert}</span>
@@ -415,6 +432,7 @@ export default function AIChat({
                           tLine.includes("Always seek professional medical guidance. Swasth-AI is a wellness companion") ||
                           tLine.includes("Swasth-AI provides pre-consultation information") ||
                           tLine.includes("Swasth-AI is a wellness companion") ||
+                          tLine.includes("always consult your physician for medical decisions") ||
                           tLine === "Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care.") {
                         return null;
                       }
@@ -424,9 +442,9 @@ export default function AIChat({
                         const citationText = tLine.replace("**RAG Citation:**", "").replace("RAG Citation:", "").replace("*Swasth-AI Citations*", "").trim();
                         const matches = citationText.match(/\[(.*?)\]/g) || [citationText];
                         return (
-                          <div key={lIdx} className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/60">
+                          <div key={lIdx} className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/40">
                             {matches.map((match, mIdx) => (
-                              <span key={mIdx} className="bg-primary/10 text-primary dark:text-primary-container px-2 py-0.5 rounded-md text-[9px] font-bold flex items-center gap-1 border border-primary/20">
+                              <span key={mIdx} className="bg-primary/5 text-primary dark:text-primary-container px-2 py-0.5 rounded-lg text-[9px] font-semibold flex items-center gap-1 border border-primary/10">
                                 <Database className="w-2.5 h-2.5" />
                                 {match.replace(/\[|\]/g, "")}
                               </span>
@@ -450,7 +468,7 @@ export default function AIChat({
                         const rest = tLine.replace(/^(Good\s+(Morning|Afternoon|Evening)[,!.]?)\s*/i, "");
                         return (
                           <p key={lIdx} className="leading-relaxed text-sm">
-                            <span className="text-primary font-black">{tLine.match(/^(Good\s+(Morning|Afternoon|Evening))/i)?.[0]}</span>
+                            <span className="text-primary font-semibold">{tLine.match(/^(Good\s+(Morning|Afternoon|Evening))/i)?.[0]}</span>
                             {rest ? ` ${rest}` : ""}
                           </p>
                         );
@@ -513,7 +531,7 @@ export default function AIChat({
                     </div>
                   )}
 
-                  <span className={`text-[9px] block mt-2 text-right ${isAI ? "text-on-surface-variant dark:text-slate-400" : "text-white/70"}`}>
+                  <span className={`text-[8px] block mt-1.5 text-right ${isAI ? "text-on-surface-variant dark:text-slate-400" : "text-white/70"}`}>
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
@@ -522,14 +540,14 @@ export default function AIChat({
           })}
 
           {isLoading && (
-            <div className="flex items-end gap-3 justify-start" id="chat-bubble-loading">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white flex items-center justify-center shadow-md shrink-0 mb-1">
-                <Sparkles className="w-4 h-4 fill-white/20" />
+            <div className="flex items-end gap-2 justify-start" id="chat-bubble-loading">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-blue-500 text-white flex items-center justify-center shadow-sm shrink-0 mb-0.5">
+                <Sparkles className="w-3 h-3 fill-white/20" />
               </div>
-              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-4 py-3.5 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0s]"></span>
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.15s]"></span>
-                <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.3s]"></span>
+              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/60 px-3.5 py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0s]"></span>
+                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.15s]"></span>
+                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.3s]"></span>
               </div>
             </div>
           )}
@@ -537,8 +555,8 @@ export default function AIChat({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Section */}
-        <div className="px-3 md:px-5 py-3 md:py-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0">
+        {/* Input */}
+        <div className="px-4 py-2.5 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800/60 shrink-0">
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
               <input 
@@ -549,15 +567,17 @@ export default function AIChat({
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={handleInputKeyDown}
                 placeholder="Ask about medications, lab results, or diet..."
-                className="w-full h-11 md:h-12 px-4 pr-10 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-semibold focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                className="w-full h-10 px-4 pr-10 rounded-[18px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-medium focus:outline-none focus:border-primary/50 focus:ring-[3px] focus:ring-primary/10 transition-all duration-200 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                aria-label="Chat input"
               />
               {userInput && (
                 <button
                   type="button"
                   onClick={() => setUserInput("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md transition-colors cursor-pointer"
+                  aria-label="Clear input"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -565,20 +585,22 @@ export default function AIChat({
               type="button"
               onClick={(e) => void handleSend(e)}
               disabled={!userInput.trim() || isLoading}
-              className="w-11 h-11 md:w-12 md:h-12 rounded-xl bg-primary hover:bg-primary-container text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:shadow-primary/35 transition-all disabled:opacity-40 active:scale-95 shrink-0 cursor-pointer"
+              className="w-10 h-10 rounded-[14px] bg-primary hover:bg-primary-container text-white flex items-center justify-center shadow-sm hover:shadow-md hover:shadow-primary/20 transition-all duration-200 disabled:opacity-40 active:scale-[0.97] shrink-0 cursor-pointer"
+              aria-label="Send message"
             >
-              <Send className="w-4 h-4 md:w-5 md:h-5" />
+              <Send className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="mt-2.5 flex items-center justify-between gap-2">
-            <p className="text-[9px] md:text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed">
-              AI guidance is educational — always consult your physician for medical decisions.
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <p className="text-[9px] text-slate-400 dark:text-slate-500 text-center flex-1 leading-relaxed">
+              AI guidance is educational — always consult your physician.
             </p>
             <button
               type="button"
               onClick={onClearChat}
-              className="text-[10px] font-bold px-2.5 py-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors shrink-0 cursor-pointer"
+              className="text-[9px] font-semibold px-2 py-1 rounded-[14px] text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors shrink-0 cursor-pointer"
+              aria-label="Clear chat history"
             >
               Clear
             </button>

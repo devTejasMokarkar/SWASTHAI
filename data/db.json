@@ -4764,28 +4764,7 @@
   "chats": [
     {
       "userId": "sarah-session-token",
-      "messages": [
-        {
-          "sender": "user",
-          "text": "Suggest Vegetarian and Gluten-Free recipes",
-          "timestamp": "2026-07-21T14:57:36.619Z"
-        },
-        {
-          "sender": "ai",
-          "text": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood Evening, Sarah! I'm He-Co, here to help you with some healthy and delicious vegetarian gluten-free dinner ideas. \n\nGiven your request and the time of day, I'd be happy to suggest a nutritious dinner option. For a balanced vegetarian and gluten-free meal, you could try:\n\n- **Gluten-Free Chapati**: You can make these using a mix of rice flour, sorghum flour, and water. \n - **Lentil Curry**: A hearty lentil curry made with spices, onions, tomatoes, and a variety of vegetables like carrots, beans, and spinach. \n - **Rice**: Opt for brown rice for added fiber and nutrients. \n\nThis meal provides a good balance of carbohydrates, proteins, and essential vitamins and minerals. Remember to listen to your body and adjust portion sizes accordingly. \n\nSince you're taking Metformin, it's important to maintain a balanced diet and monitor your blood sugar levels. Always consult a healthcare professional or a registered dietitian for personalized dietary advice, especially if you have specific health concerns or conditions. \n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. \n\n**RAG Citation:**\n- Medications: Lisinopril, Metformin, Atorvastatin\n- Files: \"Full Blood Panel.pdf\"",
-          "timestamp": "2026-07-21T14:57:46.426Z"
-        },
-        {
-          "sender": "user",
-          "text": "hi",
-          "timestamp": "2026-07-21T15:05:56.631Z"
-        },
-        {
-          "sender": "ai",
-          "text": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood Evening, Sarah! It's great to hear from you again. \n\nFor dinner, I'd be delighted to offer some healthy and tasty vegetarian gluten-free options, especially considering your dietary preferences and medical context. \n\n- **Gluten-Free Flatbread**: You can prepare these using a blend of rice flour and sorghum flour, which are naturally gluten-free. This ensures a safe and tasty alternative to traditional wheat-based flatbreads. \n\n- **Spiced Lentil Stew**: A warm and comforting dish, this lentil stew can be made with a variety of lentils (like red or green lentils) cooked with aromatic spices, garlic, and ginger. Add some chopped tomatoes and a mix of vegetables such as carrots, peas, and cauliflower for added flavor and nutrition. \n\n- **Brown Rice**: As a side dish, brown rice is an excellent source of complex carbohydrates and fiber. It complements the meal and helps maintain stable blood sugar levels, which is particularly important for individuals with diabetes or those taking medications like Metformin. \n\nThis dinner suggestion aligns with your dietary needs and provides a balanced meal. Remember, it's always best to consult a healthcare professional or a dietitian for personalized advice, especially if you have specific health goals or concerns. \n\n**RAG Citation**:\n- Medications: Lisinopril, Metformin, Atorvastatin\n- Files: \"Amoxicillin Prescription.png\", \"Chest X-Ray_Left.dicom\", \"Immunization Record.pdf\"\n\n⚠️ **Disclaimer**: Swasth-AI acts as a pre-consultation health companion and home-remedy suggestor for minor issues. It does not replace a physical physician or provide formal medical diagnoses. For any major, severe, or persistent symptoms, please seek professional care or consult a doctor immediately.",
-          "timestamp": "2026-07-21T15:06:04.598Z"
-        }
-      ]
+      "messages": []
     }
   ],
   "scans": [

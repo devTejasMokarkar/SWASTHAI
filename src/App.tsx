@@ -16,7 +16,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("health_companion_token"));
-  const [activeTab, setActiveTab] = useState<"today" | "files" | "chat" | "profile">("today");
+  const [activeTab, setActiveTab] = useState<"today" | "files" | "profile">("today");
+  const [showChatOverlay, setShowChatOverlay] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const stored = localStorage.getItem("health_companion_dark");
@@ -616,18 +617,6 @@ export default function App() {
             onDeleteMedication={handleDeleteMedication}
           />
         );
-      case "chat":
-        return (
-          <AIChat
-            chatHistory={chatHistory}
-            onSendMessage={handleSendMessage}
-            onClearChat={handleClearChat}
-            auditLogs={auditLogs}
-            user={user}
-            medications={medications}
-            debugMode={debugMode}
-          />
-        );
       case "profile":
         return (
           <ProfileSetup
@@ -849,15 +838,6 @@ export default function App() {
             </button>
 
             <button
-              onClick={() => setActiveTab("chat")}
-              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "chat" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
-                }`}
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span className="text-[10px] font-bold mt-1">Chat</span>
-            </button>
-
-            <button
               onClick={() => setActiveTab("files")}
               className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "files" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
                 }`}
@@ -875,6 +855,42 @@ export default function App() {
               <span className="text-[10px] font-bold mt-1">Profile</span>
             </button>
           </nav>
+
+          {/* Floating AI Chat button */}
+          {user && (
+            <button
+              onClick={() => setShowChatOverlay(true)}
+              className="fixed left-6 bottom-28 md:bottom-24 z-30 w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-xl hover:shadow-rose-500/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              title="Ask He-Co AI"
+              id="btn-chat-fab"
+            >
+              <MessageSquare className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* AI Chat Overlay — Floating Agent Panel */}
+          <AnimatePresence>
+            {showChatOverlay && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.96 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="fixed left-3 right-3 bottom-3 z-50 sm:left-auto sm:right-6 sm:bottom-28 sm:w-[360px] sm:max-w-[calc(100vw-2rem)] sm:h-[520px] sm:max-h-[60vh] bg-white dark:bg-slate-950 rounded-3xl shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08),0_8px_40px_-8px_rgba(0,0,0,0.12)] dark:shadow-[0_2px_20px_-4px_rgba(0,0,0,0.3),0_8px_40px_-8px_rgba(0,0,0,0.4)] border border-slate-200/80 dark:border-slate-800/60 overflow-hidden flex flex-col"
+              >
+                <AIChat
+                  chatHistory={chatHistory}
+                  onSendMessage={handleSendMessage}
+                  onClearChat={handleClearChat}
+                  onClose={() => setShowChatOverlay(false)}
+                  auditLogs={auditLogs}
+                  user={user}
+                  medications={medications}
+                  debugMode={debugMode}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
     </div>
