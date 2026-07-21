@@ -311,12 +311,12 @@ export default function AIChat({
                 >
                   {/* Server-side Clinical Safety Alerts */}
                   {isSafetyAlert && (
-                    <div className="mb-3 p-3.5 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40 rounded-xl text-[11px] text-red-700 dark:text-red-400 font-semibold space-y-1.5 flex flex-col">
-                      <div className="flex items-center gap-1.5 text-xs text-red-800 dark:text-red-300">
-                        <ShieldAlert className="w-4 h-4 shrink-0 text-red-600" />
-                        <span>SWASTH-AI CLINICAL SAFETY WARNING (SERVER)</span>
+                    <div className="mb-3 p-2.5 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl text-[11px] text-red-700 dark:text-red-400 font-semibold flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-xs text-red-800 dark:text-red-300 font-bold uppercase tracking-wider">
+                        <ShieldAlert className="w-3.5 h-3.5 shrink-0 text-red-600" />
+                        <span>Server Safety Alert</span>
                       </div>
-                      <div className="pl-1">
+                      <div className="pl-5 text-[10px] opacity-90">
                         {alertContent.split("\n").map((line, lIdx) => (
                           <p key={lIdx} className="leading-relaxed">{line}</p>
                         ))}
@@ -326,57 +326,64 @@ export default function AIChat({
 
                   {/* Client-side Clinical Safety Validator Warning Banner */}
                   {isAI && clientSafetyIssues.length > 0 && (
-                    <div className="mb-3.5 p-4 bg-amber-50 dark:bg-amber-955/20 border-2 border-amber-400/80 dark:border-amber-900/60 rounded-xl space-y-2 flex flex-col shadow-sm">
+                    <div className="mb-3.5 p-3 bg-amber-50 dark:bg-amber-955/20 border-l-4 border-amber-500 rounded-r-xl shadow-sm flex flex-col gap-2">
                       <div className="flex items-center gap-1.5 text-xs text-amber-800 dark:text-amber-300 font-extrabold uppercase tracking-wide">
-                        <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 animate-pulse" />
-                        <span>Clinical Safety Detector (Client-Side)</span>
+                        <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                        <span>Client Safety Detector</span>
                       </div>
-                      <div className="space-y-2 pl-1 text-[11px] leading-relaxed text-amber-900 dark:text-amber-200">
+                      <div className="space-y-1.5 pl-5 text-[10px] leading-relaxed text-amber-900 dark:text-amber-200">
                         {clientSafetyIssues.map((issue, idx) => (
-                          <div key={idx} className="space-y-1">
-                            <p className="font-extrabold">⚠️ {issue.alert}</p>
-                            <p className="text-amber-700 dark:text-amber-400 font-semibold">{issue.action}</p>
+                          <div key={idx}>
+                            <span className="font-extrabold">⚠️ {issue.alert}</span>
+                            <span className="ml-1 opacity-80">{issue.action}</span>
                           </div>
                         ))}
-                      </div>
-                      <div className="pt-2 border-t border-amber-200/50 dark:border-amber-900/40 flex flex-col sm:flex-row gap-2 justify-between items-start sm:items-center">
-                        <span className="text-[10px] text-amber-800 dark:text-amber-400 font-bold leading-normal">
-                          Risk detected! Re-evaluate with a clinician before taking any medication.
-                        </span>
-                        <a 
-                          href="tel:911" 
-                          className="text-[10px] bg-amber-600 hover:bg-amber-700 text-white font-extrabold px-3.5 py-1.5 rounded-lg transition-all shadow-sm flex items-center gap-1.5 hover:scale-105 active:scale-95 cursor-pointer shrink-0"
-                          id="btn-safety-alert-contact"
-                        >
-                          Contact Professional
-                        </a>
                       </div>
                     </div>
                   )}
 
                   {/* AI Response Text */}
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {regularContent.split("\n").map((line, lIdx) => {
-                      if (line.trim().startsWith("---") || line.trim().startsWith("*Swasth-AI Citations")) {
+                      const tLine = line.trim();
+                      if (!tLine) return null;
+                      
+                      // Filter out redundant disclaimer spam
+                      if (tLine.includes("[Clinical Advice Disclaimer & Wellness Role]") || 
+                          tLine.includes("Always seek professional medical guidance. Swasth-AI is a wellness companion")) {
+                        return null;
+                      }
+                      
+                      // Format RAG Citations nicely
+                      if (tLine.startsWith("RAG Citation:") || tLine.startsWith("*Swasth-AI Citations")) {
+                        const citationText = tLine.replace("RAG Citation:", "").replace("*Swasth-AI Citations*", "").trim();
+                        // Extract bracketed items
+                        const matches = citationText.match(/\[(.*?)\]/g) || [citationText];
                         return (
-                          <p key={lIdx} className="text-[10px] text-slate-400 dark:text-slate-500 font-bold border-t border-slate-100 dark:border-slate-800 pt-2 mt-2">
-                            {line}
+                          <div key={lIdx} className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/60">
+                            {matches.map((match, mIdx) => (
+                              <span key={mIdx} className="bg-primary/10 text-primary dark:text-primary-container px-2 py-0.5 rounded-md text-[9px] font-bold flex items-center gap-1 border border-primary/20">
+                                <Database className="w-2.5 h-2.5" />
+                                {match.replace(/\[|\]/g, "")}
+                              </span>
+                            ))}
+                          </div>
+                        );
+                      }
+                      
+                      // Format Disclaimer cleanly
+                      if (tLine.startsWith("Disclaimer:") || tLine.startsWith("⚠️ **Disclaimer**:")) {
+                        return (
+                          <p key={lIdx} className="text-[9px] text-slate-500 dark:text-slate-400 font-medium italic mt-2 bg-slate-100/50 dark:bg-slate-900/50 p-2 rounded-lg">
+                            <Info className="w-3 h-3 inline-block mr-1 text-slate-400" />
+                            {tLine.replace("⚠️ **Disclaimer**:", "").replace("Disclaimer:", "").trim()}
                           </p>
                         );
                       }
-                      return <p key={lIdx}>{line}</p>;
+
+                      return <p key={lIdx} className="leading-relaxed text-sm">{line}</p>;
                     })}
                   </div>
-
-                  {/* Global Clinical Advice Disclaimer Footer */}
-                  {isAI && (
-                    <div className="mt-4 pt-3 border-t border-slate-200/40 dark:border-slate-800/80 text-[10px] text-slate-400 dark:text-slate-500 flex flex-col gap-1 italic leading-normal">
-                      <p className="font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[8px]">[Clinical Advice Disclaimer & Wellness Role]</p>
-                      <p>
-                        Always seek professional medical guidance. Swasth-AI is a wellness companion and a pre-consultation support tool designed to log, track, and provide supportive home care suggestions for minor, self-limiting concerns (like a mild common cold). It does NOT replace clinical diagnosis, treatment, or professional consultation by a licensed primary care physician. For any major, severe, or persistent symptoms, seek professional medical attention immediately.
-                      </p>
-                    </div>
-                  )}
 
                   {/* Debug Mode Raw Prompt Context Trace Panel */}
                   {isAI && debugMode && (

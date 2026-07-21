@@ -46,7 +46,7 @@ async function generateCohereChat(prompt: string) {
     },
     body: JSON.stringify({
       stream: false,
-      model: "command-r-plus",
+      model: "command-r-plus-08-2024",
       message: prompt,
       temperature: 0.4,
       max_tokens: 450,

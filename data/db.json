@@ -10,7 +10,7 @@
       "dietaryPreferences": [
         "No Preferences"
       ],
-      "credits": 154,
+      "credits": 149,
       "vitalityScoreUp": 12,
       "sleepRecovery": "7h 45m"
     }
@@ -4763,18 +4763,7 @@
   "chats": [
     {
       "userId": "sarah-session-token",
-      "messages": [
-        {
-          "sender": "user",
-          "text": "hi",
-          "timestamp": "2026-07-21T06:32:16.453Z"
-        },
-        {
-          "sender": "ai",
-          "text": "AI service unavailable right now. Please try again later.\n\n⚠️ **Disclaimer**: Swasth-AI acts as a pre-consultation health companion and home-remedy suggestor for minor issues. It does not replace a physical physician or provide formal medical diagnoses. For any major, severe, or persistent symptoms, please seek professional care or consult a doctor immediately.",
-          "timestamp": "2026-07-21T06:32:17.458Z"
-        }
-      ]
+      "messages": []
     }
   ],
   "scans": [
@@ -4889,6 +4878,300 @@
     }
   ],
   "agentCalls": [
+    {
+      "id": "call-348578fa-40ac-4203-a4f8-1bba7d3e415f",
+      "userId": "sarah-session-token",
+      "query": "hi",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Amoxicillin Prescription.png",
+            "similarity": 0.9933978226847748,
+            "aiInsight": "Course: 250mg, 3x daily. Ends in 3 days."
+          },
+          {
+            "name": "Chest X-Ray_Left.dicom",
+            "similarity": 0.9496691299472938,
+            "aiInsight": "No acute abnormalities detected. Comparison to 2022 stable."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": 0.8998117115612907,
+            "aiInsight": "Tetanus booster due in 18 months."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood afternoon, Sarah. I'm He-Co, here to offer some wellness insights and suggestions for minor health concerns.\n\nI see you've been prescribed Lisinopril, Metformin, and Atorvastatin, and you've taken your Metformin today. It's great that you're staying on top of your medication routine! Remember, Lisinopril and Atorvastatin are typically taken once daily, so ensure you don't miss those doses. \n\nYour recent chest X-ray shows no acute issues, which is reassuring. However, if you're experiencing any symptoms like chest pain, shortness of breath, or persistent cough, it's important to consult a doctor promptly. \n\nAs for your diet, considering you take Metformin, it's crucial to be mindful of your blood sugar levels. If you're planning your meals for the day, here's a suggestion:\n- Breakfast: Opt for a low-glycemic fruit like berries or a small bowl of oatmeal. Avoid sweet fruits to keep your blood sugar stable.\n- Lunch: You could have whole-wheat chapatis with a light vegetable curry and some dal.\n- Dinner: Keep it light with a small portion of chapatis, rice, and a side of vegetables.\n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. If you have any concerns about your health, please consult a doctor.\n\n**RAG Citation:**\n- Medications: Lisinopril, Metformin, Atorvastatin\n- Files: \"Amoxicillin Prescription.png\", \"Chest X-Ray_Left.dicom\", \"Immunization Record.pdf\"",
+      "safetyWarnings": [
+        "Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves."
+      ],
+      "timestamp": "2026-07-21T06:45:17.822Z"
+    },
+    {
+      "id": "call-b75e30ad-28b9-4a44-88a9-f88a8e9be0f4",
+      "userId": "sarah-session-token",
+      "query": "hi",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Amoxicillin Prescription.png",
+            "similarity": 0.9933978226847748,
+            "aiInsight": "Course: 250mg, 3x daily. Ends in 3 days."
+          },
+          {
+            "name": "Chest X-Ray_Left.dicom",
+            "similarity": 0.9496691299472938,
+            "aiInsight": "No acute abnormalities detected. Comparison to 2022 stable."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": 0.8998117115612907,
+            "aiInsight": "Tetanus booster due in 18 months."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves.\n--------------------------------------------\n\nGood afternoon, Sarah! It's great to hear from you again. \n\nI see you're currently on a course of Amoxicillin, and it's important to ensure you complete the full course as prescribed. Since you're also taking Lisinopril, Metformin, and Atorvastatin, maintaining a healthy lifestyle is crucial. \n\nFor your diet, especially with Metformin, I recommend a balanced approach. If you're looking for dinner ideas, consider a nutritious meal like whole-wheat chapatis with a side of vegetables and a moderate portion of lean protein, such as grilled chicken or fish. This can help manage your blood sugar levels and provide essential nutrients. \n\nStaying hydrated is essential, especially when taking medications. Ensure you drink enough water throughout the day, and if you're feeling up to it, some light exercise or a short walk can be beneficial for your overall health and well-being. \n\nRemember, these suggestions are for minor health concerns and general wellness. If you have any specific symptoms or concerns, it's always best to consult a doctor for a thorough evaluation. \n\nRAG Citation: [Amoxicillin Prescription.png, Chest X-Ray_Left.dicom, Immunization Record.pdf] [Lisinopril, Metformin, Atorvastatin]\n\n⚠️ **Disclaimer**: Swasth-AI acts as a pre-consultation health companion and home-remedy suggestor for minor issues. It does not replace a physical physician or provide formal medical diagnoses. For any major, severe, or persistent symptoms, please seek professional care or consult a doctor immediately.",
+      "safetyWarnings": [
+        "Glycemic Warning: Suggested sugar source \"sugar\" spikes blood glucose, directly opposing diabetes therapies. Focus on low-glycemic foods and consult a primary care physician to monitor your long-term glucose curves."
+      ],
+      "timestamp": "2026-07-21T06:41:50.472Z"
+    },
+    {
+      "id": "call-3c9d9e12-6bd2-490d-95d2-4f8988d3b4f1",
+      "userId": "sarah-session-token",
+      "query": "hi",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Amoxicillin Prescription.png",
+            "similarity": 0.9933978226847748,
+            "aiInsight": "Course: 250mg, 3x daily. Ends in 3 days."
+          },
+          {
+            "name": "Chest X-Ray_Left.dicom",
+            "similarity": 0.9496691299472938,
+            "aiInsight": "No acute abnormalities detected. Comparison to 2022 stable."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": 0.8998117115612907,
+            "aiInsight": "Tetanus booster due in 18 months."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "Good afternoon, Sarah! I'm He-Co, here to offer some friendly health advice.\n\nI see you've been prescribed Amoxicillin, and your chest X-ray shows no acute issues. That's great news! It's important to complete the full course of antibiotics as prescribed, ensuring you take the medication at the right times and dosages. \n\nGiven your current medications, including Lisinopril, Metformin, and Atorvastatin, it's essential to maintain a healthy lifestyle. Here are some general wellness tips:\n- Stay hydrated by drinking plenty of fluids throughout the day.\n- Consider incorporating light exercises or stretches into your routine to maintain mobility and muscle health.\n- If you're feeling well enough, a short walk outdoors can be beneficial for fresh air and gentle physical activity.\n\nAs for your diet, especially with your Metformin prescription, it's important to maintain a balanced and healthy eating pattern. If you have specific dietary preferences or restrictions, I can offer tailored advice. \n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. \n\nRAG Citation: [Amoxicillin Prescription.png, Chest X-Ray_Left.dicom, Immunization Record.pdf] [Lisinopril, Metformin, Atorvastatin]",
+      "safetyWarnings": [],
+      "timestamp": "2026-07-21T06:41:32.148Z"
+    },
+    {
+      "id": "call-15daa3c7-b360-4645-8ffa-6982754e9c28",
+      "userId": "sarah-session-token",
+      "query": "hi",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Amoxicillin Prescription.png",
+            "similarity": 0.9933978226847748,
+            "aiInsight": "Course: 250mg, 3x daily. Ends in 3 days."
+          },
+          {
+            "name": "Chest X-Ray_Left.dicom",
+            "similarity": 0.9496691299472938,
+            "aiInsight": "No acute abnormalities detected. Comparison to 2022 stable."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": 0.8998117115612907,
+            "aiInsight": "Tetanus booster due in 18 months."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "AI service unavailable right now. Please try again later.\n\n⚠️ **Disclaimer**: Swasth-AI acts as a pre-consultation health companion and home-remedy suggestor for minor issues. It does not replace a physical physician or provide formal medical diagnoses. For any major, severe, or persistent symptoms, please seek professional care or consult a doctor immediately.",
+      "safetyWarnings": [],
+      "timestamp": "2026-07-21T06:41:09.104Z"
+    },
+    {
+      "id": "call-3d3c5330-da9c-421a-8ebe-c77d7d0856e3",
+      "userId": "sarah-session-token",
+      "query": "hi",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Amoxicillin Prescription.png",
+            "similarity": 0.9933978226847748,
+            "aiInsight": "Course: 250mg, 3x daily. Ends in 3 days."
+          },
+          {
+            "name": "Chest X-Ray_Left.dicom",
+            "similarity": 0.9496691299472938,
+            "aiInsight": "No acute abnormalities detected. Comparison to 2022 stable."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": 0.8998117115612907,
+            "aiInsight": "Tetanus booster due in 18 months."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "AI service unavailable right now. Please try again later.\n\n⚠️ **Disclaimer**: Swasth-AI acts as a pre-consultation health companion and home-remedy suggestor for minor issues. It does not replace a physical physician or provide formal medical diagnoses. For any major, severe, or persistent symptoms, please seek professional care or consult a doctor immediately.",
+      "safetyWarnings": [],
+      "timestamp": "2026-07-21T06:37:07.601Z"
+    },
     {
       "id": "call-30619e28-b388-42df-97da-10180d6449e3",
       "userId": "sarah-session-token",
@@ -5821,6 +6104,46 @@
     }
   ],
   "creditLogs": [
+    {
+      "id": "log-c29ca3ce-5e6a-4003-a013-284dfb8137f8",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"hi\"",
+      "timestamp": "2026-07-21T06:45:08.668Z",
+      "remaining": 149
+    },
+    {
+      "id": "log-3c4ea15b-1340-40cf-bfe0-438828b35e26",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"hi\"",
+      "timestamp": "2026-07-21T06:41:44.458Z",
+      "remaining": 150
+    },
+    {
+      "id": "log-b1dca543-4d09-4fef-9f09-0110e515f6fa",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"hi\"",
+      "timestamp": "2026-07-21T06:41:24.580Z",
+      "remaining": 151
+    },
+    {
+      "id": "log-6dc17f85-b9d8-40b1-a9a9-c5bd2257e5c5",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"hi\"",
+      "timestamp": "2026-07-21T06:41:07.855Z",
+      "remaining": 152
+    },
+    {
+      "id": "log-283db4fa-c0b0-43f0-8314-2ca85723ade9",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"hi\"",
+      "timestamp": "2026-07-21T06:37:06.773Z",
+      "remaining": 153
+    },
     {
       "id": "log-712847d1-dc2b-43d4-8135-529d3dbb81b9",
       "userId": "sarah-session-token",

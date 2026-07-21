@@ -3,7 +3,7 @@ import { User, SmartActions, Vitals, FileRecord, Medication, ChatMessage } from 
 import { 
   Heart, Calendar, FolderOpen, MessageSquare, User as UserIcon, Sparkles, 
   ShieldAlert, CheckCircle2, LogOut, Menu, X, Lock, Key, AlertCircle, Activity,
-  Sun, Moon, Download
+  Sun, Moon, Download, Home
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -845,7 +845,7 @@ export default function App() {
                 activeTab === "today" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
               }`}
             >
-              <Calendar className="w-5 h-5" />
+              <Home className="w-5 h-5" />
               <span className="text-[10px] font-bold mt-1">Home</span>
             </button>
 
