@@ -172,7 +172,7 @@ export default function Medications({
       <section id="scanner-section">
         <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-6">AI Interaction Scanner</h2>
         
-        <div className="relative w-full aspect-video md:aspect-[21/9] rounded-3xl overflow-hidden shadow-xl border border-white/40 group" id="scanner-viewfinder">
+        <div className="relative w-full aspect-video md:aspect-[21/9] rounded-3xl overflow-hidden shadow-xl border border-white/40 group max-h-[220px] sm:max-h-[300px] md:max-h-none" id="scanner-viewfinder">
           {/* Camera Viewfinder Mockup */}
           <div className="absolute inset-0 z-0 bg-slate-900">
             <img 
@@ -197,25 +197,25 @@ export default function Medications({
           </div>
 
           {/* Quick interactive buttons to trigger dynamic scans */}
-          <div className="absolute bottom-4 left-4 z-20 flex gap-2" id="preset-scanners">
+          <div className="absolute bottom-2 left-2 right-2 z-20 flex flex-wrap gap-1.5" id="preset-scanners">
             <button 
               onClick={() => handleRunScan("Lisinopril 10mg")}
-              className="bg-white/80 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-on-surface text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="bg-white/80 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-on-surface text-[9px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
-              Scan Preset: Lisinopril
+              <Sparkles className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-primary" />
+              <span className="truncate">Scan: Lisinopril</span>
             </button>
             <button 
               onClick={() => handleRunScan("Ibuprofen 400mg")}
-              className="bg-white/80 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-on-surface text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="bg-white/80 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-on-surface text-[9px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-red-600" />
-              Scan Preset: Ibuprofen
+              <Sparkles className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-red-600" />
+              <span className="truncate">Scan: Ibuprofen</span>
             </button>
           </div>
 
           {/* Floating Glass Result Overlays */}
-          <div className="absolute bottom-4 right-4 z-20 max-w-xs md:max-w-sm" id="scanner-result-overlay">
+          <div className="absolute bottom-14 sm:bottom-4 left-2 right-2 sm:left-auto sm:right-4 z-20 max-w-none sm:max-w-xs md:max-w-sm" id="scanner-result-overlay">
             <AnimatePresence mode="wait">
               {isScanning ? (
                 <motion.div 
@@ -308,7 +308,7 @@ export default function Medications({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.25 }}
-                className={`bg-white dark:bg-slate-900 border p-6 rounded-2xl flex flex-col justify-between group shadow-md shadow-slate-950/5 dark:shadow-black/20 relative ${
+                className={`bg-white dark:bg-slate-900 border p-4 sm:p-6 rounded-2xl flex flex-col justify-between group shadow-md shadow-slate-950/5 dark:shadow-black/20 relative ${
                   med.conflictDetected ? "border-red-300 ring-2 ring-red-50 dark:ring-red-950/20" : "border-slate-100 dark:border-slate-800"
                 }`}
                 id={`med-card-${med.id}`}
@@ -515,7 +515,7 @@ export default function Medications({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
                       Strength
@@ -548,7 +548,7 @@ export default function Medications({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
                       Frequency

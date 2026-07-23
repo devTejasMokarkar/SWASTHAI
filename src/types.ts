@@ -8,7 +8,6 @@ export interface User {
   credits: number;
   vitalityScoreUp: number;
   sleepRecovery: string;
-  sugarUnitPreference?: "mg/dL" | "mmol/L";
 }
 
 export interface SmartActions {

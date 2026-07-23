@@ -87,6 +87,16 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Prevent double-tap zoom on interactive elements */
+button, a, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* Fluid typography base */
+html {
+  font-size: clamp(14px, 0.5vw + 13px, 16px);
+}
+
 /* Premium Global Scrollbar Styling */
 @layer base {
   ::-webkit-scrollbar {

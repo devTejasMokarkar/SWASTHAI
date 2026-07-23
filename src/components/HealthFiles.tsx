@@ -366,7 +366,7 @@ export default function HealthFiles({
                     setSelectedDate(new Date(year, month, dayNum));
                   }
                 }}
-                className={`py-1.5 relative rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer group h-11 md:h-10 ${
+                className={`py-1 relative rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer group h-10 sm:h-11 ${
                   isSelected
                     ? "bg-pink-500 text-white font-black shadow-md shadow-pink-500/10"
                     : hasReadings
@@ -459,15 +459,15 @@ export default function HealthFiles({
         {/* Dynamic Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Blood Sugar Curve */}
-          <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-6 rounded-3xl shadow-sm flex flex-col justify-between min-h-[360px]">
+          <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm flex flex-col justify-between min-h-[280px] sm:min-h-[360px]">
             <div>
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex justify-between items-start mb-3 sm:mb-4">
                 <div className="space-y-1">
-                  <h3 className="font-extrabold text-base text-on-surface dark:text-slate-100 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-pink-500 rounded-full inline-block animate-pulse"></span>
+                  <h3 className="font-extrabold text-sm sm:text-base text-on-surface dark:text-slate-100 flex items-center gap-2">
+                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-pink-500 rounded-full inline-block animate-pulse"></span>
                     Blood Glucose Trend
                   </h3>
-                  <p className="text-[11px] text-on-surface-variant dark:text-slate-400">
+                  <p className="text-[10px] sm:text-[11px] text-on-surface-variant dark:text-slate-400">
                     Circadian targets adapt based on selected contexts.
                   </p>
                 </div>
@@ -523,15 +523,15 @@ export default function HealthFiles({
           </div>
 
           {/* Blood Pressure Curves */}
-          <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-6 rounded-3xl shadow-sm flex flex-col justify-between min-h-[360px]">
+          <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm flex flex-col justify-between min-h-[280px] sm:min-h-[360px]">
             <div>
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex justify-between items-start mb-3 sm:mb-4">
                 <div className="space-y-1">
-                  <h3 className="font-extrabold text-base text-on-surface dark:text-slate-100 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-rose-500 rounded-full inline-block animate-pulse"></span>
+                  <h3 className="font-extrabold text-sm sm:text-base text-on-surface dark:text-slate-100 flex items-center gap-2">
+                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-rose-500 rounded-full inline-block animate-pulse"></span>
                     Blood Pressure Dynamics
                   </h3>
-                  <p className="text-[11px] text-on-surface-variant dark:text-slate-400">
+                  <p className="text-[10px] sm:text-[11px] text-on-surface-variant dark:text-slate-400">
                     Tracks both systolic and diastolic ranges simultaneously.
                   </p>
                 </div>
@@ -718,15 +718,15 @@ export default function HealthFiles({
               <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">
-                      <th className="py-2 w-[35%] min-w-[100px]">Date/Time</th>
-                      <th className="py-2 w-[15%]">Vitals Type</th>
-                      <th className="py-2 text-right w-[20%]">Value Recorded</th>
-                      <th className="py-2 text-right w-[15%]">Pulse/Context</th>
-                      <th className="py-2 text-center w-[15%]">AI Classification</th>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">
+                      <th className="py-1.5 sm:py-2 w-[30%] sm:w-[35%] min-w-[80px] sm:min-w-[100px]">Date/Time</th>
+                      <th className="py-1.5 sm:py-2 w-[15%]">Type</th>
+                      <th className="py-1.5 sm:py-2 text-right w-[20%]">Value</th>
+                      <th className="py-1.5 sm:py-2 text-right w-[15%]">Pulse/Ctx</th>
+                      <th className="py-1.5 sm:py-2 text-center w-[15%] sm:w-[15%]">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100/50 dark:divide-slate-800/40 text-xs">
+                  <tbody className="divide-y divide-slate-100/50 dark:divide-slate-800/40 text-[10px] sm:text-xs">
                     {(() => {
                       const displayedReadings = selectedDate
                         ? vitalsReadings.filter((r) => {
@@ -741,26 +741,26 @@ export default function HealthFiles({
 
                       return displayedReadings.slice(0, 20).map((r) => (
                         <tr key={r.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/20">
-                          <td className="py-2.5 text-[10px] font-bold text-slate-500">
+                          <td className="py-1.5 sm:py-2.5 text-[9px] sm:text-[10px] font-bold text-slate-500">
                             {new Date(r.timestamp).toLocaleString()}
                           </td>
-                          <td className="py-2.5 font-bold text-on-surface dark:text-slate-200 uppercase text-[10px]">
+                          <td className="py-1.5 sm:py-2.5 font-bold text-on-surface dark:text-slate-200 uppercase text-[9px] sm:text-[10px]">
                             {r.type === "blood_sugar" ? "Glucose" : "Pressure"}
                           </td>
-                          <td className="py-2.5 text-right font-black text-on-surface dark:text-slate-100">
+                          <td className="py-1.5 sm:py-2.5 text-right font-black text-on-surface dark:text-slate-100 text-[10px] sm:text-xs">
                             {r.type === "blood_sugar" 
                               ? `${r.sugarValue} ${r.sugarUnit || "mg/dL"}`
                               : `${r.systolic}/${r.diastolic} mmHg`
                             }
                           </td>
-                          <td className="py-2.5 text-right font-medium text-slate-500">
+                          <td className="py-1.5 sm:py-2.5 text-right font-medium text-slate-500 text-[9px] sm:text-[10px]">
                             {r.type === "blood_sugar" 
                               ? r.sugarContext 
                               : r.pulse ? `${r.pulse} BPM` : "—"
                             }
                           </td>
-                          <td className="py-2.5 text-center">
-                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${
+                          <td className="py-1.5 sm:py-2.5 text-center">
+                            <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1 sm:px-2 py-0.5 rounded ${
                               r.severity === "crisis"
                                 ? "bg-red-500/10 text-red-500 border border-red-500/20 animate-bounce"
                                 : r.severity === "abnormal"
@@ -775,7 +775,7 @@ export default function HealthFiles({
                     })()}
                     {vitalsReadings.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="py-12 text-center text-slate-400 dark:text-slate-600 font-bold">
+                        <td colSpan={5} className="py-8 sm:py-12 text-center text-slate-400 dark:text-slate-600 font-bold text-[10px] sm:text-xs">
                           No logged records yet. Go to "Today" and click "Log Reading" to start!
                         </td>
                       </tr>
@@ -898,7 +898,7 @@ export default function HealthFiles({
                                   setNewReminderDays([...newReminderDays, day]);
                                 }
                               }}
-                              className={`w-9 h-9 rounded-full text-[10px] font-bold flex items-center justify-center transition-all cursor-pointer ${
+                              className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full text-[8px] sm:text-[10px] font-bold flex items-center justify-center transition-all cursor-pointer ${
                                 isSelected
                                   ? "bg-pink-500 text-white shadow-md shadow-pink-500/10"
                                   : "bg-slate-100 dark:bg-slate-950 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800"
@@ -1041,20 +1041,20 @@ export default function HealthFiles({
 
       {/* Tab Switcher */}
       <div className="flex justify-between items-center flex-wrap gap-4" id="tabs-header-container">
-        <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-fit flex-wrap gap-1" id="category-tab-switcher">
+        <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-fit flex-wrap gap-0.5 sm:gap-1" id="category-tab-switcher">
           <button 
             onClick={() => setActiveTab("all")}
-            className={`px-4 md:px-6 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-2.5 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
               activeTab === "all" 
                 ? "bg-white dark:bg-slate-900 text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
                 : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
             }`}
           >
-            All Files
+            All
           </button>
           <button 
             onClick={() => setActiveTab("report")}
-            className={`px-4 md:px-6 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-2.5 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
               activeTab === "report" 
                 ? "bg-white dark:bg-slate-900 text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
                 : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
@@ -1064,7 +1064,7 @@ export default function HealthFiles({
           </button>
           <button 
             onClick={() => setActiveTab("prescription")}
-            className={`px-4 md:px-6 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-2.5 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
               activeTab === "prescription" 
                 ? "bg-white dark:bg-slate-900 text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
                 : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
@@ -1074,7 +1074,7 @@ export default function HealthFiles({
           </button>
           <button 
             onClick={() => setActiveTab("vitals")}
-            className={`px-4 md:px-6 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-2.5 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
               activeTab === "vitals" 
                 ? "bg-white dark:bg-slate-900 text-pink-500 font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
                 : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
@@ -1112,7 +1112,7 @@ export default function HealthFiles({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/60 p-6 rounded-3xl flex flex-col justify-between group hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 relative hover:scale-[1.01]"
+                  className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/60 p-4 sm:p-6 rounded-2xl sm:rounded-3xl flex flex-col justify-between group hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 relative hover:scale-[1.01]"
                   id={`file-card-${file.id}`}
                 >
                   {/* Header block with Type icon & Options button */}
@@ -1277,7 +1277,7 @@ export default function HealthFiles({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
                       Category

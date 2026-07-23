@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User, SmartActions, Vitals } from "../types";
-import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap } from "lucide-react";
+import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import SkeletonCard from "./SkeletonCard";
 import confetti from "canvas-confetti";
@@ -70,6 +70,7 @@ interface DashboardProps {
     temperatureUnit?: "F" | "C";
     spo2Value?: number;
   }) => Promise<{ reading: any; analysis: string; isNormal: boolean; severity: string }>;
+  onOpenChat?: () => void;
 }
 
 export default function Dashboard({
@@ -80,6 +81,7 @@ export default function Dashboard({
   onToggleAction,
   onUpdateVitals,
   onLogVitalsReading,
+  onOpenChat,
 }: DashboardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
@@ -92,38 +94,6 @@ export default function Dashboard({
   
   const [prevWater, setPrevWater] = useState(smartActions.waterLoggedMl);
   const [triggerConfetti, setTriggerConfetti] = useState(false);
-
-  // Vitals Tracker States
-  const [showVitalsLogModal, setShowVitalsLogModal] = useState(false);
-  const [vitalsType, setVitalsType] = useState<"blood_sugar" | "blood_pressure" | "temperature" | "spo2">("blood_sugar");
-  const [sugarVal, setSugarVal] = useState("");
-  const [sugarUnit, setSugarUnit] = useState<"mg/dL" | "mmol/L">(user.sugarUnitPreference || "mg/dL");
-  const [sugarContext, setSugarContext] = useState<"Fasting" | "Post-meal" | "Random" | "Bedtime">("Fasting");
-  const [systolic, setSystolic] = useState("");
-  const [diastolic, setDiastolic] = useState("");
-  const [pulse, setPulse] = useState("");
-  const [tempVal, setTempVal] = useState("");
-  const [tempUnit, setTempUnit] = useState<"F" | "C">("F");
-  const [spo2Val, setSpo2Val] = useState("");
-  const [logTime, setLogTime] = useState("");
-  const [isLoggingVitals, setIsLoggingVitals] = useState(false);
-  const [vitalsFeedback, setVitalsFeedback] = useState<{
-    reading: any;
-    analysis: string;
-    isNormal: boolean;
-    severity: string;
-  } | null>(null);
-
-  // Initialize logTime dynamically to current local time on open
-  useEffect(() => {
-    if (showVitalsLogModal) {
-      const now = new Date();
-      const offsetMs = now.getTimezoneOffset() * 60 * 1000;
-      const localISO = new Date(now.getTime() - offsetMs).toISOString().slice(0, 16);
-      setLogTime(localISO);
-      setVitalsFeedback(null); // clear previous feedback
-    }
-  }, [showVitalsLogModal]);
 
   useEffect(() => {
     if (smartActions.waterLoggedMl >= smartActions.waterGoalMl && prevWater < smartActions.waterGoalMl) {
@@ -267,62 +237,6 @@ export default function Dashboard({
     );
   }
 
-  const handleLogVitalSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!onLogVitalsReading) return;
-
-    setIsLoggingVitals(true);
-    setVitalsFeedback(null);
-    try {
-      const payload: any = {
-        type: vitalsType,
-        timestamp: new Date(logTime).toISOString(),
-      };
-
-      if (vitalsType === "blood_sugar") {
-        if (!sugarVal) return;
-        payload.sugarValue = Number(sugarVal);
-        payload.sugarUnit = sugarUnit;
-        payload.sugarContext = sugarContext;
-      } else if (vitalsType === "blood_pressure") {
-        if (!systolic || !diastolic) return;
-        payload.systolic = Number(systolic);
-        payload.diastolic = Number(diastolic);
-        if (pulse) payload.pulse = Number(pulse);
-      } else if (vitalsType === "temperature") {
-        if (!tempVal) return;
-        payload.temperatureValue = Number(tempVal);
-        payload.temperatureUnit = tempUnit;
-      } else if (vitalsType === "spo2") {
-        if (!spo2Val) return;
-        payload.spo2Value = Number(spo2Val);
-      }
-
-      const res = await onLogVitalsReading(payload);
-      if (res && res.reading) {
-        setVitalsFeedback(res);
-        // Reset state variables for sugar or pressure values
-        setSugarVal("");
-        setSystolic("");
-        setDiastolic("");
-        setPulse("");
-        setTempVal("");
-        setSpo2Val("");
-      } else {
-        setVitalsFeedback({
-          reading: payload,
-          analysis: "Vital reading successfully logged on the server. Always maintain baseline hydration and balanced clinical nutrition.",
-          isNormal: true,
-          severity: "normal"
-        });
-      }
-    } catch (err) {
-      console.error("Vitals quick log failed:", err);
-    } finally {
-      setIsLoggingVitals(false);
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -337,22 +251,29 @@ export default function Dashboard({
       </AnimatePresence>
 
       {/* Flash Greeting Section */}
-      <section className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 relative overflow-hidden" id="greeting-section">
+      <section className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 md:gap-6 relative" id="greeting-section">
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col items-start">
           <motion.h1 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="text-4xl md:text-6xl font-black tracking-tight bg-gradient-to-br from-primary via-blue-500 to-emerald-400 bg-clip-text text-transparent pb-1 drop-shadow-sm"
+            className="text-3xl md:text-5xl font-black tracking-tight flex items-center flex-wrap gap-2 md:gap-3"
           >
-            {greeting}, {user.fullName || "Sarah"}.
+            <span className="bg-gradient-to-br from-primary via-blue-500 to-emerald-400 bg-clip-text text-transparent pb-1 drop-shadow-sm">
+              {greeting}, {user.fullName || "Sarah"}.
+            </span>
+            {user.dob && (
+              <span className="text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 tracking-wide border border-slate-200/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 px-2.5 py-1 rounded-full shadow-sm">
+                {Math.floor((new Date().getTime() - new Date(user.dob).getTime()) / 3.15576e+10)} yrs
+              </span>
+            )}
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-            className="text-lg text-on-surface-variant dark:text-slate-300 max-w-2xl mt-3 leading-relaxed font-medium"
+            className="text-sm md:text-base text-on-surface-variant dark:text-slate-400 max-w-2xl mt-1 leading-relaxed font-medium"
           >
             {greetingSubtext}
           </motion.p>
@@ -363,15 +284,16 @@ export default function Dashboard({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-2 shrink-0 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 px-3 py-2 md:px-5 md:py-4 rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] md:self-center hover:scale-105 transition-transform duration-300"
+          className="flex flex-row items-center gap-3 shrink-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-sm dark:shadow-[0_4px_20px_rgb(0,0,0,0.15)] hover:scale-[1.02] transition-transform duration-300 self-start xl:self-auto"
         >
-          <div className="flex items-center gap-1.5 md:gap-2.5 text-[10px] md:text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider md:tracking-widest">
-            <Calendar className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+            <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
             <span>{formattedDate}</span>
           </div>
-          <div className="flex items-center gap-1.5 md:gap-2.5 text-xs md:text-base font-black text-on-surface dark:text-slate-100 tracking-wider">
-            <Clock className="w-3.5 h-3.5 md:w-5 md:h-5 text-secondary animate-pulse" />
-            <span className="font-mono bg-gradient-to-r from-slate-800 to-slate-500 dark:from-slate-100 dark:to-slate-400 bg-clip-text text-transparent">{formattedTime}</span>
+          <div className="w-px h-4 md:h-5 bg-slate-300 dark:bg-slate-700"></div>
+          <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-black text-on-surface dark:text-slate-200 tracking-wider">
+            <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-secondary animate-pulse" />
+            <span className="font-mono bg-gradient-to-r from-slate-700 to-slate-500 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">{formattedTime}</span>
           </div>
         </motion.div>
       </section>
@@ -397,9 +319,9 @@ export default function Dashboard({
                         {user.dietaryPreferences?.some(p => p.toLowerCase().includes("diabet") || p.toLowerCase().includes("sugar") || p.toLowerCase().includes("glucose") || p.toLowerCase().includes("metformin")) ? "Diabetic Protocol" : "Balanced Protocol"}
                       </span>
                     </div>
-                    <h2 className="text-3xl font-black text-on-surface dark:text-white tracking-tight flex items-center gap-3">
-                      <div className="p-2.5 bg-primary/10 rounded-2xl">
-                        <Utensils className="w-7 h-7 text-primary" />
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white tracking-tight flex items-center gap-2 sm:gap-3">
+                      <div className="p-1.5 sm:p-2.5 bg-primary/10 rounded-xl sm:rounded-2xl">
+                        <Utensils className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary" />
                       </div>
                       AI Diet Recommendation
                     </h2>
@@ -473,17 +395,17 @@ export default function Dashboard({
           {/* Water log action */}
           <div 
             onClick={() => onUpdateWater(500)}
-            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-blue-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-5 rounded-[2rem] flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-1"
+            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-blue-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col gap-3 sm:gap-5 group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-1"
             id="action-water"
           >
-            <div className="flex justify-between items-center w-full">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner">
-                  <Droplet className="w-6 h-6 fill-primary/20 dark:fill-primary/40 group-hover:animate-bounce" />
+            <div className="flex justify-between items-center w-full gap-2">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner shrink-0">
+                  <Droplet className="w-5 h-5 sm:w-6 sm:h-6 fill-primary/20 dark:fill-primary/40" />
                 </div>
-                <div>
-                  <p className="font-extrabold text-on-surface dark:text-white text-base">Log 500ml Water</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">
+                <div className="min-w-0">
+                  <p className="font-extrabold text-on-surface dark:text-white text-sm sm:text-base truncate">Log 500ml Water</p>
+                  <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 font-semibold truncate">
                     Progress: {smartActions.waterLoggedMl}ml / {smartActions.waterGoalMl}ml
                   </p>
                 </div>
@@ -525,20 +447,20 @@ export default function Dashboard({
           {/* Vitamin D action */}
           <div 
             onClick={() => onToggleAction("vitaminD")}
-            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-purple-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-5 rounded-[2rem] flex justify-between items-center group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(168,85,247,0.3)] hover:-translate-y-1"
+            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-purple-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] flex justify-between items-center group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(168,85,247,0.3)] hover:-translate-y-1"
             id="action-vitamin"
           >
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-secondary flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner group-hover:rotate-12">
-                <Pill className="w-6 h-6" />
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-secondary flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner shrink-0">
+                <Pill className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="font-extrabold text-on-surface dark:text-white text-base">Take Vitamin D</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">Morning Dosage</p>
+              <div className="min-w-0">
+                <p className="font-extrabold text-on-surface dark:text-white text-sm sm:text-base truncate">Take Vitamin D</p>
+                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 font-semibold truncate">Morning Dosage</p>
               </div>
             </div>
             <button 
-              className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all duration-300 font-black shadow-sm shrink-0 ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border-2 flex items-center justify-center transition-all duration-300 font-black shadow-sm shrink-0 ${
                 smartActions.vitaminD 
                   ? "border-secondary bg-gradient-to-br from-secondary to-purple-600 text-white shadow-secondary/30" 
                   : "border-secondary/30 group-hover:border-secondary text-secondary group-hover:bg-secondary/5"
@@ -551,20 +473,20 @@ export default function Dashboard({
           {/* Breathing exercise action */}
           <div 
             onClick={() => onToggleAction("breathing")}
-            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-orange-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-5 rounded-[2rem] flex justify-between items-center group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(249,115,22,0.3)] hover:-translate-y-1"
+            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-orange-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] flex justify-between items-center group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(249,115,22,0.3)] hover:-translate-y-1"
             id="action-breathing"
           >
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-tertiary flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner">
-                <Wind className="w-6 h-6" />
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-tertiary flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner shrink-0">
+                <Wind className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="font-extrabold text-on-surface dark:text-white text-base">3min Breathing</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">Stress reduction</p>
+              <div className="min-w-0">
+                <p className="font-extrabold text-on-surface dark:text-white text-sm sm:text-base truncate">3min Breathing</p>
+                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 font-semibold truncate">Stress reduction</p>
               </div>
             </div>
             <button 
-              className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all duration-300 font-black shadow-sm shrink-0 ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border-2 flex items-center justify-center transition-all duration-300 font-black shadow-sm shrink-0 ${
                 smartActions.breathing 
                   ? "border-tertiary bg-gradient-to-br from-tertiary to-orange-600 text-white shadow-tertiary/30" 
                   : "border-tertiary/30 group-hover:border-tertiary text-tertiary group-hover:bg-tertiary/5"
@@ -578,121 +500,55 @@ export default function Dashboard({
       </div>
 
       {/* Health Insights Grid */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" id="vitals-grid">
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6" id="vitals-grid">
         {/* Heart Rate */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 md:p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(239,68,68,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-heart-rate">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-100 to-red-200 dark:from-red-500/20 dark:to-red-600/10 text-red-600 flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
-            <Heart className="w-6 h-6 fill-red-500/80 dark:fill-red-500 group-hover:animate-ping" />
+        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(239,68,68,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-heart-rate">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-red-100 to-red-200 dark:from-red-500/20 dark:to-red-600/10 text-red-600 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-red-500/80 dark:fill-red-500" />
           </div>
-          <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Heart Rate</p>
-          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-2 flex items-baseline gap-1">
-            {vitals.heartRate} <span className="text-sm font-bold text-slate-400 dark:text-slate-500">BPM</span>
+          <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Heart Rate</p>
+          <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
+            {vitals.heartRate} <span className="text-[10px] sm:text-sm font-bold text-slate-400 dark:text-slate-500">BPM</span>
           </p>
         </div>
 
         {/* Steps */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 md:p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-steps">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
-            <Footprints className="w-6 h-6 text-primary group-hover:animate-bounce" />
+        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-steps">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <Footprints className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
           </div>
-          <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Steps</p>
-          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-2 flex items-baseline gap-1">
+          <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Steps</p>
+          <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
             {vitals.steps.toLocaleString()}
           </p>
         </div>
 
         {/* Sleep */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 md:p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-sleep">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
-            <Moon className="w-6 h-6 fill-purple-500/80 dark:fill-purple-400 group-hover:rotate-12 transition-transform" />
+        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-sleep">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <Moon className="w-5 h-5 sm:w-6 sm:h-6 fill-purple-500/80 dark:fill-purple-400" />
           </div>
-          <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sleep</p>
-          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-2 flex items-baseline gap-1">
+          <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sleep</p>
+          <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
             {vitals.sleep}
           </p>
         </div>
 
         {/* Calories */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 md:p-6 rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(249,115,22,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-calories">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
-            <Flame className="w-6 h-6 fill-orange-500/80 dark:fill-orange-400" />
+        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(249,115,22,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-calories">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <Flame className="w-5 h-5 sm:w-6 sm:h-6 fill-orange-500/80 dark:fill-orange-400" />
           </div>
-          <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Calories</p>
-          <p className="text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-2 flex items-baseline gap-1">
-            {vitals.calories} <span className="text-sm font-bold text-slate-400 dark:text-slate-500">kcal</span>
+          <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Calories</p>
+          <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
+            {vitals.calories} <span className="text-[10px] sm:text-sm font-bold text-slate-400 dark:text-slate-500">kcal</span>
           </p>
         </div>
       </section>
 
       {/* Activity Trends Section Removed */}
 
-      {/* Floating Heart FAB – expands radially */}
-      <div className="fixed right-6 bottom-28 md:bottom-24 z-40">
-        <AnimatePresence>
-          {fabOpen && (
-            <>
-              <motion.button
-                key="sugar"
-                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                animate={{ opacity: 1, scale: 1, x: 0, y: -75 }}
-                exit={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                transition={{ type: "spring", stiffness: 280, damping: 22, delay: 0 }}
-                onClick={() => { setVitalsType("blood_sugar"); setShowVitalsLogModal(true); setFabOpen(false); }}
-                className="absolute w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer group"
-                title="Blood Sugar"
-              >
-                <Candy className="w-5 h-5" />
-                <span className="absolute right-full mr-2 px-2 py-0.5 rounded-lg bg-slate-900/90 text-white text-[10px] font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  Sugar
-                </span>
-              </motion.button>
-              <motion.button
-                key="bp"
-                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                animate={{ opacity: 1, scale: 1, x: -55, y: -55 }}
-                exit={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                transition={{ type: "spring", stiffness: 280, damping: 22, delay: 0.07 }}
-                onClick={() => { setVitalsType("blood_pressure"); setShowVitalsLogModal(true); setFabOpen(false); }}
-                className="absolute w-11 h-11 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer group"
-                title="Blood Pressure"
-              >
-                <Activity className="w-5 h-5" />
-                <span className="absolute right-full mr-2 px-2 py-0.5 rounded-lg bg-slate-900/90 text-white text-[10px] font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  BP
-                </span>
-              </motion.button>
-              <motion.button
-                key="spo2"
-                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                animate={{ opacity: 1, scale: 1, x: -75, y: 0 }}
-                exit={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                transition={{ type: "spring", stiffness: 280, damping: 22, delay: 0.14 }}
-                onClick={() => { setVitalsType("spo2"); setShowVitalsLogModal(true); setFabOpen(false); }}
-                className="absolute w-11 h-11 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer group"
-                title="SpO2"
-              >
-                <Wind className="w-5 h-5" />
-                <span className="absolute right-full mr-2 px-2 py-0.5 rounded-lg bg-slate-900/90 text-white text-[10px] font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  SpO2
-                </span>
-              </motion.button>
-            </>
-          )}
-        </AnimatePresence>
 
-        <motion.button
-          onClick={() => setFabOpen(!fabOpen)}
-          className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-xl hover:shadow-rose-500/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer relative"
-          title={fabOpen ? "Close" : "Log Vitals"}
-          id="heart-fab"
-          animate={{ rotate: fabOpen ? 90 : 0 }}
-          transition={{ type: "spring", stiffness: 280, damping: 22 }}
-        >
-          <span className="text-lg leading-none select-none">
-            {fabOpen ? <X className="w-6 h-6" /> : <Heart className="w-6 h-6 fill-current" />}
-          </span>
-        </motion.button>
-      </div>
 
       {/* Quick Log Modal Overlay */}
       <AnimatePresence>
@@ -702,11 +558,11 @@ export default function Dashboard({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md shadow-2xl relative border border-slate-100 dark:border-slate-800"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-6 w-full max-w-md shadow-2xl relative border border-slate-100 dark:border-slate-800"
             >
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-on-surface dark:text-slate-100 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-bold text-on-surface dark:text-slate-100 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   Quick Log Vitals
                 </h3>
                 <button 
@@ -805,7 +661,7 @@ export default function Dashboard({
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 rounded-xl">
                     <span className="text-xs text-on-surface-variant dark:text-slate-400 block font-medium">Glycemic Index (GI) Target</span>
                     <span className="text-lg font-bold text-on-surface dark:text-slate-100 mt-1 block">&lt; 53 GI (Low)</span>
@@ -847,348 +703,6 @@ export default function Dashboard({
         )}
       </AnimatePresence>
 
-      {/* Quick Log Vitals Modal (Blood Sugar & Blood Pressure) */}
-      <AnimatePresence>
-        {showVitalsLogModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" id="vitals-log-modal">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md shadow-2xl relative border border-slate-100 dark:border-slate-800 max-h-[90vh] overflow-y-auto"
-            >
-              <div className="flex justify-between items-center mb-5">
-                <h3 className="text-lg font-black text-on-surface dark:text-slate-100 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-pink-500 animate-pulse" />
-                  Log Vital Reading
-                </h3>
-                <button 
-                  onClick={() => setShowVitalsLogModal(false)}
-                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-on-surface-variant dark:text-slate-400 transition-colors cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {!vitalsFeedback ? (
-                <form onSubmit={handleLogVitalSubmit} className="space-y-5">
-                  {/* Category Switcher Tabs */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-1 p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/60 rounded-xl">
-                    <button
-                      type="button"
-                      onClick={() => setVitalsType("blood_sugar")}
-                      className={`py-2 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
-                        vitalsType === "blood_sugar"
-                          ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                          : "text-on-surface-variant hover:text-on-surface"
-                      }`}
-                    >
-                      Blood Sugar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setVitalsType("blood_pressure")}
-                      className={`py-2 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
-                        vitalsType === "blood_pressure"
-                          ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                          : "text-on-surface-variant hover:text-on-surface"
-                      }`}
-                    >
-                      Blood Pressure
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setVitalsType("temperature")}
-                      className={`py-2 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
-                        vitalsType === "temperature"
-                          ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                          : "text-on-surface-variant hover:text-on-surface"
-                      }`}
-                    >
-                      Temperature
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setVitalsType("spo2")}
-                      className={`py-2 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
-                        vitalsType === "spo2"
-                          ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                          : "text-on-surface-variant hover:text-on-surface"
-                      }`}
-                    >
-                      SpO2 (Oxygen)
-                    </button>
-                  </div>
-
-                  {vitalsType === "blood_sugar" ? (
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between items-center mb-1.5">
-                          <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
-                            Glucose Value
-                          </label>
-                          {/* Unit Selector */}
-                          <div className="flex gap-1 bg-slate-50 dark:bg-slate-950 p-0.5 rounded-md border border-slate-200/40 dark:border-slate-800/40">
-                            <button
-                              type="button"
-                              onClick={() => setSugarUnit("mg/dL")}
-                              className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
-                                sugarUnit === "mg/dL"
-                                  ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                                  : "text-slate-400 dark:text-slate-500"
-                              }`}
-                            >
-                              mg/dL
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setSugarUnit("mmol/L")}
-                              className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
-                                sugarUnit === "mmol/L"
-                                  ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                                  : "text-slate-400 dark:text-slate-500"
-                              }`}
-                            >
-                              mmol/L
-                            </button>
-                          </div>
-                        </div>
-                        <input
-                          type="number"
-                          step="0.1"
-                          required
-                          placeholder={sugarUnit === "mg/dL" ? "e.g. 110" : "e.g. 6.1"}
-                          value={sugarVal}
-                          onChange={(e) => setSugarVal(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
-                        />
-                      </div>
-
-                      {/* Context selector tags */}
-                      <div>
-                        <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
-                          Reading Context (Sugar Targets Differ)
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {(["Fasting", "Post-meal", "Random", "Bedtime"] as const).map((ctx) => (
-                            <button
-                              key={ctx}
-                              type="button"
-                              onClick={() => setSugarContext(ctx)}
-                              className={`py-2 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
-                                sugarContext === ctx
-                                  ? "border-pink-500 bg-pink-500/5 text-pink-500 font-extrabold"
-                                  : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 hover:border-slate-300"
-                              }`}
-                            >
-                              {ctx}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ) : vitalsType === "blood_pressure" ? (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">
-                            Systolic (mmHg)
-                          </label>
-                          <input
-                            type="number"
-                            required
-                            placeholder="e.g. 120"
-                            value={systolic}
-                            onChange={(e) => setSystolic(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">
-                            Diastolic (mmHg)
-                          </label>
-                          <input
-                            type="number"
-                            required
-                            placeholder="e.g. 80"
-                            value={diastolic}
-                            onChange={(e) => setDiastolic(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">
-                          Pulse Rate (BPM) <span className="text-[10px] text-slate-400 dark:text-slate-500 lowercase">(optional)</span>
-                        </label>
-                        <input
-                          type="number"
-                          placeholder="e.g. 72"
-                          value={pulse}
-                          onChange={(e) => setPulse(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
-                        />
-                      </div>
-                    </div>
-                  ) : vitalsType === "temperature" ? (
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between items-center mb-1.5">
-                          <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
-                            Body Temperature
-                          </label>
-                          <div className="flex gap-1 bg-slate-50 dark:bg-slate-950 p-0.5 rounded-md border border-slate-200/40 dark:border-slate-800/40">
-                            <button
-                              type="button"
-                              onClick={() => setTempUnit("F")}
-                              className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
-                                tempUnit === "F"
-                                  ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                                  : "text-slate-400 dark:text-slate-500"
-                              }`}
-                            >
-                              °F
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setTempUnit("C")}
-                              className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
-                                tempUnit === "C"
-                                  ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                                  : "text-slate-400 dark:text-slate-500"
-                              }`}
-                            >
-                              °C
-                            </button>
-                          </div>
-                        </div>
-                        <input
-                          type="number"
-                          step="0.1"
-                          required
-                          placeholder={tempUnit === "F" ? "e.g. 98.6" : "e.g. 37.0"}
-                          value={tempVal}
-                          onChange={(e) => setTempVal(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">
-                          Blood Oxygen (SpO2 %)
-                        </label>
-                        <input
-                          type="number"
-                          required
-                          placeholder="e.g. 98"
-                          value={spo2Val}
-                          onChange={(e) => setSpo2Val(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Manual Time Override */}
-                  <div>
-                    <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">
-                      Reading Time
-                    </label>
-                    <input
-                      type="datetime-local"
-                      required
-                      value={logTime}
-                      onChange={(e) => setLogTime(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
-                    />
-                  </div>
-
-                  <div className="mt-6 flex gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                    <button
-                      type="button"
-                      onClick={() => setShowVitalsLogModal(false)}
-                      className="flex-1 py-3 text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isLoggingVitals}
-                      className="flex-1 py-3 text-sm font-bold text-white bg-pink-500 hover:bg-pink-600 rounded-xl transition-all shadow-md shadow-pink-500/10 cursor-pointer disabled:opacity-50 active:scale-95"
-                    >
-                      {isLoggingVitals ? "Saving..." : "Save Reading"}
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                /* Interactive AI Feedback Overlay */
-                <div className="space-y-4 py-2 animate-in fade-in duration-300">
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <h4 className="text-sm font-extrabold text-on-surface dark:text-slate-100 flex items-center gap-1.5">
-                      <Sparkles className="w-4.5 h-4.5 text-pink-500 animate-pulse" />
-                      Immediate AI Analysis
-                    </h4>
-                    <span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider border ${
-                      vitalsFeedback.severity === "crisis" 
-                        ? "bg-rose-500/10 text-rose-500 border-rose-500/30 animate-bounce"
-                        : vitalsFeedback.severity === "abnormal"
-                        ? "bg-amber-500/10 text-amber-500 border-amber-500/30"
-                        : "bg-emerald-500/10 text-emerald-500 border-emerald-500/30"
-                    }`}>
-                      {vitalsFeedback.severity === "crisis" ? "Urgent Critical" : vitalsFeedback.isNormal ? "Optimal Range" : "Attention Needed"}
-                    </span>
-                  </div>
-
-                  {vitalsFeedback.severity === "crisis" && (
-                    <div className="bg-red-50 dark:bg-red-950/20 border-2 border-red-500 p-4 rounded-2xl animate-pulse flex items-start gap-3">
-                      <ShieldAlert className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-xs text-red-600 dark:text-red-400 font-extrabold uppercase tracking-wide">
-                          ⚠️ EMERGENCY CRISIS THRESHOLD MET
-                        </p>
-                        <p className="text-[11px] text-red-500 dark:text-red-300 font-semibold leading-normal mt-1">
-                          This is an extremely critical level. Please contact a qualified doctor or go to the nearest emergency room immediately. Do not delay!
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="bg-slate-50 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-150 dark:border-slate-800 space-y-3">
-                    <div className="text-xs text-on-surface dark:text-slate-200 font-medium leading-relaxed whitespace-pre-wrap">
-                      {vitalsFeedback.analysis}
-                    </div>
-                  </div>
-
-                  {/* Standard Medical Disclaimer */}
-                  <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/40 rounded-xl text-[10px] text-slate-400 leading-normal">
-                    <span className="font-bold text-slate-500">Disclaimer:</span> Swasth AI provides supplementary general support based on standard values. This information is not a substitute for professional medical care, diagnosis, or treatment.
-                  </div>
-
-                  <div className="pt-2 flex gap-3">
-                    <button 
-                      type="button"
-                      onClick={() => setVitalsFeedback(null)}
-                      className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all hover:bg-slate-200 cursor-pointer text-center"
-                    >
-                      Log Another
-                    </button>
-                    <button 
-                      type="button"
-                      onClick={() => setShowVitalsLogModal(false)}
-                      className="flex-1 py-3 bg-pink-500 text-white rounded-xl text-xs font-bold transition-all hover:bg-pink-600 cursor-pointer text-center"
-                    >
-                      Close feedback
-                    </button>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }

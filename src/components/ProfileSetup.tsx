@@ -29,10 +29,6 @@ export default function ProfileSetup({
   const [dietaryPreferences, setDietaryPreferences] = useState<string[]>(
     user.dietaryPreferences || ["No Preferences"]
   );
-  const [sugarUnitPreference, setSugarUnitPreference] = useState<"mg/dL" | "mmol/L">(
-    user.sugarUnitPreference || "mg/dL"
-  );
-  
   const [creditLogs, setCreditLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [showLogsHistory, setShowLogsHistory] = useState(false);
@@ -90,13 +86,12 @@ export default function ProfileSetup({
         dob,
         gender,
         dietaryPreferences,
-        sugarUnitPreference,
       });
       onFinishOnboarding();
     }
   };
 
-  const dietPresets = ["Vegetarian", "Vegan", "Gluten-Free", "Ketogenic", "No Preferences"];
+  const dietPresets = ["Vegetarian", "Vegan", "Gluten-Free", "Ketogenic", "Non Veg", "No Preferences"];
 
   return (
     <motion.div
@@ -174,13 +169,13 @@ export default function ProfileSetup({
               <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
                 Gender Identity
               </label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {["Male", "Female", "Other"].map((gen) => (
                   <button
                     key={gen}
                     type="button"
                     onClick={() => setGender(gen)}
-                    className={`h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-xs transition-all cursor-pointer ${
+                    className={`h-10 sm:h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-[10px] sm:text-xs transition-all cursor-pointer ${
                       gender === gen
                         ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
                         : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
@@ -204,13 +199,13 @@ export default function ProfileSetup({
                     <div 
                       key={pref}
                       onClick={() => handleDietToggle(pref)}
-                      className={`px-4 py-2.5 rounded-full border flex items-center gap-2 cursor-pointer transition-all ${
+                      className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-full border flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-all ${
                         isChecked 
                           ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary" 
                           : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-on-surface-variant dark:text-slate-400"
                       }`}
                     >
-                      <span className="text-xs font-bold">{pref}</span>
+                      <span className="text-[10px] sm:text-xs font-bold">{pref}</span>
                       <input 
                         type="checkbox" 
                         checked={isChecked}
@@ -223,36 +218,6 @@ export default function ProfileSetup({
               </div>
             </div>
 
-            {/* Sugar Unit Preference */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-                Blood Sugar Unit Preference
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSugarUnitPreference("mg/dL")}
-                    className={`h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-[11px] md:text-xs transition-all cursor-pointer ${
-                      sugarUnitPreference === "mg/dL"
-                        ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
-                        : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
-                    }`}
-                  >
-                    mg/dL (US)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSugarUnitPreference("mmol/L")}
-                    className={`h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-[11px] md:text-xs transition-all cursor-pointer ${
-                      sugarUnitPreference === "mmol/L"
-                        ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
-                        : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
-                    }`}
-                  >
-                    mmol/L (UK/EU)
-                  </button>
-              </div>
-            </div>
           </div>
         ) : (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -341,7 +306,7 @@ export default function ProfileSetup({
       </div>
 
       {/* Credits Management Section */}
-      <div className="w-full bg-white/85 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6" id="credit-management-card">
+      <div className="w-full bg-white/85 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6" id="credit-management-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/30 rounded-full flex items-center justify-center text-amber-500 shrink-0">
@@ -357,32 +322,32 @@ export default function ProfileSetup({
             </div>
           </div>
 
-          <div className="bg-amber-500/10 border border-amber-500/20 px-5 py-3 rounded-2xl flex flex-col items-center justify-center min-w-[120px] shrink-0">
-            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Available Balance</span>
-            <span className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-1">{user.credits !== undefined ? user.credits : 120}</span>
-            <span className="text-[9px] font-semibold text-slate-400 dark:text-slate-500 mt-0.5">Credits</span>
+          <div className="bg-amber-500/10 border border-amber-500/20 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl flex flex-col items-center justify-center min-w-[100px] sm:min-w-[120px] shrink-0">
+            <span className="text-[9px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Available</span>
+            <span className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 mt-0.5 sm:mt-1">{user.credits !== undefined ? user.credits : 120}</span>
+            <span className="text-[8px] sm:text-[9px] font-semibold text-slate-400 dark:text-slate-500 mt-0.5">Credits</span>
           </div>
         </div>
 
         {/* Action Buttons to Refill */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-2">
           <button
             type="button"
             onClick={() => onRefillCredits && onRefillCredits(50)}
-            className="h-12 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:shadow active:scale-95 transition-all cursor-pointer"
+            className="h-10 sm:h-12 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-[10px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 shadow-sm hover:shadow active:scale-95 transition-all cursor-pointer"
             id="btn-refill-50"
           >
-            <Plus className="w-4 h-4" />
-            <span>Refill 50 Credits</span>
+            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>Refill 50</span>
           </button>
           <button
             type="button"
             onClick={() => onRefillCredits && onRefillCredits(100)}
-            className="h-12 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+            className="h-10 sm:h-12 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold text-[10px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 active:scale-95 transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
             id="btn-refill-100"
           >
-            <Plus className="w-4 h-4" />
-            <span>Refill 100 Credits</span>
+            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>Refill 100</span>
           </button>
         </div>
 
@@ -406,7 +371,7 @@ export default function ProfileSetup({
           </button>
 
           {showLogsHistory && (
-            <div className="mt-3.5 space-y-2 max-h-48 overflow-y-auto pr-1">
+            <div className="mt-3.5 space-y-2 max-h-64 sm:max-h-48 overflow-y-auto pr-1">
               {loadingLogs ? (
                 <div className="flex items-center justify-center py-6 text-xs text-slate-400 gap-1.5">
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />

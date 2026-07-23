@@ -695,7 +695,7 @@ app.get("/api/auth/profile", authenticate, (req: any, res) => {
 });
 
 app.post("/api/auth/profile/update", authenticate, (req: any, res) => {
-  const { fullName, dob, gender, dietaryPreferences, sugarUnitPreference } = req.body;
+  const { fullName, dob, gender, dietaryPreferences } = req.body;
   const db = getDb();
   const userIdx = db.users.findIndex((u: any) => u.id === req.userId);
   if (userIdx === -1) return res.status(404).json({ error: "User not found" });
@@ -704,7 +704,6 @@ app.post("/api/auth/profile/update", authenticate, (req: any, res) => {
   if (dob !== undefined) db.users[userIdx].dob = dob;
   if (gender !== undefined) db.users[userIdx].gender = gender;
   if (dietaryPreferences !== undefined) db.users[userIdx].dietaryPreferences = dietaryPreferences;
-  if (sugarUnitPreference !== undefined) db.users[userIdx].sugarUnitPreference = sugarUnitPreference;
 
   saveDb(db);
   res.json({ success: true, user: db.users[userIdx] });

@@ -3,7 +3,7 @@ import { User, SmartActions, Vitals, FileRecord, Medication, ChatMessage } from 
 import {
   Heart, Calendar, FolderOpen, MessageSquare, User as UserIcon, Sparkles,
   ShieldAlert, CheckCircle2, LogOut, Menu, X, Lock, Key, AlertCircle, Activity,
-  Sun, Moon, Download, Home
+  Sun, Moon, Download, Home, Pill
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -12,12 +12,14 @@ import Medications from "./components/Medications";
 import HealthFiles from "./components/HealthFiles";
 import ProfileSetup from "./components/ProfileSetup";
 import AIChat from "./components/AIChat";
+import VitalsLogModal from "./components/VitalsLogModal";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("health_companion_token"));
-  const [activeTab, setActiveTab] = useState<"today" | "files" | "profile">("today");
+  const [activeTab, setActiveTab] = useState<"today" | "files" | "profile" | "medicine">("today");
   const [showChatOverlay, setShowChatOverlay] = useState(false);
+  const [showVitalsLogModal, setShowVitalsLogModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const stored = localStorage.getItem("health_companion_dark");
@@ -589,15 +591,16 @@ export default function App() {
     switch (activeTab) {
       case "today":
         return (
-          <Dashboard
-            user={user}
-            smartActions={smartActions}
-            vitals={vitals}
-            onUpdateWater={handleUpdateWater}
-            onToggleAction={handleToggleAction}
-            onUpdateVitals={handleUpdateVitals}
-            onLogVitalsReading={handleLogVitalsReading}
-          />
+            <Dashboard
+              user={user}
+              smartActions={smartActions}
+              vitals={vitals}
+              onUpdateWater={handleUpdateWater}
+              onToggleAction={handleToggleAction}
+              onUpdateVitals={handleUpdateVitals}
+              onLogVitalsReading={handleLogVitalsReading}
+              onOpenChat={() => setShowChatOverlay(true)}
+            />
         );
       case "files":
         return (
@@ -610,6 +613,16 @@ export default function App() {
             onToggleVitalReminder={handleToggleVitalReminder}
             onDeleteReminder={handleDeleteVitalReminder}
             onAddReminder={handleAddVitalReminder}
+            medications={medications}
+            onAddMedication={handleAddMedication}
+            onToggleTaken={handleToggleTaken}
+            onToggleReminder={handleToggleReminder}
+            onDeleteMedication={handleDeleteMedication}
+          />
+        );
+      case "medicine":
+        return (
+          <Medications
             medications={medications}
             onAddMedication={handleAddMedication}
             onToggleTaken={handleToggleTaken}
@@ -653,7 +666,7 @@ export default function App() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-xl shadow-slate-900/5 dark:shadow-black/20 relative"
+            className="w-full max-w-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl shadow-slate-900/5 dark:shadow-black/20 relative mx-2 sm:mx-0"
             id="auth-gate-card"
           >
             <div className="text-center space-y-2 mb-8">
@@ -827,32 +840,52 @@ export default function App() {
           </main>
 
           {/* BOTTOM RESPONSIVE NAVIGATION BAR */}
-          <nav className="fixed bottom-0 left-0 w-full z-40 flex justify-around items-center h-20 px-4 pb-safe bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-xl rounded-t-2xl transition-colors duration-300">
+          <nav className="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center h-20 px-4 pb-safe bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-xl rounded-t-2xl transition-colors duration-300">
             <button
               onClick={() => setActiveTab("today")}
-              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "today" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
+              className={`flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[56px] min-h-[56px] ${activeTab === "today" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
                 }`}
             >
-              <Home className="w-5 h-5" />
-              <span className="text-[10px] font-bold mt-1">Home</span>
+              <Home className="w-6 h-6" />
+              <span className="text-[10px] font-bold mt-0.5">Home</span>
             </button>
 
             <button
               onClick={() => setActiveTab("files")}
-              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "files" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
+              className={`flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[56px] min-h-[56px] ${activeTab === "files" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
                 }`}
             >
-              <FolderOpen className="w-5 h-5" />
-              <span className="text-[10px] font-bold mt-1">Health Files</span>
+              <FolderOpen className="w-6 h-6" />
+              <span className="text-[10px] font-bold mt-0.5">Files</span>
+            </button>
+
+            {/* Center Heart Vitals FAB */}
+            <div className="relative -top-5">
+              <button
+                onClick={() => setShowVitalsLogModal(true)}
+                className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-[0_4px_20px_-4px_rgba(244,63,94,0.5)] hover:shadow-[0_8px_25px_-4px_rgba(244,63,94,0.6)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+                title="Log Vitals"
+              >
+                <Heart className="w-6 h-6 fill-white" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => setActiveTab("medicine")}
+              className={`flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[56px] min-h-[56px] ${activeTab === "medicine" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
+                }`}
+            >
+              <Pill className="w-6 h-6" />
+              <span className="text-[10px] font-bold mt-0.5">Meds</span>
             </button>
 
             <button
               onClick={() => setActiveTab("profile")}
-              className={`flex flex-col items-center justify-center px-3 md:px-4 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[60px] ${activeTab === "profile" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
+              className={`flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[56px] min-h-[56px] ${activeTab === "profile" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"
                 }`}
             >
-              <UserIcon className="w-5 h-5" />
-              <span className="text-[10px] font-bold mt-1">Profile</span>
+              <UserIcon className="w-6 h-6" />
+              <span className="text-[10px] font-bold mt-0.5">Profile</span>
             </button>
           </nav>
 
@@ -860,7 +893,7 @@ export default function App() {
           {user && (
             <button
               onClick={() => setShowChatOverlay(true)}
-              className="fixed left-6 bottom-28 md:bottom-24 z-30 w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-xl hover:shadow-rose-500/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              className="fixed right-6 bottom-28 md:bottom-24 z-30 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-indigo-600 text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
               title="Ask He-Co AI"
               id="btn-chat-fab"
             >
@@ -876,7 +909,7 @@ export default function App() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.96 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="fixed left-3 right-3 bottom-3 z-50 sm:left-auto sm:right-6 sm:bottom-28 sm:w-[360px] sm:max-w-[calc(100vw-2rem)] sm:h-[520px] sm:max-h-[60vh] bg-white dark:bg-slate-950 rounded-3xl shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08),0_8px_40px_-8px_rgba(0,0,0,0.12)] dark:shadow-[0_2px_20px_-4px_rgba(0,0,0,0.3),0_8px_40px_-8px_rgba(0,0,0,0.4)] border border-slate-200/80 dark:border-slate-800/60 overflow-hidden flex flex-col"
+                className="fixed inset-x-0 bottom-0 top-0 z-50 sm:inset-auto sm:left-auto sm:right-6 sm:bottom-28 sm:w-[360px] sm:max-w-[calc(100vw-2rem)] sm:h-[520px] sm:max-h-[60vh] bg-white dark:bg-slate-950 shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08),0_8px_40px_-8px_rgba(0,0,0,0.12)] dark:shadow-[0_2px_20px_-4px_rgba(0,0,0,0.3),0_8px_40px_-8px_rgba(0,0,0,0.4)] border-0 sm:border border-slate-200/80 dark:border-slate-800/60 overflow-hidden flex flex-col rounded-none sm:rounded-3xl"
               >
                 <AIChat
                   chatHistory={chatHistory}
@@ -891,6 +924,12 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
+          
+          <VitalsLogModal
+            isOpen={showVitalsLogModal}
+            onClose={() => setShowVitalsLogModal(false)}
+            onLogVitalsReading={handleLogVitalsReading}
+          />
         </div>
       )}
     </div>

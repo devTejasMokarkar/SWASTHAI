@@ -10,7 +10,7 @@
       "dietaryPreferences": [
         "No Preferences"
       ],
-      "credits": 145,
+      "credits": 144,
       "vitalityScoreUp": 12,
       "sleepRecovery": "7h 45m",
       "sugarUnitPreference": "mg/dL"
@@ -18,7 +18,7 @@
   ],
   "smartActions": {
     "sarah-session-token": {
-      "waterLoggedMl": 1500,
+      "waterLoggedMl": 3000,
       "waterGoalMl": 2500,
       "vitaminD": true,
       "breathing": true
@@ -4891,6 +4891,66 @@
   ],
   "agentCalls": [
     {
+      "id": "call-ea49b8d2-2a84-48e4-be74-afe578351a45",
+      "userId": "sarah-session-token",
+      "query": "Check Ibuprofen conflict with Lisinopril",
+      "retrievedContext": {
+        "profile": {
+          "fullName": "Sarah",
+          "dob": "1994-10-24",
+          "gender": "Female",
+          "dietaryPreferences": [
+            "No Preferences"
+          ]
+        },
+        "medications": [
+          {
+            "name": "Lisinopril",
+            "strength": "10mg",
+            "taken": false
+          },
+          {
+            "name": "Metformin",
+            "strength": "500mg",
+            "taken": true
+          },
+          {
+            "name": "Atorvastatin",
+            "strength": "20mg",
+            "taken": false
+          }
+        ],
+        "vitals": {
+          "heartRate": 72,
+          "steps": 8432,
+          "sleep": "7h 45m",
+          "calories": 1850
+        },
+        "files": [
+          {
+            "name": "Chest X-Ray_Left.dicom",
+            "similarity": 0.9998431399680432,
+            "aiInsight": "No acute abnormalities detected. Comparison to 2022 stable."
+          },
+          {
+            "name": "Immunization Record.pdf",
+            "similarity": 0.988688347521283,
+            "aiInsight": "Tetanus booster due in 18 months."
+          },
+          {
+            "name": "Amoxicillin Prescription.png",
+            "similarity": 0.914761360625452,
+            "aiInsight": "Course: 250mg, 3x daily. Ends in 3 days."
+          }
+        ]
+      },
+      "rawGeneratedResponse": "⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]\n• NSAID Interaction: \"ibuprofen\" restricts kidney blood flow and counteracts the therapeutic efficacy of Lisinopril. Use safer alternatives and seek medical consultation for long-term pain management.\n--------------------------------------------\n\nGood Evening, Sarah. I'm He-Co, here to help you with your health queries. \n\nRegarding your question, it's important to note that taking Ibuprofen along with Lisinopril can potentially lead to decreased effectiveness of Lisinopril, which is a medication used to treat high blood pressure. This interaction is something to be cautious about, especially if you are managing hypertension. \n\nIn general, it's always a good idea to consult a pharmacist or your doctor before taking any new medications, especially when you are already on a prescribed regimen. This is a precautionary measure to ensure the safety and effectiveness of your treatment. \n\nFor minor ailments, I'd like to emphasize our focus on natural remedies. For instance, if you have a mild headache, you could try a warm compress or a gentle head massage with essential oils. These simple measures often provide relief without the need for medication. \n\nDisclaimer: Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care. If you are experiencing any major, severe, or persistent symptoms, please consult a medical doctor immediately.\n\nRAG Citation: [Amoxicillin Prescription.png, Lisinopril, Metformin, Atorvastatin]",
+      "safetyWarnings": [
+        "NSAID Interaction: \"ibuprofen\" restricts kidney blood flow and counteracts the therapeutic efficacy of Lisinopril. Use safer alternatives and seek medical consultation for long-term pain management."
+      ],
+      "timestamp": "2026-07-21T16:42:25.004Z"
+    },
+    {
       "id": "call-261fda2c-af8d-4621-b9d7-48a6b12cef14",
       "userId": "sarah-session-token",
       "query": "hi",
@@ -6354,6 +6414,14 @@
     }
   ],
   "creditLogs": [
+    {
+      "id": "log-ae03527a-5617-42fd-b606-f7ab91ff9d00",
+      "userId": "sarah-session-token",
+      "amount": 1,
+      "reason": "He-Co AI Chat: \"Check Ibuprofen conflict with ...\"",
+      "timestamp": "2026-07-21T16:42:16.360Z",
+      "remaining": 144
+    },
     {
       "id": "log-99c031fb-2650-40ad-8af1-196eb139ccef",
       "userId": "sarah-session-token",
