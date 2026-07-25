@@ -18,3 +18,7 @@ View your app in AI Studio: https://ai.studio/apps/f4db37c5-3831-4ca8-b3c8-4fa17
 2. Set `COHERE_API_KEY` in [.env.local](.env.local) for production chat responses, and `GEMINI_API_KEY` if you also want Gemini fallback support
 3. Run the app:
    `npm run dev`
+
+
+other.projects 
+sign language app

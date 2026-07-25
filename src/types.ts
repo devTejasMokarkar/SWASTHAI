@@ -70,6 +70,7 @@ export interface Medication {
   taken: boolean;
   loggedAt: string | null;
   reminderSet: boolean;
+  reminderInterval?: string;
   conflictDetected?: boolean;
   conflictMessage?: string;
 }

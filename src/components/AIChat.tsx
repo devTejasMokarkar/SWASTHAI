@@ -16,6 +16,7 @@ interface AIChatProps {
   user: User;
   medications: Medication[];
   debugMode?: boolean;
+  token: string | null;
 }
 
 const localRiskDictionary = {
@@ -132,7 +133,8 @@ export default function AIChat({
   auditLogs = [],
   user,
   medications,
-  debugMode = false
+  debugMode = false,
+  token
 }: AIChatProps) {
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -166,7 +168,6 @@ export default function AIChat({
     setRunningDiagnostics(true);
     setDiagnosticError(null);
     try {
-      const token = localStorage.getItem("health_companion_token") || "sarah-session-token";
       const res = await fetch("/api/gemini/diagnostics/run", {
         method: "POST",
         headers: {

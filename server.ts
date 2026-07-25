@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import { supabaseAdmin } from "./src/lib/supabaseAdmin.js";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
@@ -593,120 +594,80 @@ app.use((req, res, next) => {
 });
 
 // Authentication middleware to extract user context
-function authenticate(req: any, res: any, next: any) {
+async function authenticate(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    // Standard secure token fallback to our default Sarah session for beautiful zero-friction previewing
-    req.userId = "sarah-session-token";
-    return next();
+    return res.status(401).json({ error: "Missing authorization header." });
   }
   const token = authHeader.replace("Bearer ", "");
-  const db = getDb();
-  const user = db.users.find((u: any) => u.id === token);
-  if (!user) {
+  
+  const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+  
+  if (error || !user) {
     return res.status(401).json({ error: "Unauthorized session. Please sign in again." });
   }
+  
   req.userId = user.id;
   next();
 }
 
 // --- SECURE AUTHENTICATION ENDPOINTS ---
 
-app.post("/api/auth/register", (req, res) => {
-  const { fullName, email, password } = req.body;
-  if (!fullName || !email || !password) {
-    return res.status(400).json({ error: "Missing required fields." });
+app.get("/api/auth/profile", authenticate, async (req: any, res) => {
+  const { data: profile, error } = await supabaseAdmin
+    .from('profiles')
+    .select('*')
+    .eq('user_id', req.userId)
+    .single();
+
+  if (error || !profile) {
+    return res.status(404).json({ error: "Profile not found" });
   }
 
-  const db = getDb();
-  if (db.users.some((u: any) => u.email.toLowerCase() === email.toLowerCase())) {
-    return res.status(400).json({ error: "An account with this email already exists." });
-  }
-
-  const userId = crypto.randomUUID();
-  const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
-
-  const newUser = {
-    id: userId,
-    email: email.toLowerCase(),
-    passwordHash,
-    fullName,
-    dob: "",
-    gender: "Other",
-    dietaryPreferences: ["No Preferences"],
-    credits: 120,
-    vitalityScoreUp: 0,
-    sleepRecovery: "N/A"
+  // To match frontend expected structure:
+  const user = {
+    id: profile.user_id,
+    fullName: profile.name,
+    email: profile.email,
+    dob: profile.dob || '1994-10-24',
+    gender: profile.gender,
+    dietaryPreferences: profile.conditions || [],
+    credits: 120, // Should be fetched from credit_usage sum in real app
   };
 
-  db.users.push(newUser);
-
-  // Initialize companion states for this user
-  db.smartActions[userId] = {
-    waterLoggedMl: 0,
-    waterGoalMl: 2500,
-    vitaminD: false,
-    breathing: false
-  };
-
-  db.vitals[userId] = {
-    heartRate: 70,
-    steps: 0,
-    sleep: "0h 0m",
-    calories: 0,
-    activityTrends: [0, 0, 0, 0, 0, 0, 0]
-  };
-
-  saveDb(db);
-
-  res.status(201).json({ token: userId, user: { id: userId, fullName, email } });
-});
-
-app.post("/api/auth/login", (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: "Missing email or password." });
-  }
-
-  const db = getDb();
-  const user = db.users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
-  if (!user) {
-    return res.status(401).json({ error: "Invalid email or password." });
-  }
-
-  const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
-  if (user.passwordHash !== passwordHash) {
-    return res.status(401).json({ error: "Invalid email or password." });
-  }
-
-  res.json({ token: user.id, user: { id: user.id, fullName: user.fullName, email: user.email } });
-});
-
-app.get("/api/auth/profile", authenticate, (req: any, res) => {
-  const db = getDb();
-  const user = db.users.find((u: any) => u.id === req.userId);
-  if (!user) return res.status(404).json({ error: "User not found" });
+  // Mocking smartActions and vitals for now as they aren't fully migrated
+  const smartActions = { waterLoggedMl: 0, waterGoalMl: 2500, vitaminD: false, breathing: false };
+  const vitals = { heartRate: 72, steps: 8432, sleep: "7h 45m", calories: 1850, activityTrends: [40, 65, 45, 85, 60, 95, 75] };
 
   res.json({
     user,
-    smartActions: db.smartActions[req.userId] || { waterLoggedMl: 0, waterGoalMl: 2500, vitaminD: false, breathing: false },
-    vitals: db.vitals[req.userId] || { heartRate: 72, steps: 8432, sleep: "7h 45m", calories: 1850, activityTrends: [40, 65, 45, 85, 60, 95, 75] }
+    smartActions,
+    vitals
   });
 });
 
-app.post("/api/auth/profile/update", authenticate, (req: any, res) => {
-  const { fullName, dob, gender, dietaryPreferences } = req.body;
-  const db = getDb();
-  const userIdx = db.users.findIndex((u: any) => u.id === req.userId);
-  if (userIdx === -1) return res.status(404).json({ error: "User not found" });
+app.post("/api/auth/profile/update", authenticate, async (req: any, res) => {
+  const { fullName, dob, gender, dietaryPreferences, weightKg, heightCm, healthGoals } = req.body;
 
-  if (fullName !== undefined) db.users[userIdx].fullName = fullName;
-  if (dob !== undefined) db.users[userIdx].dob = dob;
-  if (gender !== undefined) db.users[userIdx].gender = gender;
-  if (dietaryPreferences !== undefined) db.users[userIdx].dietaryPreferences = dietaryPreferences;
+  const updates: any = {};
+  if (fullName !== undefined) updates.name = fullName;
+  if (dob !== undefined) updates.dob = dob;
+  if (gender !== undefined) updates.gender = gender;
+  if (weightKg !== undefined) updates.weight_kg = parseFloat(weightKg);
+  if (dietaryPreferences !== undefined) updates.conditions = dietaryPreferences;
 
-  saveDb(db);
-  res.json({ success: true, user: db.users[userIdx] });
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .update(updates)
+    .eq('user_id', req.userId)
+    .select()
+    .single();
+
+  if (error) {
+    return res.status(500).json({ error: "Failed to update profile" });
+  }
+
+  res.json({ success: true, user: { ...req.body, id: req.userId } });
 });
 
 // --- CREDITS SYSTEM ENDPOINTS ---
@@ -799,14 +760,19 @@ app.post("/api/metrics/action/toggle", authenticate, (req: any, res) => {
 
 // --- HEALTH FILES ENDPOINTS ---
 
-app.get("/api/files", authenticate, (req: any, res) => {
-  const db = getDb();
-  const userFiles = db.files.filter((f: any) => f.userId === req.userId);
-  res.json(userFiles);
+app.get("/api/files", authenticate, async (req: any, res) => {
+  const { data, error } = await supabaseAdmin
+    .from('files')
+    .select('*')
+    .eq('user_id', req.userId)
+    .order('uploaded_at', { ascending: false });
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
 app.post("/api/files/add", authenticate, async (req: any, res) => {
-  const { name, category, size } = req.body;
+  const { name, size, category, base64Data } = req.body;
   if (!name) return res.status(400).json({ error: "Missing file name" });
 
   const db = getDb();
@@ -842,14 +808,11 @@ app.post("/api/files/add", authenticate, async (req: any, res) => {
   }
 
   const newFile: any = {
-    id: "file-" + crypto.randomUUID(),
-    userId: req.userId,
-    name,
-    date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    size: size || "1.5 MB",
-    type: name.split(".").pop() || "pdf",
-    aiInsight,
-    category: category || "report"
+    user_id: req.userId,
+    title: name,
+    type: category || "report",
+    storage_url: `https://mock-storage.com/${name}`, // placeholder
+    ocr_summary: aiInsight
   };
 
   try {
@@ -858,24 +821,37 @@ app.post("/api/files/add", authenticate, async (req: any, res) => {
     console.error("Failed to generate embedding for added file:", err);
   }
 
-  db.files.unshift(newFile);
-  saveDb(db);
-  res.json(newFile);
+  const { data, error } = await supabaseAdmin
+    .from('files')
+    .insert([newFile])
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
-app.delete("/api/files/:id", authenticate, (req: any, res) => {
-  const db = getDb();
-  db.files = db.files.filter((f: any) => !(f.id === req.params.id && f.userId === req.userId));
-  saveDb(db);
+app.delete("/api/files/:id", authenticate, async (req: any, res) => {
+  const { error } = await supabaseAdmin
+    .from('files')
+    .delete()
+    .eq('id', req.params.id)
+    .eq('user_id', req.userId);
+
+  if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 
 // --- MEDICATIONS ENDPOINTS ---
 
-app.get("/api/medications", authenticate, (req: any, res) => {
-  const db = getDb();
-  const userMeds = db.medications.filter((m: any) => m.userId === req.userId);
-  res.json(userMeds);
+app.get("/api/medications", authenticate, async (req: any, res) => {
+  const { data, error } = await supabaseAdmin
+    .from('medications')
+    .select('*')
+    .eq('user_id', req.userId);
+    
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
 app.post("/api/medications/add", authenticate, async (req: any, res) => {
@@ -924,23 +900,23 @@ app.post("/api/medications/add", authenticate, async (req: any, res) => {
   }
 
   const newMed = {
-    id: "med-" + crypto.randomUUID(),
-    userId: req.userId,
+    user_id: req.userId,
     name,
-    strength,
-    form: form || "Tablet",
-    frequency: frequency || "Daily",
-    dueTime: dueTime || "09:00 AM",
-    taken: false,
-    loggedAt: null,
-    reminderSet: false,
-    conflictDetected,
-    conflictMessage
+    dose: strength,
+    condition: "N/A",
+    time_of_day: [dueTime || "09:00:00"],
+    with_food: false,
+    active: true
   };
 
-  db.medications.push(newMed);
-  saveDb(db);
-  res.json({ medication: newMed, conflict: conflictDetected ? conflictMessage : null });
+  const { data, error } = await supabaseAdmin
+    .from('medications')
+    .insert([newMed])
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ medication: data, conflict: conflictDetected ? conflictMessage : null });
 });
 
 app.post("/api/medications/:id/take", authenticate, (req: any, res) => {
@@ -966,10 +942,14 @@ app.post("/api/medications/:id/reminder", authenticate, (req: any, res) => {
   res.json(db.medications[medIdx]);
 });
 
-app.delete("/api/medications/:id", authenticate, (req: any, res) => {
-  const db = getDb();
-  db.medications = db.medications.filter((m: any) => !(m.id === req.params.id && m.userId === req.userId));
-  saveDb(db);
+app.delete("/api/medications/:id", authenticate, async (req: any, res) => {
+  const { error } = await supabaseAdmin
+    .from('medications')
+    .delete()
+    .eq('id', req.params.id)
+    .eq('user_id', req.userId);
+
+  if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 

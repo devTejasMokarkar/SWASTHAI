@@ -1,7 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Medication, ScanResult } from "../types";
-import { Pill, Activity, Plus, Search, ShieldAlert, Sparkles, Check, Bell, BellOff, Trash2, Camera, AlertCircle, X, CheckCircle2 } from "lucide-react";
+import { Pill, Activity, Plus, Search, ShieldAlert, Sparkles, Check, Bell, BellOff, Trash2, Camera, AlertCircle, X, CheckCircle2, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+
+const REMINDER_INTERVALS = [
+  { label: "Every 10 minutes", value: "10min" },
+  { label: "Every 30 minutes", value: "30min" },
+  { label: "Every 1 hour", value: "1h" },
+  { label: "Every 2 hours", value: "2h" },
+  { label: "Every 4 hours", value: "4h" },
+  { label: "Every 8 hours", value: "8h" },
+  { label: "Daily", value: "daily" },
+];
 
 interface MedicationsProps {
   medications: Medication[];
@@ -9,6 +19,7 @@ interface MedicationsProps {
   onToggleTaken: (id: string) => void;
   onToggleReminder: (id: string) => void;
   onDeleteMedication: (id: string) => void;
+  token: string | null;
 }
 
 export default function Medications({
@@ -17,8 +28,8 @@ export default function Medications({
   onToggleTaken,
   onToggleReminder,
   onDeleteMedication,
+  token,
 }: MedicationsProps) {
-  const [isLoading, setIsLoading] = useState(true);
   // Add Medication Form states
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState("");
@@ -26,8 +37,59 @@ export default function Medications({
   const [newForm, setNewForm] = useState("Tablet");
   const [newFrequency, setNewFrequency] = useState("Daily");
   const [newTime, setNewTime] = useState("09:00");
+  const [newReminderInterval, setNewReminderInterval] = useState("daily");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addConflictWarn, setAddConflictWarn] = useState<string | null>(null);
+
+  const reminderTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
+  const scheduleReminder = (medId: string, interval: string) => {
+    const ms = interval === "10min" ? 10 * 60 * 1000
+      : interval === "30min" ? 30 * 60 * 1000
+      : interval === "1h" ? 60 * 60 * 1000
+      : interval === "2h" ? 2 * 60 * 60 * 1000
+      : interval === "4h" ? 4 * 60 * 60 * 1000
+      : interval === "8h" ? 8 * 60 * 60 * 1000
+      : 24 * 60 * 60 * 1000;
+
+    if (Notification.permission === "granted") {
+      const timer = setInterval(() => {
+        new Notification("Swasth AI Reminder", {
+          body: `Time to take your medication!`,
+          icon: "/favicon.ico",
+        });
+      }, ms);
+      reminderTimers.current.set(medId, timer);
+    }
+  };
+
+  const clearReminder = (medId: string) => {
+    const timer = reminderTimers.current.get(medId);
+    if (timer) {
+      clearInterval(timer);
+      reminderTimers.current.delete(medId);
+    }
+  };
+
+  useEffect(() => {
+    if (Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+    return () => {
+      reminderTimers.current.forEach((timer) => clearInterval(timer));
+      reminderTimers.current.clear();
+    };
+  }, []);
+
+  useEffect(() => {
+    medications.forEach((med) => {
+      if (med.reminderSet && med.reminderInterval && !reminderTimers.current.has(med.id)) {
+        scheduleReminder(med.id, med.reminderInterval);
+      } else if (!med.reminderSet) {
+        clearReminder(med.id);
+      }
+    });
+  }, [medications]);
 
   // Scanner states
   const [scannerActive, setScannerActive] = useState(false);
@@ -41,11 +103,6 @@ export default function Medications({
 
   // Hydration detail state
   const [showHydrationDetail, setShowHydrationDetail] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 900);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleAddMed = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +118,7 @@ export default function Medications({
         form: newForm,
         frequency: newFrequency,
         dueTime: newTime,
+        reminderInterval: newReminderInterval,
       });
 
       if (res.conflict) {
@@ -84,7 +142,6 @@ export default function Medications({
 
     // Call backend scan endpoint
     try {
-      const token = localStorage.getItem("health_companion_token");
       const response = await fetch("/api/gemini/scan", {
         method: "POST",
         headers: {
@@ -95,69 +152,13 @@ export default function Medications({
       });
       const data = await response.json();
       
-      // Simulate real high-tech delay for user enchantment
-      setTimeout(() => {
-        setScanResult(data);
-        setIsScanning(false);
-      }, 1500);
+      setScanResult(data);
+      setIsScanning(false);
     } catch (err) {
       console.error(err);
       setIsScanning(false);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-10 animate-pulse" id="medications-skeleton">
-        {/* Scanner Hero Skeleton */}
-        <section className="space-y-6">
-          <div className="h-8 w-64 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-          <div className="w-full aspect-video md:aspect-[21/9] rounded-3xl bg-slate-200/50 dark:bg-slate-800/40 border border-slate-200/30 dark:border-slate-800/30 flex items-center justify-center">
-            {/* Pulsing overlay scanner lens */}
-            <div className="w-44 h-44 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl flex items-center justify-center">
-              <div className="h-10 w-24 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-            </div>
-          </div>
-          <div className="flex gap-2 max-w-md">
-            <div className="flex-1 h-12 bg-slate-200/50 dark:bg-slate-800/40 rounded-xl"></div>
-            <div className="w-24 h-12 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-          </div>
-        </section>
-
-        {/* Medications List Skeleton */}
-        <section className="space-y-6">
-          <div className="flex justify-between items-end">
-            <div className="space-y-2">
-              <div className="h-7 w-48 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
-              <div className="h-4 w-36 bg-slate-200 dark:bg-slate-800 rounded"></div>
-            </div>
-            <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-slate-200/50 dark:bg-slate-800/40 border border-slate-200/30 dark:border-slate-800/30 p-6 rounded-2xl h-[280px] flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start">
-                    <div className="w-12 h-12 rounded-xl bg-slate-200 dark:bg-slate-800"></div>
-                    <div className="h-8 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
-                  </div>
-                  <div className="space-y-2 mt-6">
-                    <div className="h-5 w-2/3 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                    <div className="h-4 w-1/3 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-8 pt-4 border-t border-slate-100 dark:border-slate-800/40">
-                  <div className="flex-1 h-10 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-                  <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-    );
-  }
 
   return (
     <motion.div
@@ -344,6 +345,12 @@ export default function Medications({
                     <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-1">
                       {med.strength} {med.form} • {med.frequency}
                     </p>
+                    {med.reminderSet && med.reminderInterval && (
+                      <p className="text-[10px] font-bold text-secondary mt-1.5 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        Reminder every {REMINDER_INTERVALS.find(i => i.value === med.reminderInterval)?.label.toLowerCase() || med.reminderInterval}
+                      </p>
+                    )}
                   </div>
 
                   {med.taken && med.loggedAt && (
@@ -553,13 +560,18 @@ export default function Medications({
                     <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
                       Frequency
                     </label>
-                    <input 
-                      type="text"
-                      placeholder="e.g. Daily, 3x daily"
+                    <select
                       value={newFrequency}
                       onChange={(e) => setNewFrequency(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
-                    />
+                    >
+                      <option>Daily</option>
+                      <option>2x daily</option>
+                      <option>3x daily</option>
+                      <option>4x daily</option>
+                      <option>Weekly</option>
+                      <option>As needed</option>
+                    </select>
                   </div>
 
                   <div>
@@ -568,12 +580,26 @@ export default function Medications({
                     </label>
                     <input 
                       type="time"
-                      placeholder="e.g. 09:00 AM"
                       value={newTime}
                       onChange={(e) => setNewTime(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
+                    Reminder Interval
+                  </label>
+                  <select
+                    value={newReminderInterval}
+                    onChange={(e) => setNewReminderInterval(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                  >
+                    {REMINDER_INTERVALS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="pt-4 flex gap-3">

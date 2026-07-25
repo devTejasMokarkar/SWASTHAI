@@ -2,8 +2,34 @@ import React, { useState, useEffect } from "react";
 import { User, SmartActions, Vitals } from "../types";
 import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import SkeletonCard from "./SkeletonCard";
 import confetti from "canvas-confetti";
+
+const ClockDisplay = () => {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+  const formattedDate = now.toLocaleDateString("en-US", {
+    weekday: "long", month: "long", day: "numeric", year: "numeric"
+  });
+  const formattedTime = now.toLocaleTimeString("en-US", {
+    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true
+  });
+  return (
+    <div className="flex flex-row items-center gap-3 shrink-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-sm dark:shadow-[0_4px_20px_rgb(0,0,0,0.15)] hover:scale-[1.02] transition-transform duration-300 self-start xl:self-auto">
+      <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+        <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+        <span>{formattedDate}</span>
+      </div>
+      <div className="w-px h-4 md:h-5 bg-slate-300 dark:bg-slate-700"></div>
+      <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-black text-on-surface dark:text-slate-200 tracking-wider">
+        <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-secondary animate-pulse" />
+        <span className="font-mono bg-gradient-to-r from-slate-700 to-slate-500 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">{formattedTime}</span>
+      </div>
+    </div>
+  );
+};
 
 const WaterConfetti = () => {
   const colors = ["#3b82f6", "#60a5fa", "#10b981", "#34d399", "#fbbf24", "#f43f5e", "#a855f7"];
@@ -83,14 +109,12 @@ export default function Dashboard({
   onLogVitalsReading,
   onOpenChat,
 }: DashboardProps) {
-  const [isLoading, setIsLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
   const [logSteps, setLogSteps] = useState(vitals.steps);
   const [logHeartRate, setLogHeartRate] = useState(vitals.heartRate);
   const [logCalories, setLogCalories] = useState(vitals.calories);
   const [showFullReport, setShowFullReport] = useState(false);
-  const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
   
   const [prevWater, setPrevWater] = useState(smartActions.waterLoggedMl);
   const [triggerConfetti, setTriggerConfetti] = useState(false);
@@ -99,21 +123,12 @@ export default function Dashboard({
     if (smartActions.waterLoggedMl >= smartActions.waterGoalMl && prevWater < smartActions.waterGoalMl) {
       setTriggerConfetti(true);
       
-      // Fire premium high-performance canvas confetti bursts
       confetti({
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 }
       });
       
-      setTimeout(() => {
-        confetti({
-          particleCount: 80,
-          spread: 100,
-          origin: { y: 0.7 }
-        });
-      }, 250);
-
       const timer = setTimeout(() => setTriggerConfetti(false), 5000);
       setPrevWater(smartActions.waterLoggedMl);
       return () => clearTimeout(timer);
@@ -121,14 +136,7 @@ export default function Dashboard({
     setPrevWater(smartActions.waterLoggedMl);
   }, [smartActions.waterLoggedMl, smartActions.waterGoalMl, prevWater]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const currentHour = currentDateTime.getHours();
+  const currentHour = new Date().getHours();
   let greeting = "Hello";
   let greetingSubtext = "";
   if (currentHour >= 5 && currentHour < 12) {
@@ -141,25 +149,6 @@ export default function Dashboard({
     greeting = "Good night";
   }
 
-  const formattedDate = currentDateTime.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric"
-  });
-
-  const formattedTime = currentDateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true
-  });
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 900);
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleSaveLogs = () => {
     onUpdateVitals({
       steps: Number(logSteps),
@@ -168,74 +157,6 @@ export default function Dashboard({
     });
     setShowLogModal(false);
   };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-8 animate-pulse" id="dashboard-skeleton">
-        {/* Skeleton Greeting */}
-        <div className="space-y-3">
-          <div className="h-10 w-2/3 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
-          <div className="h-4 w-1/2 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-        </div>
-
-        {/* Skeleton Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Featured Card Skeleton */}
-          <div className="md:col-span-8 bg-slate-200/50 dark:bg-slate-800/40 rounded-3xl p-6 h-[300px] flex flex-col justify-between border border-slate-200/30 dark:border-slate-800/30">
-            <div className="space-y-4">
-              <div className="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
-              <div className="h-8 w-64 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-              <div className="space-y-2 mt-4">
-                <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded"></div>
-                <div className="h-4 w-5/6 bg-slate-200 dark:bg-slate-800 rounded"></div>
-              </div>
-            </div>
-            <div className="h-12 w-40 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-          </div>
-
-          {/* Smart Actions Panel Skeleton */}
-          <div className="md:col-span-4 flex flex-col justify-between gap-4 h-[300px]">
-            <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded-md"></div>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-slate-200/50 dark:bg-slate-800/40 border border-slate-200/30 dark:border-slate-800/30 p-4 rounded-2xl flex justify-between items-center h-20">
-                <div className="flex items-center gap-4 w-full">
-                  <div className="w-12 h-12 rounded-xl bg-slate-200 dark:bg-slate-800"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-2/3 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                    <div className="h-3 w-1/2 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                  </div>
-                </div>
-                <div className="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-800"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Skeleton Vitals Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <SkeletonCard key={i} id={`skeleton-vital-card-${i}`} />
-          ))}
-        </div>
-
-        {/* Skeleton Chart */}
-        <div className="bg-slate-200/50 dark:bg-slate-800/40 border border-slate-200/30 dark:border-slate-800/30 p-8 rounded-3xl h-64 flex flex-col justify-between animate-pulse">
-          <div className="space-y-2">
-            <div className="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
-            <div className="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded"></div>
-          </div>
-          <div className="h-32 flex items-end justify-between gap-3 pt-4">
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <div key={i} className="flex-1 flex flex-col items-center h-full justify-end gap-2">
-                <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-t-lg" style={{ height: `${20 + i * 10}%` }}></div>
-                <div className="h-3 w-8 bg-slate-200 dark:bg-slate-800 rounded"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <motion.div
@@ -280,22 +201,7 @@ export default function Dashboard({
         </div>
         
         {/* Date and Time display */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex flex-row items-center gap-3 shrink-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-sm dark:shadow-[0_4px_20px_rgb(0,0,0,0.15)] hover:scale-[1.02] transition-transform duration-300 self-start xl:self-auto"
-        >
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-            <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-            <span>{formattedDate}</span>
-          </div>
-          <div className="w-px h-4 md:h-5 bg-slate-300 dark:bg-slate-700"></div>
-          <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-black text-on-surface dark:text-slate-200 tracking-wider">
-            <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-secondary animate-pulse" />
-            <span className="font-mono bg-gradient-to-r from-slate-700 to-slate-500 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">{formattedTime}</span>
-          </div>
-        </motion.div>
+        <ClockDisplay />
       </section>
 
       {/* Main Bento Grid */}

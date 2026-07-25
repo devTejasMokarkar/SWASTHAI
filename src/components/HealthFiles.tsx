@@ -26,6 +26,7 @@ interface HealthFilesProps {
   onToggleTaken: (id: string) => void;
   onToggleReminder: (id: string) => void;
   onDeleteMedication: (id: string) => void;
+  token: string | null;
 }
 
 export default function HealthFiles({
@@ -43,11 +44,17 @@ export default function HealthFiles({
   onToggleTaken,
   onToggleReminder: onToggleMedReminder,
   onDeleteMedication,
+  token,
 }: HealthFilesProps) {
-  const [isLoading, setIsLoading] = useState(true);
   const [healthTab, setHealthTab] = useState<"files" | "medications">("files");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "report" | "prescription" | "vitals">("all");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearchQuery(searchQuery), 200);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
   
   // Add file dialog states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -74,11 +81,6 @@ export default function HealthFiles({
   // Calendar View states
   const [currentMonth, setCurrentMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 900);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleCreateFile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,62 +116,12 @@ export default function HealthFiles({
 
   // Filter logic
   const filteredFiles = files.filter((f) => {
-    const matchesSearch = f.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          f.aiInsight.toLowerCase().includes(searchQuery.toLowerCase());
+    const query = debouncedSearchQuery.toLowerCase();
+    const matchesSearch = f.name.toLowerCase().includes(query) || 
+                          f.aiInsight.toLowerCase().includes(query);
     const matchesTab = activeTab === "all" ? true : f.category === activeTab;
     return matchesSearch && matchesTab;
   });
-
-  if (isLoading) {
-    return (
-      <div className="space-y-8 animate-pulse" id="health-files-skeleton">
-        {/* Search input skeleton */}
-        <div className="h-14 bg-slate-200/50 dark:bg-slate-800/40 rounded-2xl border border-slate-200/30 dark:border-slate-800/30 w-full"></div>
-
-        {/* Tab switcher skeleton */}
-        <div className="flex justify-between items-center flex-wrap gap-4">
-          <div className="h-12 w-64 bg-slate-200/50 dark:bg-slate-800/40 rounded-2xl"></div>
-          <div className="h-8 w-24 bg-slate-200/50 dark:bg-slate-800/40 rounded-xl"></div>
-        </div>
-
-        {/* Page Title skeleton */}
-        <div className="space-y-2">
-          <div className="h-8 w-48 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
-          <div className="h-4 w-96 bg-slate-200 dark:bg-slate-800 rounded"></div>
-        </div>
-
-        {/* Files Grid skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-slate-200/50 dark:bg-slate-800/40 border border-slate-200/30 dark:border-slate-800/30 p-6 rounded-3xl h-[320px] flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800"></div>
-                    <div className="space-y-2">
-                      <div className="h-4 w-28 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                      <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                    </div>
-                  </div>
-                  <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800"></div>
-                </div>
-                {/* AI Insight content box */}
-                <div className="p-4 bg-slate-200/30 dark:bg-slate-800/20 rounded-2xl space-y-2">
-                  <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                  <div className="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded"></div>
-                  <div className="h-3 w-4/5 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                </div>
-              </div>
-              <div className="flex gap-2 pt-4 border-t border-slate-100 dark:border-slate-800/40">
-                <div className="flex-1 h-10 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-                <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   const handleExportCSV = () => {
     if (!vitalsReadings.length) return;
@@ -1020,6 +972,7 @@ export default function HealthFiles({
           onToggleTaken={onToggleTaken}
           onToggleReminder={onToggleMedReminder}
           onDeleteMedication={onDeleteMedication}
+          token={token}
         />
       ) : (
         <>

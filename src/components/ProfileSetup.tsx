@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User } from "../types";
-import { ShieldCheck, ArrowRight, CheckCircle2, Heart, HelpCircle, Utensils, Apple, Info, Coins, RefreshCw, History, Plus } from "lucide-react";
+import { ShieldCheck, ArrowRight, CheckCircle2, Info, Coins, RefreshCw, History, Plus } from "lucide-react";
 import { motion } from "motion/react";
 
 interface ProfileSetupProps {
@@ -22,10 +22,9 @@ export default function ProfileSetup({
   token,
   onRefillCredits,
 }: ProfileSetupProps) {
-  const [step, setStep] = useState(1);
-  const [fullName, setFullName] = useState(user.fullName || "Alex Johnson");
-  const [dob, setDob] = useState(user.dob || "1994-10-24");
-  const [gender, setGender] = useState(user.gender || "Male");
+  const [fullName, setFullName] = useState(user.fullName || "Guest User");
+  const [dob, setDob] = useState(user.dob || "1990-01-01");
+  const [gender, setGender] = useState(user.gender || "Other");
   const [dietaryPreferences, setDietaryPreferences] = useState<string[]>(
     user.dietaryPreferences || ["No Preferences"]
   );
@@ -53,19 +52,17 @@ export default function ProfileSetup({
 
   useEffect(() => {
     fetchLogs();
-  }, [token, user.credits]);
+  }, [token]);
   
-  // Extra step questions for completeness & wow factor
   const [weightKg, setWeightKg] = useState("70");
   const [heightCm, setHeightCm] = useState("175");
   const [healthGoals, setHealthGoals] = useState<string[]>(["Energy levels"]);
-  
+
   const handleDietToggle = (pref: string) => {
     if (pref === "No Preferences") {
       setDietaryPreferences(["No Preferences"]);
       return;
     }
-    
     let updated = dietaryPreferences.filter((p) => p !== "No Preferences");
     if (updated.includes(pref)) {
       updated = updated.filter((p) => p !== pref);
@@ -76,19 +73,9 @@ export default function ProfileSetup({
     setDietaryPreferences(updated);
   };
 
-  const handleNextStep = async () => {
-    if (step < 2) {
-      setStep(step + 1);
-    } else {
-      // Save all on backend
-      await onSaveProfile({
-        fullName,
-        dob,
-        gender,
-        dietaryPreferences,
-      });
-      onFinishOnboarding();
-    }
+  const handleSave = async () => {
+    await onSaveProfile({ fullName, dob, gender, dietaryPreferences });
+    onFinishOnboarding();
   };
 
   const dietPresets = ["Vegetarian", "Vegan", "Gluten-Free", "Ketogenic", "Non Veg", "No Preferences"];
@@ -102,205 +89,106 @@ export default function ProfileSetup({
       className="w-full max-w-2xl mx-auto flex flex-col items-center space-y-8 pt-6"
       id="profile-setup-view"
     >
-      {/* Multi-step Progress Bar */}
-      <div className="w-full" id="onboarding-progress">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-xs font-bold text-primary uppercase tracking-wider">
-            Step {step} of 2
-          </span>
-          <span className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
-            {step === 1 ? "Profile Basics" : "Clinical Demographics"}
-          </span>
-        </div>
-        <div className="flex gap-2">
-          <div className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${step >= 1 ? "bg-primary" : "bg-slate-200 dark:bg-slate-800"}`}></div>
-          <div className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${step >= 2 ? "bg-primary" : "bg-slate-200 dark:bg-slate-800"}`}></div>
-        </div>
-      </div>
-
       {/* Header Greeting */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl md:text-4xl font-extrabold text-on-surface dark:text-slate-100 tracking-tight">
-          Build your health profile
+          Edit Profile
         </h1>
         <p className="text-sm text-on-surface-variant dark:text-slate-400 max-w-md mx-auto">
-          Tell us a little about yourself so we can tailor your daily health insights and recommendations.
+          Update your personal details and preferences.
         </p>
       </div>
 
       {/* Bento Layout Form Card */}
       <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 p-6 md:p-8 shadow-xl shadow-slate-950/5 space-y-8" id="profile-basics-form">
-        
-        {step === 1 ? (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name Field */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1" htmlFor="full_name">
-                  Full Name
-                </label>
-                <input 
-                  type="text" 
-                  id="full_name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Alex Johnson"
-                  className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
-                />
-              </div>
-
-              {/* DOB Field */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1" htmlFor="dob">
-                  Date of Birth
-                </label>
-                <input 
-                  type="date" 
-                  id="dob"
-                  value={dob}
-                  onChange={(e) => setDob(e.target.value)}
-                  className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Gender Selection */}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-                Gender Identity
+              <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1" htmlFor="full_name">
+                Full Name
               </label>
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                {["Male", "Female", "Other"].map((gen) => (
-                  <button
-                    key={gen}
-                    type="button"
-                    onClick={() => setGender(gen)}
-                    className={`h-10 sm:h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-[10px] sm:text-xs transition-all cursor-pointer ${
-                      gender === gen
-                        ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
-                        : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
+              <input
+                type="text"
+                id="full_name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Your name"
+                className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1" htmlFor="dob">
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                id="dob"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+              Gender Identity
+            </label>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {["Male", "Female", "Other"].map((gen) => (
+                <button
+                  key={gen}
+                  type="button"
+                  onClick={() => setGender(gen)}
+                  className={`h-10 sm:h-12 flex items-center justify-center gap-2 rounded-xl border font-bold text-[10px] sm:text-xs transition-all cursor-pointer ${
+                    gender === gen
+                      ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
+                      : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 dark:hover:border-primary/40"
+                  }`}
+                >
+                  {gen}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+              Dietary Preferences
+            </label>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {dietPresets.map((pref) => {
+                const isChecked = dietaryPreferences.includes(pref);
+                return (
+                  <div
+                    key={pref}
+                    onClick={() => handleDietToggle(pref)}
+                    className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-full border flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-all ${
+                      isChecked
+                        ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
+                        : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-on-surface-variant dark:text-slate-400"
                     }`}
                   >
-                    {gen}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Dietary Preferences */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-                Dietary Preferences
-              </label>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {dietPresets.map((pref) => {
-                  const isChecked = dietaryPreferences.includes(pref);
-                  return (
-                    <div 
-                      key={pref}
-                      onClick={() => handleDietToggle(pref)}
-                      className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-full border flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-all ${
-                        isChecked 
-                          ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary" 
-                          : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-on-surface-variant dark:text-slate-400"
-                      }`}
-                    >
-                      <span className="text-[10px] sm:text-xs font-bold">{pref}</span>
-                      <input 
-                        type="checkbox" 
-                        checked={isChecked}
-                        readOnly
-                        className="rounded-full text-primary focus:ring-0 w-3.5 h-3.5 border-slate-300 dark:border-slate-700"
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-          </div>
-        ) : (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Weight */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-                  Weight (kg)
-                </label>
-                <input 
-                  type="number" 
-                  value={weightKg}
-                  onChange={(e) => setWeightKg(e.target.value)}
-                  placeholder="70"
-                  className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
-                />
-              </div>
-
-              {/* Height */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-                  Height (cm)
-                </label>
-                <input 
-                  type="number" 
-                  value={heightCm}
-                  onChange={(e) => setHeightCm(e.target.value)}
-                  placeholder="175"
-                  className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Health Goals */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-                Primary Health Milestones
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {["Cardio endurance", "Sleep recovery", "Better nutrition", "Weight management", "Stress buffering"].map((goal) => {
-                  const isSelected = healthGoals.includes(goal);
-                  return (
-                    <button
-                      key={goal}
-                      type="button"
-                      onClick={() => {
-                        if (isSelected) {
-                          setHealthGoals(healthGoals.filter((g) => g !== goal));
-                        } else {
-                          setHealthGoals([...healthGoals, goal]);
-                        }
-                      }}
-                      className={`py-3.5 px-4 rounded-xl border text-left text-xs font-bold transition-all flex justify-between items-center cursor-pointer ${
-                        isSelected 
-                          ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary" 
-                          : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400"
-                      }`}
-                    >
-                      {goal}
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
+                    <span className="text-[10px] sm:text-xs font-bold">{pref}</span>
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      readOnly
+                      className="rounded-full text-primary focus:ring-0 w-3.5 h-3.5 border-slate-300 dark:border-slate-700"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Primary Action Buttons */}
         <div className="flex flex-col gap-3 pt-2">
-          <button 
-            onClick={handleNextStep}
-            className="w-full h-14 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/35 group cursor-pointer"
+          <button
+            onClick={handleSave}
+            className="w-full h-14 bg-primary hover:bg-primary-container text-white rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/35 cursor-pointer"
           >
-            {step === 1 ? "Next Step" : "Complete Profile"}
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-          
-          <button 
-            onClick={onFinishOnboarding}
-            className="w-full h-12 text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-all cursor-pointer"
-          >
-            Skip for now
+            Save Profile
           </button>
         </div>
       </div>
