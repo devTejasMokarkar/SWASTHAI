@@ -94,11 +94,11 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
           <button
             type="button"
             onClick={() => setShowDiseaseDropdown(!showDiseaseDropdown)}
-            className="w-full h-10 px-4 flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-left text-sm font-semibold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 transition-all cursor-pointer"
+            className="w-full min-h-[40px] px-4 py-2.5 flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-left text-sm font-semibold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 transition-all cursor-pointer"
           >
             <span className="flex-1 truncate">
               {data.activeDiseases.length > 0
-                ? `${data.activeDiseases.length} condition${data.activeDiseases.length > 1 ? "s" : ""} selected`
+                ? data.activeDiseases.join(", ")
                 : "Search or select conditions..."}
             </span>
             <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${showDiseaseDropdown ? "rotate-180" : ""}`} />
@@ -182,9 +182,9 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
           ref={textareaRef}
           value={data.medicalHistory}
           onChange={e => { update("medicalHistory", e.target.value); autoResize() }}
-          placeholder={`Diabetes Type 2 diagnosed in 2021\nPenicillin allergy\nAsthma during childhood\nUnderwent appendix surgery in 2018\nFamily history of hypertension`}
+          placeholder="E.g. Diabetes Type 2 diagnosed in 2021, penicillin allergy, appendix surgery in 2018, family history of hypertension..."
           rows={2}
-          className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm resize-none overflow-hidden"
+          className="w-full px-4 py-2.5 bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 outline-none font-semibold text-sm resize-y min-h-[64px] cursor-text"
         />
         <p className="text-[10px] text-on-surface-variant dark:text-slate-500 italic">
           Include previous illnesses, surgeries, allergies, family medical history, or chronic conditions.

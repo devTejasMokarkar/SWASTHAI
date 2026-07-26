@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import { User, SmartActions, Vitals, FileRecord, Medication, ChatMessage, HealthReminder } from "./types";
 import {
   Heart, Calendar, FolderOpen, MessageSquare, User as UserIcon, Sparkles,
-  ShieldAlert, CheckCircle2, Activity,
+  ShieldAlert, CheckCircle2, Activity, Bell, X, Clock, Check,
   Sun, Moon, Download, Home, Pill, LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -48,6 +48,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<"today" | "files" | "profile" | "medicine">("today");
   const [showChatOverlay, setShowChatOverlay] = useState(false);
   const [showVitalsLogModal, setShowVitalsLogModal] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const stored = localStorage.getItem("health_companion_dark");
@@ -518,6 +519,17 @@ export default function App() {
             </button>
 
             <button
+              onClick={() => setShowReminderModal(true)}
+              className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary rounded-lg transition-colors cursor-pointer relative"
+              title="View All Reminders"
+            >
+              <Bell className="w-5 h-5" />
+              {(medications.some(m => !m.taken) || healthReminders.some(r => r.enabled)) && (
+                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping" />
+              )}
+            </button>
+
+            <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary rounded-lg transition-colors cursor-pointer"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
@@ -617,18 +629,56 @@ export default function App() {
         </nav>
 
         {user && (
-          <div className="fixed right-6 bottom-28 md:bottom-24 z-30 flex flex-col items-center gap-1.5">
-            <span className="text-[10px] font-bold text-transparent bg-gradient-to-r from-secondary via-purple-500 to-primary bg-clip-text bg-[length:200%_100%] animate-gradient whitespace-nowrap drop-shadow-sm">
-              <TypingText text="I am HeCo AI Health Advisor" />
-            </span>
-            <button
-              onClick={() => setShowChatOverlay(true)}
-              className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-indigo-600 text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              title="Ask He-Co AI"
-              id="btn-chat-fab"
+          <div className="fixed right-6 bottom-28 md:bottom-24 z-30 flex flex-col items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.5 }}
+              className="flex items-center gap-1.5 mb-1.5"
             >
-              <MessageSquare className="w-6 h-6" />
-            </button>
+              <motion.span
+                animate={{ rotate: [0, 15, -10, 15, 0] }}
+                transition={{ repeat: Infinity, duration: 2, repeatDelay: 3, ease: "easeInOut" }}
+                className="text-lg"
+              >
+                👋
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.4, duration: 0.4 }}
+                className="text-[13px] font-black bg-gradient-to-r from-primary via-purple-500 to-indigo-500 bg-clip-text text-transparent bg-[length:200%_100%] animate-gradient drop-shadow-sm"
+              >
+                HeCo
+              </motion.span>
+            </motion.div>
+
+            <div className="relative">
+              <motion.div
+                animate={{ scale: [1, 1.12, 1], opacity: [0.3, 0.6, 0.3] }}
+                transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-full bg-primary/30 dark:bg-primary/20 blur-xl"
+              />
+
+              <motion.button
+                onClick={() => setShowChatOverlay(true)}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  boxShadow: [
+                    "0 0 0 0 rgba(99,102,241,0.4)",
+                    "0 0 0 14px rgba(99,102,241,0)",
+                    "0 0 0 0 rgba(99,102,241,0)",
+                  ],
+                }}
+                transition={{ repeat: Infinity, duration: 2.5, ease: "easeOut" }}
+                className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-indigo-600 text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center cursor-pointer relative z-10"
+                title="Ask He-Co AI"
+                id="btn-chat-fab"
+              >
+                <MessageSquare className="w-6 h-6" />
+              </motion.button>
+            </div>
           </div>
         )}
 
@@ -660,6 +710,96 @@ export default function App() {
           onClose={() => setShowVitalsLogModal(false)}
           onLogVitalsReading={handleLogVitalsReading}
         />
+
+        <AnimatePresence>
+          {showReminderModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800"
+              >
+                <div className="sticky top-0 bg-white dark:bg-slate-900 z-10 flex items-center justify-between px-5 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2.5">
+                    <Bell className="w-5 h-5 text-primary" />
+                    <h2 className="text-lg font-extrabold text-on-surface dark:text-slate-100">All Reminders</h2>
+                  </div>
+                  <button onClick={() => setShowReminderModal(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer">
+                    <X className="w-5 h-5 text-on-surface-variant" />
+                  </button>
+                </div>
+
+                <div className="p-5 space-y-5">
+                  {/* Upcoming */}
+                  <div>
+                    <h3 className="text-xs font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" /> Upcoming
+                    </h3>
+                    {(() => {
+                      const upcoming: { label: string; detail: string; time: string }[] = []
+                      medications.filter(m => !m.taken).forEach(m => upcoming.push({ label: m.name, detail: m.strength, time: m.dueTime }))
+                      healthReminders.filter(r => r.enabled).forEach(r => upcoming.push({ label: r.customLabel || r.type, detail: r.type, time: r.times[0] || "—" }))
+                      vitalsReminders.filter((r: any) => !r.completed).forEach((r: any) => upcoming.push({ label: r.name || "Vitals check", detail: r.type || "", time: r.time || "—" }))
+                      return upcoming.length > 0 ? (
+                        <div className="space-y-1.5">
+                          {upcoming.map((r, i) => (
+                            <div key={i} className="flex items-center justify-between px-3.5 py-2.5 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-900/30 rounded-xl">
+                              <div>
+                                <p className="text-xs font-bold text-on-surface dark:text-slate-100">{r.label}</p>
+                                <p className="text-[10px] text-on-surface-variant">{r.detail}</p>
+                              </div>
+                              <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">{r.time}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : <p className="text-xs text-on-surface-variant italic">No upcoming reminders</p>
+                    })()}
+                  </div>
+
+                  {/* Completed / Taken */}
+                  <div>
+                    <h3 className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5" /> Completed
+                    </h3>
+                    {(() => {
+                      const done: { label: string; detail: string; time: string }[] = []
+                      medications.filter(m => m.taken).forEach(m => done.push({ label: m.name, detail: m.strength, time: m.dueTime }))
+                      healthReminders.filter(r => !r.enabled).forEach(r => done.push({ label: r.customLabel || r.type, detail: r.type, time: r.times[0] || "—" }))
+                      vitalsReminders.filter((r: any) => r.completed).forEach((r: any) => done.push({ label: r.name || "Vitals check", detail: r.type || "", time: r.time || "—" }))
+                      return done.length > 0 ? (
+                        <div className="space-y-1.5">
+                          {done.map((r, i) => (
+                            <div key={i} className="flex items-center justify-between px-3.5 py-2.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30 rounded-xl opacity-70">
+                              <div>
+                                <p className="text-xs font-bold text-on-surface dark:text-slate-100 line-through">{r.label}</p>
+                                <p className="text-[10px] text-on-surface-variant">{r.detail}</p>
+                              </div>
+                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{r.time}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : <p className="text-xs text-on-surface-variant italic">No completed reminders yet</p>
+                    })()}
+                  </div>
+
+                  {/* Summary */}
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-3.5 flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-on-surface-variant">Total active</span>
+                    <span className="font-black text-on-surface dark:text-slate-100">
+                      {medications.filter(m => !m.taken).length + healthReminders.filter(r => r.enabled).length + vitalsReminders.filter((r: any) => !r.completed).length}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

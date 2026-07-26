@@ -997,9 +997,19 @@ export default function HealthFiles({
       ) : (
         <>
           {/* Page Title */}
-          <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-on-surface dark:text-slate-100">Health Files</h2>
-            <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-1">Manage your digital health records with AI-powered insights.</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight text-on-surface dark:text-slate-100">Health Files</h2>
+              <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-1">Manage your digital health records with AI-powered insights.</p>
+            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="shrink-0 h-11 px-4 rounded-xl bg-primary text-white shadow-md hover:shadow-primary/35 flex items-center gap-2 hover:scale-105 active:scale-95 transition-all text-xs font-bold"
+              title="Upload Health Record"
+            >
+              <Plus className="w-5 h-5" />
+              Upload
+            </button>
           </div>
 
           {/* Files List Grid */}
@@ -1079,23 +1089,12 @@ export default function HealthFiles({
               <div className="col-span-full py-12 flex flex-col items-center justify-center text-center text-on-surface-variant space-y-3">
                 <FolderOpen className="w-12 h-12 text-slate-300" />
                 <h3 className="font-bold text-base text-on-surface">No Files Found</h3>
-                <p className="text-xs max-w-xs">Try clearing your search query or uploading a clinical file using the floating action button below.</p>
+                <p className="text-xs max-w-xs">Try clearing your search query or uploading a new clinical file.</p>
               </div>
             )}
           </div>
 
-          {/* Floating Add File button */}
-          <button 
-            onClick={() => setShowAddModal(true)}
-            className="fixed bottom-28 md:bottom-24 right-6 w-16 h-16 rounded-2xl bg-primary text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-40 group"
-            title="Upload Health Record"
-            id="add-file-fab"
-          >
-            <Plus className="w-8 h-8" />
-            <span className="absolute right-full mr-4 px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
-              Upload New File
-            </span>
-          </button>
+
         </>
       )}
 

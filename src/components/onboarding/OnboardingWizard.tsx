@@ -171,14 +171,20 @@ export function OnboardingWizard() {
                 exit="exit"
                 transition={{ duration: 0.25, ease: "easeInOut" }}
               >
-                <div className="text-center py-2">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-2">
+                <div className="text-center py-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">
                     <Activity className="w-6 h-6" />
                   </div>
                   <h2 className="text-base font-extrabold text-on-surface dark:text-slate-100">
                     You're all set!
                   </h2>
-                  <p className="text-xs text-on-surface-variant dark:text-slate-400 mt-0.5 mb-5">
+                  {data.step1.fullName && (
+                    <p className="text-sm font-semibold text-on-surface-variant dark:text-slate-400 mt-1">
+                      Profile for {data.step1.fullName}
+                      {data.step1.dob && `, ${calculateAge(data.step1.dob)} yrs`}
+                    </p>
+                  )}
+                  <p className="text-xs text-on-surface-variant dark:text-slate-500 mt-1 mb-5">
                     Sign in with Google to save your health profile.
                   </p>
 
@@ -223,4 +229,13 @@ export function OnboardingWizard() {
       </div>
     </div>
   )
+}
+
+function calculateAge(dob: string): number {
+  const birth = new Date(dob)
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const m = today.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--
+  return age
 }

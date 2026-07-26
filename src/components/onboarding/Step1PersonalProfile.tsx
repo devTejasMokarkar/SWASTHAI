@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { ChipSelect } from "../ui/ChipSelect"
-import { ChevronDown, Check } from "lucide-react"
+import { Check } from "lucide-react"
 
 export interface Step1Data {
   fullName: string
@@ -17,10 +16,10 @@ interface Step1Props {
   onChange: (data: Step1Data) => void
 }
 
-const dietOptions = [
-  "Vegetarian", "Vegan", "Non Vegetarian", "Eggetarian",
-  "Gluten Free", "Ketogenic", "Jain", "Low Carb",
-  "High Protein", "No Preference",
+const mainDietOptions = ["Vegetarian", "Vegan", "Non Vegetarian", "No Preference"]
+const extraDietOptions = [
+  "Eggetarian", "Gluten Free", "Ketogenic", "Jain",
+  "Low Carb", "High Protein",
 ]
 
 const mainGoals = [
@@ -49,8 +48,21 @@ const extraGoals = [
 ]
 
 export function Step1PersonalProfile({ data, onChange }: Step1Props) {
+  const [showMoreDiet, setShowMoreDiet] = useState(false)
   const [showMoreGoals, setShowMoreGoals] = useState(false)
+  const dietRef = useRef<HTMLDivElement>(null)
   const goalsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!showMoreDiet) return
+    const handleClick = (e: MouseEvent) => {
+      if (dietRef.current && !dietRef.current.contains(e.target as Node)) {
+        setShowMoreDiet(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [showMoreDiet])
 
   useEffect(() => {
     if (!showMoreGoals) return
@@ -67,6 +79,22 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
     onChange({ ...data, [field]: value })
   }
 
+  const toggleDiet = (pref: string) => {
+    const current = data.dietaryPreferences
+    if (pref === "No Preference") {
+      update("dietaryPreferences", ["No Preference"])
+      return
+    }
+    let updated = current.filter(p => p !== "No Preference")
+    if (updated.includes(pref)) {
+      updated = updated.filter(p => p !== pref)
+      if (updated.length === 0) updated = ["No Preference"]
+    } else {
+      updated.push(pref)
+    }
+    update("dietaryPreferences", updated)
+  }
+
   const toggleExtraGoal = (goal: string) => {
     const current = data.healthGoals
     const updated = current.includes(goal)
@@ -75,8 +103,9 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
     update("healthGoals", updated)
   }
 
-  const selectedExtraCount = extraGoals.filter(g => data.healthGoals.includes(g)).length
-  const selectedMain = data.healthGoals.filter(g => mainGoals.includes(g))
+  const selectedExtraDietCount = extraDietOptions.filter(d => data.dietaryPreferences.includes(d)).length
+  const selectedExtraGoalCount = extraGoals.filter(g => data.healthGoals.includes(g)).length
+  const selectedMainGoals = data.healthGoals.filter(g => mainGoals.includes(g))
 
   return (
     <div className="space-y-4">
@@ -163,7 +192,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
 
         <div className="space-y-1">
           <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-            Height (cm) <span className="font-normal normal-case">opt.</span>
+            Height (cm)
           </label>
           <input
             type="number"
@@ -177,13 +206,63 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
         </div>
       </div>
 
-      <ChipSelect
-        label="Dietary Preference"
-        options={dietOptions}
-        selected={data.dietaryPreferences}
-        onChange={val => update("dietaryPreferences", val)}
-      />
+      {/* Dietary Preference */}
+      <div className="space-y-1.5">
+        <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+          Dietary Preference
+        </label>
+        <div className="flex flex-wrap gap-1">
+          {mainDietOptions.map(d => {
+            const active = data.dietaryPreferences.includes(d)
+            const isNone = d === "No Preference"
+            const show = !isNone || data.dietaryPreferences.length === 0 || data.dietaryPreferences.includes("No Preference")
+            if (!show) return null
+            return (
+              <button key={d} type="button" onClick={() => toggleDiet(d)}
+                className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none ${
+                  active
+                    ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
+                    : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
+                }`}>
+                {d}
+              </button>
+            )
+          })}
+          <div ref={dietRef} className="relative">
+            <button type="button" onClick={() => setShowMoreDiet(!showMoreDiet)}
+              className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none ${
+                selectedExtraDietCount > 0
+                  ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
+                  : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
+              }`}>
+              {selectedExtraDietCount > 0 ? `More (${selectedExtraDietCount})` : "More options"}
+            </button>
+            {showMoreDiet && (
+              <div className="absolute top-full left-0 mt-1 z-20 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-2 max-h-60 overflow-y-auto">
+                {extraDietOptions.map(d => {
+                  const active = data.dietaryPreferences.includes(d)
+                  return (
+                    <button key={d} type="button" onClick={() => toggleDiet(d)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer">
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"}`}>
+                        {active && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <span className="text-xs font-semibold text-on-surface dark:text-slate-200">{d}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+        {data.dietaryPreferences.filter(p => p !== "No Preference").length > 0 && (
+          <p className="text-[10px] text-on-surface-variant dark:text-slate-500">
+            {data.dietaryPreferences.filter(p => p !== "No Preference").length} selected
+          </p>
+        )}
+      </div>
 
+      {/* Goals */}
       <div className="space-y-1.5">
         <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
           What do you want from Swasth AI?
@@ -192,51 +271,33 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
           {mainGoals.map(goal => {
             const active = data.healthGoals.includes(goal)
             return (
-              <button
-                key={goal}
-                type="button"
-                onClick={() => toggleExtraGoal(goal)}
+              <button key={goal} type="button" onClick={() => toggleExtraGoal(goal)}
                 className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none ${
                   active
                     ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
                     : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
-                }`}
-              >
+                }`}>
                 {goal}
               </button>
             )
           })}
-
           <div ref={goalsRef} className="relative">
-            <button
-              type="button"
-              onClick={() => setShowMoreGoals(!showMoreGoals)}
-              className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none flex items-center gap-1 ${
-                selectedExtraCount > 0
+            <button type="button" onClick={() => setShowMoreGoals(!showMoreGoals)}
+              className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none ${
+                selectedExtraGoalCount > 0
                   ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                  : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50"
-              }`}
-            >
-              {selectedExtraCount > 0 ? `Other (${selectedExtraCount})` : "Other"}
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showMoreGoals ? "rotate-180" : ""}`} />
+                  : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
+              }`}>
+              {selectedExtraGoalCount > 0 ? `Other (${selectedExtraGoalCount})` : "Other"}
             </button>
-
             {showMoreGoals && (
               <div className="absolute top-full left-0 mt-1 z-20 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-2 max-h-60 overflow-y-auto">
                 {extraGoals.map(goal => {
                   const active = data.healthGoals.includes(goal)
                   return (
-                    <button
-                      key={goal}
-                      type="button"
-                      onClick={() => toggleExtraGoal(goal)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer"
-                    >
-                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                        active
-                          ? "bg-primary border-primary"
-                          : "border-slate-300 dark:border-slate-600"
-                      }`}>
+                    <button key={goal} type="button" onClick={() => toggleExtraGoal(goal)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer">
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"}`}>
                         {active && <Check className="w-3 h-3 text-white" />}
                       </div>
                       <span className="text-xs font-semibold text-on-surface dark:text-slate-200">{goal}</span>
@@ -247,7 +308,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
             )}
           </div>
         </div>
-        {selectedMain.length > 0 && (
+        {selectedMainGoals.length > 0 && (
           <p className="text-[10px] text-on-surface-variant dark:text-slate-500">
             {data.healthGoals.length} selected
           </p>

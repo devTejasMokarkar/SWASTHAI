@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { User, SmartActions, Vitals, Medication, MedicationReminder, HealthReminder, ReminderStatus } from "../types";
-import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap, MessageSquare, Bell, Check, ChevronDown, RotateCcw } from "lucide-react";
+import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap, MessageSquare, Bell, Check, ChevronDown, RotateCcw, Settings } from "lucide-react";
+import WellnessHydrationModal from "./WellnessHydrationModal";
+
 import { motion, AnimatePresence } from "motion/react";
 import confetti from "canvas-confetti";
 
@@ -121,6 +123,7 @@ export default function Dashboard({
   const [logHeartRate, setLogHeartRate] = useState(vitals.heartRate);
   const [logCalories, setLogCalories] = useState(vitals.calories);
   const [showFullReport, setShowFullReport] = useState(false);
+  const [showWellnessModal, setShowWellnessModal] = useState(false);
   
   const [prevWater, setPrevWater] = useState(smartActions.waterLoggedMl);
   const [triggerConfetti, setTriggerConfetti] = useState(false);
@@ -227,13 +230,13 @@ export default function Dashboard({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="text-3xl md:text-5xl font-black tracking-tight flex items-center flex-wrap gap-2 md:gap-3"
+            className="text-xl md:text-3xl font-extrabold tracking-tight flex items-center flex-wrap gap-2"
           >
-            <span className="bg-gradient-to-br from-primary via-blue-500 to-emerald-400 bg-clip-text text-transparent pb-1 drop-shadow-sm">
+            <span className="bg-gradient-to-br from-primary via-blue-500 to-emerald-400 bg-clip-text text-transparent pb-0.5 drop-shadow-sm break-words">
               {greeting}, {user.fullName || "Sarah"}.
             </span>
             {user.dob && (
-              <span className="text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 tracking-wide border border-slate-200/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 px-2.5 py-1 rounded-full shadow-sm">
+              <span className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wide border border-slate-200/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap">
                 {Math.floor((new Date().getTime() - new Date(user.dob).getTime()) / 3.15576e+10)} yrs
               </span>
             )}
@@ -378,7 +381,13 @@ export default function Dashboard({
             {/* Visual Progress Bar */}
             <div className="w-full">
               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
-                <span>Hydration Goal</span>
+                <div className="flex items-center gap-2">
+                  <span>Hydration Goal</span>
+                  <button type="button" onClick={e => { e.stopPropagation(); setShowWellnessModal(true); }}
+                    className="p-1 hover:bg-primary/10 rounded-lg transition-colors cursor-pointer" title="Wellness settings">
+                    <Settings className="w-3 h-3 text-slate-400 hover:text-primary" />
+                  </button>
+                </div>
                 <span className={smartActions.waterLoggedMl >= smartActions.waterGoalMl ? "text-emerald-500" : "text-primary"}>
                   {Math.round(Math.min((smartActions.waterLoggedMl / smartActions.waterGoalMl) * 100, 100))}%
                 </span>
@@ -452,6 +461,14 @@ export default function Dashboard({
 
         </div>
       </div>
+
+      <WellnessHydrationModal
+        isOpen={showWellnessModal}
+        onClose={() => setShowWellnessModal(false)}
+        waterLoggedMl={smartActions.waterLoggedMl}
+        waterGoalMl={smartActions.waterGoalMl}
+        onUpdateWater={onUpdateWater}
+      />
 
       {/* Today's Reminders */}
       {todayReminders.length > 0 && (

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { User } from "../types";
-import { ShieldCheck, ArrowRight, CheckCircle2, Info, Coins, RefreshCw, History, Plus, ChevronDown, Check, Search, X } from "lucide-react";
-import { motion } from "motion/react";
-import { MedicationInput, type Medication } from "./ui/MedicationInput";
+import { Coins, RefreshCw, History, Plus, ChevronDown, Check, Search, X, Pencil, Trash2, Bell, Settings, XCircle } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import MedicationFormModal, { type MedicationFormData } from "./ui/MedicationFormModal";
+import ReminderModal, { type ProfileReminder } from "./ui/ReminderModal";
 
 interface ProfileSetupProps {
   user: User;
@@ -11,27 +12,6 @@ interface ProfileSetupProps {
   token: string | null;
   onRefillCredits?: (amount: number) => Promise<void>;
 }
-
-const dietOptions = [
-  "Vegetarian", "Vegan", "Non Vegetarian", "Eggetarian",
-  "Gluten Free", "Ketogenic", "Jain", "Low Carb",
-  "High Protein", "No Preference",
-];
-
-const mainGoals = [
-  "Maintain good health",
-  "Lose weight",
-  "Gain weight",
-  "Better nutrition",
-];
-
-const extraGoals = [
-  "Improve fitness", "Manage diabetes", "Manage blood pressure",
-  "Better sleep", "Stress management", "Healthy lifestyle",
-  "Heart health", "Women's health", "Men's health",
-  "Senior care", "Family health", "Personalized meal plans",
-  "Daily health tips", "Medicine reminders", "Track symptoms",
-];
 
 const allDiseases = [
   "Diabetes Type 2", "High Blood Pressure", "Thyroid",
@@ -44,6 +24,27 @@ const allDiseases = [
   "Vitamin D Deficiency", "Vitamin B12 Deficiency",
 ];
 
+const DIET_OPTIONS = ["Vegetarian", "Vegan", "Non Veg", "No Preference"]
+const GOAL_OPTIONS = ["Maintain health", "Lose weight", "Gain weight"]
+
+const TIME_OPTIONS = [
+  "Before Breakfast", "After Breakfast",
+  "Before Lunch", "After Lunch",
+  "Before Dinner", "After Dinner",
+  "Bedtime",
+]
+
+interface ProfileMed {
+  id: string;
+  name: string;
+  strength: string;
+  timing: string;
+  reminder: ProfileReminder | null;
+}
+
+let medIdCounter = 0;
+function nextMedId() { return `med_${++medIdCounter}` }
+
 export default function ProfileSetup({
   user,
   onSaveProfile,
@@ -54,8 +55,12 @@ export default function ProfileSetup({
   const [fullName, setFullName] = useState(user.fullName || "Guest User");
   const [dob, setDob] = useState(user.dob || "1990-01-01");
   const [gender, setGender] = useState(user.gender || "Other");
-  const [dietaryPreferences, setDietaryPreferences] = useState<string[]>(
-    user.dietaryPreferences || ["No Preferences"]
+  const [diet, setDiet] = useState(
+    user.dietaryPreferences?.[0] && DIET_OPTIONS.includes(user.dietaryPreferences[0])
+      ? user.dietaryPreferences[0] : "No Preference"
+  );
+  const [goal, setGoal] = useState(
+    user.healthGoals?.find(g => GOAL_OPTIONS.includes(g)) || "Maintain health"
   );
   const [creditLogs, setCreditLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
@@ -63,18 +68,25 @@ export default function ProfileSetup({
 
   const [weightKg, setWeightKg] = useState(user.weightKg || "70");
   const [heightCm, setHeightCm] = useState(user.heightCm || "175");
-  const [healthGoals, setHealthGoals] = useState<string[]>(user.healthGoals || []);
   const [activeDiseases, setActiveDiseases] = useState<string[]>(user.activeDiseases || []);
   const [otherDisease, setOtherDisease] = useState(user.otherDisease || "");
   const [medicalHistory, setMedicalHistory] = useState(user.medicalHistory || "");
-  const [medications, setMedications] = useState<Medication[]>([]);
-  const [noMedication, setNoMedication] = useState(user.noMedication ?? true);
 
-  const [showMoreGoals, setShowMoreGoals] = useState(false);
+  const initialMeds = (user as any).profileMedications || [];
+  const [medications, setMedications] = useState<ProfileMed[]>(
+    initialMeds.length > 0 ? initialMeds.map((m: any) => ({ ...m, id: m.id || nextMedId() })) : []
+  );
+
   const [showDiseaseDropdown, setShowDiseaseDropdown] = useState(false);
   const [diseaseSearch, setDiseaseSearch] = useState("");
 
-  const goalsRef = useRef<HTMLDivElement>(null);
+  const [showMedForm, setShowMedForm] = useState(false);
+  const [editingMedIndex, setEditingMedIndex] = useState<number | null>(null);
+
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [reminderMedIndex, setReminderMedIndex] = useState<number | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+
   const diseasesRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -101,17 +113,6 @@ export default function ProfileSetup({
   }, [token]);
 
   useEffect(() => {
-    if (!showMoreGoals) return;
-    const handleClick = (e: MouseEvent) => {
-      if (goalsRef.current && !goalsRef.current.contains(e.target as Node)) {
-        setShowMoreGoals(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [showMoreGoals]);
-
-  useEffect(() => {
     if (!showDiseaseDropdown) return;
     const handleClick = (e: MouseEvent) => {
       if (diseasesRef.current && !diseasesRef.current.contains(e.target as Node)) {
@@ -134,28 +135,6 @@ export default function ProfileSetup({
     autoResize();
   }, [medicalHistory, autoResize]);
 
-  const handleDietToggle = (pref: string) => {
-    if (pref === "No Preferences") {
-      setDietaryPreferences(["No Preferences"]);
-      return;
-    }
-    let updated = dietaryPreferences.filter((p) => p !== "No Preferences");
-    if (updated.includes(pref)) {
-      updated = updated.filter((p) => p !== pref);
-      if (updated.length === 0) updated = ["No Preferences"];
-    } else {
-      updated.push(pref);
-    }
-    setDietaryPreferences(updated);
-  };
-
-  const toggleExtraGoal = (goal: string) => {
-    const updated = healthGoals.includes(goal)
-      ? healthGoals.filter(g => g !== goal)
-      : [...healthGoals, goal];
-    setHealthGoals(updated);
-  };
-
   const toggleDisease = (disease: string) => {
     setActiveDiseases(prev =>
       prev.includes(disease)
@@ -168,21 +147,68 @@ export default function ProfileSetup({
     setActiveDiseases(prev => prev.filter(d => d !== disease));
   };
 
-  const selectedExtraCount = extraGoals.filter(g => healthGoals.includes(g)).length;
   const filteredDiseases = diseaseSearch
     ? allDiseases.filter(d => d.toLowerCase().includes(diseaseSearch.toLowerCase()))
     : allDiseases;
 
   const handleSave = async () => {
     await onSaveProfile({
-      fullName, dob, gender, dietaryPreferences,
-      weightKg, heightCm, healthGoals,
-      activeDiseases, otherDisease, medicalHistory, noMedication,
-    });
+      fullName, dob, gender,
+      dietaryPreferences: [diet],
+      weightKg, heightCm,
+      healthGoals: [goal],
+      activeDiseases, otherDisease, medicalHistory,
+      noMedication: medications.length === 0,
+      profileMedications: medications,
+    } as any);
     onFinishOnboarding();
   };
 
-  const dietPresets = ["Vegetarian", "Vegan", "Gluten-Free", "Ketogenic", "Non Veg", "No Preferences"];
+  // Medication handlers
+  const openAddMed = () => {
+    setEditingMedIndex(null);
+    setShowMedForm(true);
+  };
+
+  const openEditMed = (index: number) => {
+    setEditingMedIndex(index);
+    setShowMedForm(true);
+  };
+
+  const handleMedSave = (data: MedicationFormData) => {
+    if (editingMedIndex !== null) {
+      setMedications(prev => prev.map((m, i) =>
+        i === editingMedIndex ? { ...m, name: data.name, strength: data.strength, timing: data.timing } : m
+      ));
+    } else {
+      setMedications(prev => [...prev, {
+        id: nextMedId(),
+        name: data.name,
+        strength: data.strength,
+        timing: data.timing,
+        reminder: null,
+      }]);
+    }
+  };
+
+  const deleteMed = (index: number) => {
+    if (window.confirm("Remove this medication? Its reminder will also be deleted.")) {
+      setMedications(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const openReminder = (index: number) => {
+    setReminderMedIndex(index);
+    setShowReminderModal(true);
+  };
+
+  const handleReminderSave = (reminder: ProfileReminder) => {
+    if (reminderMedIndex !== null) {
+      setMedications(prev => prev.map((m, i) =>
+        i === reminderMedIndex ? { ...m, reminder } : m
+      ));
+    }
+  };
 
   return (
     <motion.div
@@ -190,138 +216,116 @@ export default function ProfileSetup({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.4 }}
-      className="w-full max-w-2xl mx-auto flex flex-col items-center space-y-6 pt-6"
+      className="w-full max-w-xl mx-auto flex flex-col items-center space-y-5 pt-6 pb-10"
       id="profile-setup-view"
     >
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 relative w-full">
+        <button type="button" onClick={() => setShowSettings(true)}
+          className="absolute right-0 top-0 w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-on-surface-variant dark:text-slate-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-all cursor-pointer">
+          <Settings className="w-5 h-5" />
+        </button>
         <h1 className="text-3xl md:text-4xl font-extrabold text-on-surface dark:text-slate-100 tracking-tight">
           Edit Profile
         </h1>
-        <p className="text-sm text-on-surface-variant dark:text-slate-400 max-w-md mx-auto">
+        <p className="text-sm text-on-surface-variant dark:text-slate-400">
           Update your personal details, health info, and preferences.
         </p>
       </div>
 
-      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 p-6 md:p-8 shadow-xl shadow-slate-950/5 space-y-6" id="profile-basics-form">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider" htmlFor="full_name">
-              Full Name
-            </label>
-            <input type="text" id="full_name" value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm" />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider" htmlFor="dob">
-              Date of Birth
-            </label>
-            <input type="date" id="dob" value={dob}
-              onChange={(e) => setDob(e.target.value)}
-              className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm" />
-          </div>
+      {/* Card 1: Personal details */}
+      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
+        <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Personal Details</p>
+
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider" htmlFor="full_name">Full Name</label>
+          <input type="text" id="full_name" value={fullName} onChange={e => setFullName(e.target.value)}
+            className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Gender</label>
-            <div className="grid grid-cols-3 gap-1">
-              {["Male", "Female", "Other"].map((gen) => (
-                <button key={gen} type="button" onClick={() => setGender(gen)}
-                  className={`h-10 flex items-center justify-center rounded-xl border font-bold text-xs transition-all cursor-pointer ${
-                    gender === gen
-                      ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
-                      : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50"
-                  }`}>{gen}</button>
-              ))}
-            </div>
+        <div className="flex gap-2.5">
+          <div className="flex-1 space-y-1.5">
+            <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Date of Birth</label>
+            <input type="date" value={dob} onChange={e => setDob(e.target.value)}
+              className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary outline-none font-semibold text-sm" />
           </div>
-          <div className="space-y-1.5">
+          <div className="flex-1 space-y-1.5">
             <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Weight (kg)</label>
             <input type="number" value={weightKg} onChange={e => setWeightKg(e.target.value)} placeholder="70" min="20" max="300"
-              className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm" />
+              className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary outline-none font-semibold text-sm" />
           </div>
-          <div className="space-y-1.5">
+          <div className="flex-1 space-y-1.5">
             <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Height (cm)</label>
             <input type="number" value={heightCm} onChange={e => setHeightCm(e.target.value)} placeholder="170" min="50" max="300"
-              className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm" />
+              className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary outline-none font-semibold text-sm" />
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Dietary Preferences</label>
-          <div className="flex flex-wrap gap-2">
-            {dietPresets.map((pref) => {
-              const isChecked = dietaryPreferences.includes(pref);
+          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Gender</label>
+          <div className="flex gap-2">
+            {["Male", "Female", "Other"].map(gen => {
+              const active = gender === gen;
               return (
-                <div key={pref} onClick={() => handleDietToggle(pref)}
-                  className={`px-3 py-2 rounded-full border flex items-center gap-1.5 cursor-pointer transition-all ${
-                    isChecked
-                      ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                      : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-on-surface-variant dark:text-slate-400"
-                  }`}>
-                  <span className="text-[10px] font-bold">{pref}</span>
-                  <input type="checkbox" checked={isChecked} readOnly
-                    className="rounded-full text-primary focus:ring-0 w-3.5 h-3.5 border-slate-300 dark:border-slate-700" />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
-            Health Goals
-          </label>
-          <div className="flex flex-wrap gap-1.5">
-            {mainGoals.map(goal => {
-              const active = healthGoals.includes(goal);
-              return (
-                <button key={goal} type="button" onClick={() => toggleExtraGoal(goal)}
-                  className={`h-10 px-3.5 rounded-full border font-bold text-xs transition-all cursor-pointer ${
+                <button key={gen} type="button" onClick={() => setGender(gen)}
+                  className={`flex-1 h-11 rounded-xl border text-sm font-bold transition-all cursor-pointer ${
                     active
-                      ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                      : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50"
-                  }`}>{goal}</button>
+                      ? "bg-primary border-primary text-white"
+                      : "bg-transparent border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-300 hover:border-primary/50"
+                  }`}>{gen}</button>
               );
             })}
-            <div ref={goalsRef} className="relative">
-              <button type="button" onClick={() => setShowMoreGoals(!showMoreGoals)}
-                className={`h-10 px-3.5 rounded-full border font-bold text-xs transition-all cursor-pointer flex items-center gap-1 ${
-                  selectedExtraCount > 0
-                    ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                    : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50"
-                }`}>
-                {selectedExtraCount > 0 ? `Other (${selectedExtraCount})` : "Other"}
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showMoreGoals ? "rotate-180" : ""}`} />
-              </button>
-              {showMoreGoals && (
-                <div className="absolute top-full left-0 mt-1 z-20 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-2 max-h-60 overflow-y-auto">
-                  {extraGoals.map(goal => {
-                    const active = healthGoals.includes(goal);
-                    return (
-                      <button key={goal} type="button" onClick={() => toggleExtraGoal(goal)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer">
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"}`}>
-                          {active && <Check className="w-3 h-3 text-white" />}
-                        </div>
-                        <span className="text-xs font-semibold text-on-surface dark:text-slate-200">{goal}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Card 2: Diet and goal */}
+      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
+        <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Diet and Goal</p>
+
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Diet</label>
+          <div className="flex flex-wrap gap-1.5">
+            {DIET_OPTIONS.map(d => {
+              const active = diet === d;
+              return (
+                <button key={d} type="button" onClick={() => setDiet(d)}
+                  className={`px-4 h-9 rounded-full border text-[11px] font-bold transition-all cursor-pointer ${
+                    active
+                      ? "bg-primary border-primary text-white"
+                      : "bg-transparent border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-300 hover:border-primary/50"
+                  }`}>{d}</button>
+              );
+            })}
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
-            Active Diseases / Conditions
-          </label>
+          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Goal</label>
+          <div className="flex flex-wrap gap-1.5">
+            {GOAL_OPTIONS.map(g => {
+              const active = goal === g;
+              return (
+                <button key={g} type="button" onClick={() => setGoal(g)}
+                  className={`px-4 h-9 rounded-full border text-[11px] font-bold transition-all cursor-pointer ${
+                    active
+                      ? "bg-primary border-primary text-white"
+                      : "bg-transparent border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-300 hover:border-primary/50"
+                  }`}>{g}</button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Card 3: Medical history */}
+      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
+        <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Medical History</p>
+
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Conditions</label>
           <div ref={diseasesRef} className="relative">
             <button type="button" onClick={() => setShowDiseaseDropdown(!showDiseaseDropdown)}
-              className="w-full h-10 px-4 flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-left text-sm font-semibold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 transition-all cursor-pointer">
+              className="w-full h-11 px-4 flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-left text-sm font-semibold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 transition-all cursor-pointer">
               <span className="flex-1 truncate">
                 {activeDiseases.length > 0
                   ? `${activeDiseases.length} condition${activeDiseases.length > 1 ? "s" : ""} selected`
@@ -361,12 +365,12 @@ export default function ProfileSetup({
             )}
           </div>
           {activeDiseases.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1.5 pt-1">
               {activeDiseases.map(d => (
-                <span key={d} className="inline-flex items-center gap-1 h-8 px-3 bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-full text-[10px] font-bold text-primary">
+                <span key={d} className="inline-flex items-center gap-1 h-7 px-3 bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-full text-[10px] font-bold text-primary">
                   {d}
                   <button type="button" onClick={() => removeDisease(d)} className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer">
-                    <X className="w-3 h-3" />
+                    <X className="w-2.5 h-2.5" />
                   </button>
                 </span>
               ))}
@@ -375,110 +379,187 @@ export default function ProfileSetup({
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
-            Medical History & Allergies
-          </label>
+          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Notes</label>
           <textarea ref={textareaRef} value={medicalHistory} onChange={e => { setMedicalHistory(e.target.value); autoResize(); }}
-            placeholder={`Diabetes Type 2 diagnosed in 2021\nPenicillin allergy\nAsthma during childhood\nUnderwent appendix surgery in 2018`}
+            placeholder="Past conditions, allergies, surgeries"
             rows={2}
             className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm resize-none overflow-hidden" />
-          <p className="text-[10px] text-on-surface-variant dark:text-slate-500 italic">
-            Include previous illnesses, surgeries, allergies, or chronic conditions.
-          </p>
-        </div>
-
-        <MedicationInput
-          medications={medications}
-          onChange={setMedications}
-          noMedication={noMedication}
-          onNoMedicationChange={setNoMedication}
-        />
-
-        <div className="flex flex-col gap-3 pt-2">
-          <button onClick={handleSave}
-            className="w-full h-14 bg-primary hover:bg-primary-container text-white rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/35 cursor-pointer">
-            Save Profile
-          </button>
         </div>
       </div>
 
-      <div className="w-full bg-white/85 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6" id="credit-management-card">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/30 rounded-full flex items-center justify-center text-amber-500 shrink-0">
-              <Coins className="w-6 h-6 animate-pulse" />
-            </div>
-            <div className="space-y-1">
-              <h4 className="font-bold text-base text-on-surface dark:text-slate-100 flex items-center gap-1.5">
-                Swasth AI Credit Center
-              </h4>
-              <p className="text-xs text-on-surface-variant dark:text-slate-400 max-w-sm leading-relaxed">
-                Tokens used to run advanced medical reasoning tasks. <strong>1 credit</strong> is deducted per AI Chat request, and <strong>1 credit</strong> is deducted automatically for daily AI diet recommendations.
-              </p>
-            </div>
-          </div>
-          <div className="bg-amber-500/10 border border-amber-500/20 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl flex flex-col items-center justify-center min-w-[100px] sm:min-w-[120px] shrink-0">
-            <span className="text-[9px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Available</span>
-            <span className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 mt-0.5 sm:mt-1">{user.credits !== undefined ? user.credits : 120}</span>
-            <span className="text-[8px] sm:text-[9px] font-semibold text-slate-400 dark:text-slate-500 mt-0.5">Credits</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-2">
-          <button type="button" onClick={() => onRefillCredits && onRefillCredits(50)}
-            className="h-10 sm:h-12 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-[10px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 shadow-sm hover:shadow active:scale-95 transition-all cursor-pointer" id="btn-refill-50">
-            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>Refill 50</span>
-          </button>
-          <button type="button" onClick={() => onRefillCredits && onRefillCredits(100)}
-            className="h-10 sm:h-12 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold text-[10px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 active:scale-95 transition-all cursor-pointer border border-slate-200 dark:border-slate-700" id="btn-refill-100">
-            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>Refill 100</span>
+      {/* Card 4: Medications */}
+      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Medications</p>
+          <button type="button" onClick={openAddMed}
+            className="w-9 h-9 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors cursor-pointer">
+            <Plus className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4">
-          <button type="button" onClick={() => { if (!showLogsHistory) fetchLogs(); setShowLogsHistory(!showLogsHistory); }}
-            className="w-full flex items-center justify-between text-xs font-bold text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200 transition-colors cursor-pointer">
-            <span className="flex items-center gap-1.5">
-              <History className="w-4 h-4" />
-              <span>Credit Usage & Transaction Logs</span>
-            </span>
-            <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-bold">
-              {showLogsHistory ? "Hide Logs" : `View Logs (${creditLogs.length || 0})`}
-            </span>
-          </button>
-          {showLogsHistory && (
-            <div className="mt-3.5 space-y-2 max-h-64 sm:max-h-48 overflow-y-auto pr-1">
-              {loadingLogs ? (
-                <div className="flex items-center justify-center py-6 text-xs text-slate-400 gap-1.5">
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Fetching statements...</span>
-                </div>
-              ) : creditLogs.length > 0 ? (
-                creditLogs.map((log: any) => {
-                  const isDeduction = log.amount > 0;
-                  return (
-                    <div key={log.id} className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs">
-                      <div className="space-y-0.5">
-                        <p className="font-bold text-on-surface dark:text-slate-200">{log.reason}</p>
-                        <p className="text-[10px] text-on-surface-variant dark:text-slate-500 font-semibold">{new Date(log.timestamp).toLocaleString()}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-0.5 shrink-0">
-                        <span className={`font-extrabold ${isDeduction ? "text-rose-500" : "text-emerald-500"}`}>{isDeduction ? `-${log.amount}` : `+${Math.abs(log.amount)}`} Cr</span>
-                        <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold">bal: {log.remaining}</span>
-                      </div>
+        {medications.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-6 text-center">
+            <p className="text-sm text-on-surface-variant dark:text-slate-400 font-medium">No medications added</p>
+            <button type="button" onClick={openAddMed}
+              className="flex items-center gap-1.5 text-xs font-bold text-primary hover:underline cursor-pointer">
+              <Plus className="w-3.5 h-3.5" /> Add your first medicine
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-0">
+            {medications.map((med, i) => {
+              const timingLabel = med.reminder?.timeOfDay || med.timing
+              const summary = [med.strength, timingLabel].filter(Boolean).join(", ")
+              return (
+                <div key={med.id}>
+                  {i > 0 && <hr className="border-slate-100 dark:border-slate-800" />}
+                  <div className="flex items-center gap-3 py-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-on-surface dark:text-slate-100 truncate">{med.name}</p>
+                      <p className="text-[11px] text-on-surface-variant dark:text-slate-400 truncate">{summary.toLowerCase()}</p>
                     </div>
-                  );
-                })
-              ) : (
-                <p className="text-center py-6 text-xs text-slate-400 dark:text-slate-500 italic">No credit operations recorded on this session.</p>
-              )}
-            </div>
-          )}
-        </div>
+                    <button type="button" onClick={() => openReminder(i)}
+                      className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                        med.reminder
+                          ? "text-primary bg-primary/10 dark:bg-primary/20"
+                          : "text-slate-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`}
+                      title={med.reminder ? "Edit reminder" : "Set reminder"}>
+                      <Bell className="w-4 h-4" />
+                    </button>
+                    <button type="button" onClick={() => openEditMed(i)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-on-surface dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button type="button" onClick={() => deleteMed(i)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
+      {/* Save button */}
+      <button onClick={handleSave}
+        className="w-full h-14 bg-primary hover:bg-primary-container text-white rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/35 cursor-pointer text-base">
+        Save Profile
+      </button>
+
+      {/* Settings modal */}
+      <AnimatePresence>
+        {showSettings && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 30 }}
+              className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden max-h-[90vh] overflow-y-auto"
+            >
+              <div className="p-6 space-y-5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <Settings className="w-5 h-5 text-primary" />
+                    <h3 className="text-base font-bold text-on-surface dark:text-slate-100">Settings</h3>
+                  </div>
+                  <button type="button" onClick={() => setShowSettings(false)}
+                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors cursor-pointer">
+                    <XCircle className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 rounded-2xl p-5 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-amber-100 dark:bg-amber-950/50 rounded-full flex items-center justify-center text-amber-500 shrink-0">
+                      <Coins className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm text-on-surface dark:text-slate-100">Swasth AI Credit Center</h4>
+                      <p className="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5 leading-relaxed">
+                        1 credit deducted per AI Chat request and daily AI diet recommendation.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between bg-white dark:bg-slate-950 rounded-xl px-4 py-3 border border-slate-200 dark:border-slate-800">
+                    <span className="text-xs font-bold text-on-surface-variant dark:text-slate-400">Available Credits</span>
+                    <span className="text-xl font-black text-amber-600 dark:text-amber-400">{user.credits !== undefined ? user.credits : 120}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button type="button" onClick={() => onRefillCredits && onRefillCredits(50)}
+                      className="h-10 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+                      <Plus className="w-3.5 h-3.5" /> Refill 50
+                    </button>
+                    <button type="button" onClick={() => onRefillCredits && onRefillCredits(100)}
+                      className="h-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-slate-200 dark:border-slate-700">
+                      <Plus className="w-3.5 h-3.5" /> Refill 100
+                    </button>
+                  </div>
+                  <button type="button" onClick={() => { if (!showLogsHistory) fetchLogs(); setShowLogsHistory(!showLogsHistory); }}
+                    className="w-full flex items-center justify-between text-[11px] font-bold text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200 transition-colors cursor-pointer pt-1">
+                    <span className="flex items-center gap-1.5">
+                      <History className="w-3.5 h-3.5" />
+                      <span>Transaction Logs</span>
+                    </span>
+                    <span className="text-[9px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-bold">
+                      {showLogsHistory ? "Hide" : `View (${creditLogs.length || 0})`}
+                    </span>
+                  </button>
+                  {showLogsHistory && (
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                      {loadingLogs ? (
+                        <div className="flex items-center justify-center py-4 text-xs text-slate-400 gap-1.5">
+                          <RefreshCw className="w-3 h-3 animate-spin" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : creditLogs.length > 0 ? (
+                        creditLogs.map((log: any) => {
+                          const isDeduction = log.amount > 0;
+                          return (
+                            <div key={log.id} className="p-2.5 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-800 flex justify-between items-center text-[11px]">
+                              <div className="space-y-0.5">
+                                <p className="font-bold text-on-surface dark:text-slate-200">{log.reason}</p>
+                                <p className="text-[9px] text-on-surface-variant dark:text-slate-500">{new Date(log.timestamp).toLocaleString()}</p>
+                              </div>
+                              <span className={`font-extrabold shrink-0 ${isDeduction ? "text-rose-500" : "text-emerald-500"}`}>
+                                {isDeduction ? `-${log.amount}` : `+${Math.abs(log.amount)}`}
+                              </span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <p className="text-center py-4 text-xs text-slate-400 italic">No transactions recorded.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Medication form modal */}
+      <MedicationFormModal
+        open={showMedForm}
+        onClose={() => { setShowMedForm(false); setEditingMedIndex(null) }}
+        onSave={handleMedSave}
+        initial={editingMedIndex !== null ? medications[editingMedIndex] : undefined}
+      />
+
+      {/* Reminder modal */}
+      {reminderMedIndex !== null && (
+        <ReminderModal
+          open={showReminderModal}
+          onClose={() => { setShowReminderModal(false); setReminderMedIndex(null) }}
+          medicationName={medications[reminderMedIndex]?.name || ""}
+          medicationStrength={medications[reminderMedIndex]?.strength || ""}
+          onSave={handleReminderSave}
+          initial={medications[reminderMedIndex]?.reminder || undefined}
+        />
+      )}
     </motion.div>
   );
 }

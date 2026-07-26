@@ -110,17 +110,6 @@ export function MedicationInput({
             {medications.length} Medication{medications.length > 1 ? "s" : ""} Added
           </span>
         )}
-        <label className="flex items-center gap-1.5 cursor-pointer ml-auto">
-          <input
-            type="checkbox"
-            checked={noMedication}
-            onChange={e => onNoMedicationChange(e.target.checked)}
-            className="rounded text-primary focus:ring-primary/30 w-3.5 h-3.5 border-slate-300 dark:border-slate-700"
-          />
-          <span className="text-[10px] font-semibold text-on-surface-variant dark:text-slate-400">
-            No Current Medication
-          </span>
-        </label>
       </div>
 
       {noMedication ? (
@@ -266,6 +255,17 @@ export function MedicationInput({
             })}
           </AnimatePresence>
 
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={noMedication}
+              onChange={e => onNoMedicationChange(e.target.checked)}
+              className="rounded text-primary focus:ring-primary/30 w-3.5 h-3.5 border-slate-300 dark:border-slate-700"
+            />
+            <span className="text-[10px] font-semibold text-on-surface-variant dark:text-slate-400">
+              No Current Medication
+            </span>
+          </label>
           <button
             type="button"
             onClick={addMedication}

@@ -134,6 +134,7 @@ export default function AIChat({
   medications,
   token
 }: AIChatProps) {
+  const [suggestions, setSuggestions] = useState<{ text: string; type: string }[]>([]);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showAudit, setShowAudit] = useState(false);
@@ -207,8 +208,9 @@ export default function AIChat({
   };
 
   const handleSuggestedQuery = async (query: string) => {
+    const context = buildProfileContext(user, medications);
     setUserInput(query);
-    inputRef.current?.focus();
+    await onSendMessage(`${context}\n\n${query}`);
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -232,11 +234,60 @@ export default function AIChat({
     scrollToBottom();
   }, [chatHistory, isLoading]);
 
-  const suggestions = [
-    { text: "Check Ibuprofen conflict with Lisinopril", type: "conflict" },
-    { text: "Explain optimal FEV1/FVC ratios", type: "report" },
-    { text: "Suggest Vegetarian and Gluten-Free recipes", type: "diet" },
-  ];
+  useEffect(() => {
+    setSuggestions(buildSuggestions(user, medications));
+  }, [user, medications]);
+
+  function buildProfileContext(u: User, meds: Medication[]): string {
+    const parts: string[] = [];
+    if (u.fullName) parts.push(`Name: ${u.fullName}`);
+    if (u.gender) parts.push(`Gender: ${u.gender}`);
+    if (u.dob) {
+      const age = Math.floor((new Date().getTime() - new Date(u.dob).getTime()) / 31557600000);
+      parts.push(`Age: ${age}`);
+    }
+    if (u.weightKg) parts.push(`Weight: ${u.weightKg} kg`);
+    if (u.heightCm) parts.push(`Height: ${u.heightCm} cm`);
+    if (u.activeDiseases?.length) parts.push(`Conditions: ${u.activeDiseases.join(", ")}`);
+    const diet = u.dietaryPreferences?.filter(d => d !== "No Preference");
+    if (diet?.length) parts.push(`Diet: ${diet.join(", ")}`);
+    if (u.healthGoals?.length) parts.push(`Goals: ${u.healthGoals.join(", ")}`);
+    if (u.medicalHistory) parts.push(`Medical History: ${u.medicalHistory}`);
+    if (meds.length > 0) parts.push(`Medications: ${meds.map(m => `${m.name}${m.strength ? " "+m.strength : ""}`).join(", ")}`);
+    return `[User Profile: ${parts.join(" | ")}]`;
+  }
+
+  function buildSuggestions(u: User, meds: Medication[]): { text: string; type: string }[] {
+    const result: { text: string; type: string }[] = [];
+
+    if (meds.length >= 2) {
+      result.push({ text: `Check ${meds[0].name} conflict with ${meds[1].name}`, type: "conflict" });
+    } else if (meds.length === 1) {
+      result.push({ text: `How does ${meds[0].name} work?`, type: "report" });
+    } else if (u.activeDiseases?.length) {
+      result.push({ text: `Check ${u.activeDiseases[0]} medication interactions`, type: "conflict" });
+    } else {
+      result.push({ text: "Check Ibuprofen conflict with Lisinopril", type: "conflict" });
+    }
+
+    if (u.activeDiseases?.length) {
+      result.push({ text: `Explain optimal management for ${u.activeDiseases[0]}`, type: "report" });
+    } else if (meds.length > 0) {
+      result.push({ text: `How to take ${meds[0].name} correctly?`, type: "report" });
+    } else {
+      result.push({ text: "Explain optimal FEV1/FVC ratios", type: "report" });
+    }
+
+    const dietPref = u.dietaryPreferences?.find(d => d !== "No Preference");
+    const goal = u.healthGoals?.[0] || "general health";
+    if (dietPref) {
+      result.push({ text: `Suggest ${dietPref.toLowerCase()} recipes for ${goal.toLowerCase()}`, type: "diet" });
+    } else {
+      result.push({ text: "Suggest healthy meal plans for balanced nutrition", type: "diet" });
+    }
+
+    return result;
+  }
 
   // Filter audit logs based on search query and filter chip
   const filteredAudits = auditLogs.filter(log => {
@@ -315,10 +366,7 @@ export default function AIChat({
             <h3 className="font-bold text-sm text-on-surface dark:text-slate-100 truncate leading-tight">
               He-Co
             </h3>
-            <p className="text-[9px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1 leading-tight mt-0.5">
-              <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
-              HIPAA Secure
-            </p>
+
           </div>
 
           <button
@@ -357,9 +405,6 @@ export default function AIChat({
         <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-2 min-h-0 scroll-smooth" id="chat-messages-container">
           {chatHistory.length === 0 && !isLoading && (
             <div className="flex flex-col items-center justify-center min-h-full py-6 text-center px-2 sm:px-4">
-              <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-primary/10 to-blue-500/10 text-primary flex items-center justify-center mb-4 shadow-inner">
-                <Sparkles className="w-5 h-5" />
-              </div>
               <h3 className="text-base font-bold text-on-surface dark:text-slate-100 mb-1.5">Ask me anything</h3>
               <p className="text-xs text-on-surface-variant dark:text-slate-400 max-w-xs mb-6 leading-relaxed">
                 Drug interactions, lab results, meal plans, and health records.
