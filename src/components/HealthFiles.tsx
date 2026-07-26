@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { FileRecord, Medication } from "../types";
+import { FileRecord } from "../types";
 import { 
   Search, FolderOpen, FileText, MoreVertical, Sparkles, Plus, Trash2, X, AlertCircle,
   Activity, Clock, Download, Bell, Filter, TrendingUp, Calendar, Check, Loader2,
-  ChevronLeft, ChevronRight, Pill
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import Medications from "./Medications";
 
 interface HealthFilesProps {
   files: FileRecord[];
@@ -19,13 +18,6 @@ interface HealthFilesProps {
   onToggleVitalReminder?: (id: string) => Promise<void>;
   onDeleteReminder?: (id: string) => Promise<void>;
   onAddReminder?: (reminder: any) => Promise<void>;
-
-  // Medications Integration Props
-  medications: Medication[];
-  onAddMedication: (med: Partial<Medication>) => Promise<{ success: boolean; conflict?: string }>;
-  onToggleTaken: (id: string) => void;
-  onToggleReminder: (id: string) => void;
-  onDeleteMedication: (id: string) => void;
   token: string | null;
 }
 
@@ -38,15 +30,8 @@ export default function HealthFiles({
   onToggleVitalReminder,
   onDeleteReminder,
   onAddReminder,
-  
-  medications,
-  onAddMedication,
-  onToggleTaken,
-  onToggleReminder: onToggleMedReminder,
-  onDeleteMedication,
   token,
 }: HealthFilesProps) {
-  const [healthTab, setHealthTab] = useState<"files" | "medications">("files");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "report" | "prescription" | "vitals">("all");
@@ -939,45 +924,8 @@ export default function HealthFiles({
       className="space-y-8"
       id="health-files-view"
     >
-      {/* High-Level Tab Switcher */}
-      <div className="flex border-b border-slate-100 dark:border-slate-800 pb-1 mb-4 w-full justify-start overflow-x-auto gap-2">
-        <button
-          onClick={() => setHealthTab("files")}
-          className={`flex items-center gap-2 px-3 md:px-5 py-3 border-b-2 font-black text-[11px] md:text-sm tracking-tight transition-all cursor-pointer whitespace-nowrap ${
-            healthTab === "files"
-              ? "border-primary text-primary"
-              : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-          }`}
-        >
-          <FolderOpen className="w-4 h-4" />
-          <span>Documents & Logs</span>
-        </button>
-        <button
-          onClick={() => setHealthTab("medications")}
-          className={`flex items-center gap-2 px-3 md:px-5 py-3 border-b-2 font-black text-[11px] md:text-sm tracking-tight transition-all cursor-pointer whitespace-nowrap ${
-            healthTab === "medications"
-              ? "border-primary text-primary"
-              : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-          }`}
-        >
-          <Pill className="w-4 h-4" />
-          <span>Medications</span>
-        </button>
-      </div>
-
-      {healthTab === "medications" ? (
-        <Medications
-          medications={medications}
-          onAddMedication={onAddMedication}
-          onToggleTaken={onToggleTaken}
-          onToggleReminder={onToggleMedReminder}
-          onDeleteMedication={onDeleteMedication}
-          token={token}
-        />
-      ) : (
-        <>
-          {/* Search & Filter Section */}
-          {activeTab !== "vitals" && (
+      {/* Search & Filter Section */}
+        {activeTab !== "vitals" && (
         <section className="relative w-full" id="search-section">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-slate-400 w-5 h-5" />
@@ -1280,8 +1228,6 @@ export default function HealthFiles({
           </div>
         )}
       </AnimatePresence>
-        </>
-      )}
     </motion.div>
   );
 }

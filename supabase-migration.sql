@@ -19,6 +19,7 @@ create table profiles (
   age               smallint,
   gender            varchar(20),
   weight_kg         numeric(5,2),
+  height_cm         numeric(5,1),
   conditions        text[] default '{}',
   medications_text  text,
   history_text      text,

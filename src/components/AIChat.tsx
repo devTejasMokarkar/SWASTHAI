@@ -15,7 +15,6 @@ interface AIChatProps {
   auditLogs?: any[];
   user: User;
   medications: Medication[];
-  debugMode?: boolean;
   token: string | null;
 }
 
@@ -133,7 +132,6 @@ export default function AIChat({
   auditLogs = [],
   user,
   medications,
-  debugMode = false,
   token
 }: AIChatProps) {
   const [userInput, setUserInput] = useState("");
@@ -409,12 +407,6 @@ export default function AIChat({
               ? clientSafetyIssues.filter(i => !alertContent.toLowerCase().includes(i.type))
               : clientSafetyIssues;
 
-            // Find matching audit log for debug mode
-            const precedingUserMsg = isAI && index > 0 ? chatHistory[index - 1] : null;
-            const matchingLog = precedingUserMsg 
-              ? auditLogs.find(log => log.query?.toLowerCase() === precedingUserMsg.text?.toLowerCase())
-              : null;
-
             return (
               <motion.div
                 key={index}
@@ -536,48 +528,6 @@ export default function AIChat({
                       return <p key={lIdx} className="leading-relaxed text-sm">{renderBold(line)}</p>;
                     })}
                   </div>
-
-                  {/* Debug Mode Raw Prompt Context Trace Panel */}
-                  {isAI && debugMode && (
-                    <div className="mt-4 p-3.5 bg-indigo-950/10 dark:bg-indigo-950/45 border border-indigo-200/30 dark:border-indigo-950/60 rounded-xl space-y-2">
-                      <div className="flex items-center justify-between text-[10px] text-indigo-700 dark:text-indigo-300 font-extrabold uppercase tracking-wider">
-                        <span className="flex items-center gap-1.5">
-                          <Database className="w-3.5 h-3.5 text-indigo-500" />
-                          RAG TRACE: Raw AI Prompt Context
-                        </span>
-                        <span className="text-[8px] bg-indigo-100 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-200 px-1.5 py-0.5 rounded uppercase font-black tracking-widest border border-indigo-200/40">
-                          Active Debug
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-indigo-950 dark:text-indigo-200/90 leading-relaxed space-y-2 font-mono">
-                        <div>
-                          <p className="font-extrabold text-[9px] text-indigo-800 dark:text-indigo-400 uppercase tracking-widest">[Tier 1: Deterministic Health Profile & Vitals]</p>
-                          <div className="pl-2.5 border-l border-indigo-300/40 dark:border-indigo-800/60 space-y-0.5 mt-0.5 font-medium">
-                            <p>• User Profile: {matchingLog?.retrievedContext?.profile?.fullName || user.fullName} (DOB: {matchingLog?.retrievedContext?.profile?.dob || user.dob}, Gender: {matchingLog?.retrievedContext?.profile?.gender || user.gender})</p>
-                            <p>• Dietary Preferences: {matchingLog?.retrievedContext?.profile?.dietaryPreferences?.join(", ") || user.dietaryPreferences?.join(", ") || "None specified"}</p>
-                            <p>• Current Vitals: Heart Rate: {matchingLog?.retrievedContext?.vitals?.heartRate || "72"} BPM, Steps: {matchingLog?.retrievedContext?.vitals?.steps || "8432"} steps, Sleep: {matchingLog?.retrievedContext?.vitals?.sleep || "7.5h"} sleep</p>
-                            <p>• Checked Medications: {matchingLog?.retrievedContext?.medications?.length > 0 ? matchingLog.retrievedContext.medications.map((m: any) => `${m.name} (${m.strength})`).join(", ") : medications.map(m => `${m.name} (${m.strength})`).join(", ") || "None logged"}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="pt-1">
-                          <p className="font-extrabold text-[9px] text-indigo-800 dark:text-indigo-400 uppercase tracking-widest">[Tier 2: Semantically Matched Health Records]</p>
-                          <div className="pl-2.5 border-l border-indigo-300/40 dark:border-indigo-800/60 space-y-1.5 mt-0.5 font-medium">
-                            {matchingLog?.retrievedContext?.files && matchingLog.retrievedContext.files.length > 0 ? (
-                              matchingLog.retrievedContext.files.map((f: any, fIdx: number) => (
-                                <div key={fIdx} className="space-y-0.5">
-                                  <p>• Document: "{f.name}" (Similarity Score: {(f.similarity * 100).toFixed(1)}%)</p>
-                                  <p className="text-[9px] text-indigo-600 dark:text-indigo-400 italic pl-2 leading-relaxed">Insight: "{f.aiInsight}"</p>
-                                </div>
-                              ))
-                            ) : (
-                              <p className="italic text-slate-400 dark:text-slate-500">No semantically matched files were found above the relevance threshold.</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   <span className={`text-[8px] block mt-1.5 text-right ${isAI ? "text-on-surface-variant dark:text-slate-400" : "text-white/70"}`}>
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}

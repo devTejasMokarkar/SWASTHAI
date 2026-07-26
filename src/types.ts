@@ -8,6 +8,56 @@ export interface User {
   credits: number;
   vitalityScoreUp: number;
   sleepRecovery: string;
+  avatarUrl?: string;
+  provider?: string;
+  weightKg?: string;
+  heightCm?: string;
+  healthGoals?: string[];
+  activeDiseases?: string[];
+  otherDisease?: string;
+  medicalHistory?: string;
+  noMedication?: boolean;
+}
+
+export interface MedicationReminder {
+  id: string;
+  medicationId: string;
+  userId: string;
+  reminderName: string;
+  frequency: "Once Daily" | "Twice Daily" | "Three Times Daily" | "Four Times Daily" | "Weekly" | "Monthly" | "Custom";
+  times: string[];
+  foodRelation: "Empty Stomach" | "Before Meal" | "After Meal" | "With Food" | "Bedtime" | "Any Time";
+  mealSelection: ("Breakfast" | "Lunch" | "Dinner")[];
+  startDate: string;
+  endDate: string | null;
+  noEndDate: boolean;
+  repeatDays: string[];
+  notificationSound: string;
+  snooze: number;
+  notes: string;
+  enabled: boolean;
+}
+
+export interface HealthReminder {
+  id: string;
+  userId: string;
+  type: "Drink Water" | "Exercise" | "Walk" | "Blood Sugar Check" | "Blood Pressure Check" | "Weight Check" | "Sleep" | "Doctor Appointment" | "Lab Test" | "Refill Medicine" | "Custom";
+  customLabel?: string;
+  times: string[];
+  frequency: "Once Daily" | "Twice Daily" | "Three Times Daily" | "Custom";
+  repeatDays: string[];
+  notes: string;
+  enabled: boolean;
+}
+
+export interface ReminderStatus {
+  id: string;
+  reminderId: string;
+  reminderType: "medication" | "health";
+  date: string;
+  time: string;
+  status: "pending" | "taken" | "skipped" | "snoozed";
+  snoozedUntil?: string;
 }
 
 export interface SmartActions {

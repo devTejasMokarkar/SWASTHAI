@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { User, SmartActions, Vitals } from "../types";
-import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap, MessageSquare } from "lucide-react";
+import { User, SmartActions, Vitals, Medication, MedicationReminder, HealthReminder, ReminderStatus } from "../types";
+import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap, MessageSquare, Bell, Check, ChevronDown, RotateCcw } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import confetti from "canvas-confetti";
 
@@ -97,6 +97,9 @@ interface DashboardProps {
     spo2Value?: number;
   }) => Promise<{ reading: any; analysis: string; isNormal: boolean; severity: string }>;
   onOpenChat?: () => void;
+  medications?: Medication[];
+  healthReminders?: HealthReminder[];
+  onReminderStatus?: (reminderId: string, type: "medication" | "health", action: "taken" | "skipped" | "snoozed") => void;
 }
 
 export default function Dashboard({
@@ -108,6 +111,9 @@ export default function Dashboard({
   onUpdateVitals,
   onLogVitalsReading,
   onOpenChat,
+  medications = [],
+  healthReminders = [],
+  onReminderStatus,
 }: DashboardProps) {
   const [showLogModal, setShowLogModal] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
@@ -157,6 +163,48 @@ export default function Dashboard({
     });
     setShowLogModal(false);
   };
+
+  const todayStr = new Date().toISOString().split("T")[0]
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  const todayDay = dayNames[new Date().getDay()]
+
+  const todayReminders: { id: string; time: string; label: string; detail: string; type: "medication" | "health"; status: string }[] = []
+
+  medications.forEach(med => {
+    if (med.reminderSet) {
+      todayReminders.push({
+        id: med.id,
+        time: med.dueTime,
+        label: med.name,
+        detail: med.strength,
+        type: "medication",
+        status: med.taken ? "taken" : "pending",
+      })
+    }
+  })
+
+  healthReminders.forEach(rem => {
+    if (rem.enabled && rem.repeatDays.includes(todayDay)) {
+      rem.times.forEach(time => {
+        todayReminders.push({
+          id: rem.id,
+          time,
+          label: rem.type === "Custom" ? rem.customLabel || "Custom" : rem.type,
+          detail: rem.notes || rem.frequency,
+          type: "health",
+          status: "pending",
+        })
+      })
+    }
+  })
+
+  todayReminders.sort((a, b) => a.time.localeCompare(b.time))
+  const takenCount = todayReminders.filter(r => r.status === "taken").length
+  const adherencePct = todayReminders.length > 0 ? Math.round((takenCount / todayReminders.length) * 100) : 0
+
+  const handleAction = (id: string, type: "medication" | "health", action: "taken" | "skipped" | "snoozed") => {
+    onReminderStatus?.(id, type, action)
+  }
 
   return (
     <motion.div
@@ -405,13 +453,72 @@ export default function Dashboard({
         </div>
       </div>
 
+      {/* Today's Reminders */}
+      {todayReminders.length > 0 && (
+        <section className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-100 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-sm space-y-3" id="todays-reminders">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              <h3 className="text-xs font-black text-on-surface dark:text-slate-200 uppercase tracking-wider">Today's Reminders</h3>
+              <span className="text-[9px] font-bold text-on-surface-variant dark:text-slate-400">
+                {takenCount}/{todayReminders.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-20 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${adherencePct}%` }}
+                  transition={{ duration: 0.8 }}
+                  className={`h-full rounded-full ${adherencePct >= 80 ? "bg-emerald-500" : adherencePct >= 50 ? "bg-amber-500" : "bg-rose-500"}`}
+                />
+              </div>
+              <span className="text-[9px] font-bold text-on-surface-variant dark:text-slate-400">{adherencePct}%</span>
+            </div>
+          </div>
+          <div className="space-y-1.5 max-h-48 overflow-y-auto">
+            {todayReminders.map((r, i) => (
+              <div key={i} className="flex items-center gap-2.5 px-2.5 py-2 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                <span className="text-[10px] font-mono font-bold text-on-surface-variant dark:text-slate-400 w-12 shrink-0">{r.time}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold text-on-surface dark:text-slate-200 truncate">{r.label}</p>
+                  <p className="text-[8px] text-on-surface-variant dark:text-slate-500 truncate">{r.detail}</p>
+                </div>
+                <div className="flex gap-1 shrink-0">
+                  {r.status === "taken" ? (
+                    <span className="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 text-[8px] font-bold flex items-center gap-0.5">
+                      <Check className="w-2.5 h-2.5" /> Done
+                    </span>
+                  ) : (
+                    <>
+                      <button type="button" onClick={() => handleAction(r.id, r.type, "taken")}
+                        className="px-2 py-1 rounded-lg bg-primary/10 text-primary text-[8px] font-bold hover:bg-primary/20 transition-all cursor-pointer">
+                        Take
+                      </button>
+                      <button type="button" onClick={() => handleAction(r.id, r.type, "snoozed")}
+                        className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-on-surface-variant text-[8px] font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer">
+                        Snooze
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Health Insights Grid */}
       <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6" id="vitals-grid">
         {/* Heart Rate */}
         <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(239,68,68,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-heart-rate">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-red-100 to-red-200 dark:from-red-500/20 dark:to-red-600/10 text-red-600 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+          <motion.div
+            animate={{ scale: [1, 1.18, 1, 1, 1] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-red-100 to-red-200 dark:from-red-500/20 dark:to-red-600/10 text-red-600 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300"
+          >
             <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-red-500/80 dark:fill-red-500" />
-          </div>
+          </motion.div>
           <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Heart Rate</p>
           <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
             {vitals.heartRate} <span className="text-[10px] sm:text-sm font-bold text-slate-400 dark:text-slate-500">BPM</span>
@@ -420,9 +527,13 @@ export default function Dashboard({
 
         {/* Steps */}
         <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-steps">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+          <motion.div
+            animate={{ y: [0, -3, 0, 3, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300"
+          >
             <Footprints className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-          </div>
+          </motion.div>
           <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Steps</p>
           <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
             {vitals.steps.toLocaleString()}
@@ -431,9 +542,13 @@ export default function Dashboard({
 
         {/* Sleep */}
         <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-sleep">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+          <motion.div
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300"
+          >
             <Moon className="w-5 h-5 sm:w-6 sm:h-6 fill-purple-500/80 dark:fill-purple-400" />
-          </div>
+          </motion.div>
           <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sleep</p>
           <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
             {vitals.sleep}
@@ -442,9 +557,13 @@ export default function Dashboard({
 
         {/* Calories */}
         <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(249,115,22,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-calories">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300">
+          <motion.div
+            animate={{ scale: [1, 1.08, 1, 0.95, 1], rotate: [0, 2, 0, -2, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300"
+          >
             <Flame className="w-5 h-5 sm:w-6 sm:h-6 fill-orange-500/80 dark:fill-orange-400" />
-          </div>
+          </motion.div>
           <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Calories</p>
           <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
             {vitals.calories} <span className="text-[10px] sm:text-sm font-bold text-slate-400 dark:text-slate-500">kcal</span>

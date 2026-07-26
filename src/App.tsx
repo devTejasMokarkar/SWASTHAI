@@ -1,9 +1,9 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
-import { User, SmartActions, Vitals, FileRecord, Medication, ChatMessage } from "./types";
+import { User, SmartActions, Vitals, FileRecord, Medication, ChatMessage, HealthReminder } from "./types";
 import {
   Heart, Calendar, FolderOpen, MessageSquare, User as UserIcon, Sparkles,
   ShieldAlert, CheckCircle2, Activity,
-  Sun, Moon, Download, Home, Pill
+  Sun, Moon, Download, Home, Pill, LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -14,6 +14,8 @@ const ProfileSetup = lazy(() => import("./components/ProfileSetup"));
 const AIChat = lazy(() => import("./components/AIChat"));
 const VitalsLogModal = lazy(() => import("./components/VitalsLogModal"));
 import ErrorBoundary from "./components/ErrorBoundary";
+import { useAuth } from "./hooks/useAuth";
+import { Login } from "./pages/Login";
 
 function TypingText({ text }: { text: string }) {
   const [displayed, setDisplayed] = useState("");
@@ -62,7 +64,17 @@ export default function App() {
     }
   }, [darkMode]);
 
+  const { session, profile, loading: authLoading, signOut } = useAuth();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await signOut();
+    setTimeout(() => setLoggingOut(false), 600);
+  };
+
   const [user, setUser] = useState<User>({
+    id: session?.user?.id || "",
     fullName: "Guest User",
     email: "guest@swasth.ai",
     dob: "1990-01-01",
@@ -70,7 +82,14 @@ export default function App() {
     dietaryPreferences: ["No Preferences"],
     credits: 120,
     vitalityScoreUp: 72,
-    sleepRecovery: 65,
+    sleepRecovery: "65",
+    weightKg: "70",
+    heightCm: "175",
+    healthGoals: ["Maintain good health"],
+    activeDiseases: [],
+    otherDisease: "",
+    medicalHistory: "",
+    noMedication: false,
   });
   const [smartActions, setSmartActions] = useState<SmartActions>({
     waterLoggedMl: 0,
@@ -91,14 +110,24 @@ export default function App() {
   const [vitalsReminders, setVitalsReminders] = useState<any[]>([]);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
-  const [debugMode, setDebugMode] = useState<boolean>(() => {
-    return localStorage.getItem("swasth_debug_mode") === "true";
-  });
+  const [healthReminders, setHealthReminders] = useState<HealthReminder[]>([]);
 
-  const handleToggleDebugMode = (val: boolean) => {
-    setDebugMode(val);
-    localStorage.setItem("swasth_debug_mode", String(val));
-  };
+  useEffect(() => {
+    if (profile) {
+      setUser(prev => ({
+        ...prev,
+        id: profile.user_id,
+        email: profile.email || prev.email,
+        fullName: profile.name || prev.fullName,
+        gender: profile.gender || prev.gender,
+        dietaryPreferences: profile.conditions?.length ? profile.conditions : prev.dietaryPreferences,
+        weightKg: profile.weight_kg?.toString() || prev.weightKg,
+        healthGoals: profile.health_goals || prev.healthGoals,
+        activeDiseases: profile.active_diseases || prev.activeDiseases,
+        medicalHistory: profile.medical_history || prev.medicalHistory,
+      }))
+    }
+  }, [profile])
 
   const handleUpdateWater = async (amount: number) => {
     setSmartActions(prev => ({ ...prev, waterLoggedMl: prev.waterLoggedMl + amount }));
@@ -378,6 +407,8 @@ export default function App() {
             onUpdateVitals={handleUpdateVitals}
             onLogVitalsReading={handleLogVitalsReading}
             onOpenChat={() => setShowChatOverlay(true)}
+            medications={medications}
+            healthReminders={healthReminders}
           />
         );
       case "files":
@@ -391,12 +422,7 @@ export default function App() {
             onToggleVitalReminder={handleToggleVitalReminder}
             onDeleteReminder={handleDeleteVitalReminder}
             onAddReminder={handleAddVitalReminder}
-            medications={medications}
-            onAddMedication={handleAddMedication}
-            onToggleTaken={handleToggleTaken}
-            onToggleReminder={handleToggleReminder}
-            onDeleteMedication={handleDeleteMedication}
-            token={null}
+            token={session?.access_token ?? null}
           />
         );
       case "medicine":
@@ -407,7 +433,10 @@ export default function App() {
             onToggleTaken={handleToggleTaken}
             onToggleReminder={handleToggleReminder}
             onDeleteMedication={handleDeleteMedication}
-            token={null}
+            token={session?.access_token ?? null}
+            activeDiseases={user.activeDiseases}
+            healthReminders={healthReminders}
+            onHealthRemindersChange={setHealthReminders}
           />
         );
       case "profile":
@@ -416,14 +445,50 @@ export default function App() {
             user={user}
             onSaveProfile={handleSaveProfile}
             onFinishOnboarding={() => setActiveTab("today")}
-            debugMode={debugMode}
-            onToggleDebugMode={handleToggleDebugMode}
-            token={null}
+            token={session?.access_token ?? null}
             onRefillCredits={handleRefillCredits}
           />
         );
     }
   };
+
+  if (loggingOut) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-20 h-20">
+            <div className="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+            <div className="absolute inset-3 rounded-full border-4 border-secondary/20 border-b-secondary animate-spin" style={{animationDirection: 'reverse', animationDuration: '1s'}}></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Activity className="w-7 h-7 text-primary/70 animate-pulse" />
+            </div>
+          </div>
+          <p className="text-sm font-bold text-on-surface-variant">Signing you out...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-20 h-20">
+            <div className="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+            <div className="absolute inset-3 rounded-full border-4 border-secondary/20 border-b-secondary animate-spin" style={{animationDirection: 'reverse', animationDuration: '1s'}}></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Activity className="w-7 h-7 text-primary/70 animate-pulse" />
+            </div>
+          </div>
+          <p className="text-sm font-bold text-on-surface-variant">Loading Swasth AI...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Login />;
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-on-surface dark:text-slate-100 font-sans antialiased transition-colors duration-300">
@@ -460,12 +525,24 @@ export default function App() {
               {darkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-600" />}
             </button>
 
+            <button
+              onClick={handleLogout}
+              className="p-3 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-on-surface-variant dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+              title="Sign Out"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+
             <div
               onClick={() => setActiveTab("profile")}
               className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner cursor-pointer hover:border-primary transition-all relative group flex items-center justify-center bg-slate-50 dark:bg-slate-800"
               title="Profile Settings"
             >
-              <UserIcon className="w-5 h-5 text-primary" />
+              {profile?.name ? (
+                <span className="text-xs font-bold text-primary">{profile.name.charAt(0).toUpperCase()}</span>
+              ) : (
+                <UserIcon className="w-5 h-5 text-primary" />
+              )}
             </div>
           </div>
         </header>
@@ -572,8 +649,7 @@ export default function App() {
                 auditLogs={auditLogs}
                 user={user}
                 medications={medications}
-                debugMode={debugMode}
-                token={null}
+                token={session?.access_token ?? null}
               />
             </motion.div>
           )}

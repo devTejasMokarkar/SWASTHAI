@@ -647,14 +647,20 @@ app.get("/api/auth/profile", authenticate, async (req: any, res) => {
 });
 
 app.post("/api/auth/profile/update", authenticate, async (req: any, res) => {
-  const { fullName, dob, gender, dietaryPreferences, weightKg, heightCm, healthGoals } = req.body;
+  const { fullName, dob, gender, dietaryPreferences, weightKg, heightCm, healthGoals, activeDiseases, otherDisease, medicalHistory, noMedication } = req.body;
 
   const updates: any = {};
   if (fullName !== undefined) updates.name = fullName;
   if (dob !== undefined) updates.dob = dob;
   if (gender !== undefined) updates.gender = gender;
   if (weightKg !== undefined) updates.weight_kg = parseFloat(weightKg);
+  if (heightCm !== undefined) updates.height_cm = parseFloat(heightCm);
   if (dietaryPreferences !== undefined) updates.conditions = dietaryPreferences;
+  if (healthGoals !== undefined) updates.health_goals = healthGoals;
+  if (activeDiseases !== undefined) updates.active_diseases = activeDiseases;
+  if (otherDisease !== undefined) updates.other_disease = otherDisease;
+  if (medicalHistory !== undefined) updates.medical_history = medicalHistory;
+  if (noMedication !== undefined) updates.no_medication = noMedication;
 
   const { data, error } = await supabaseAdmin
     .from('profiles')

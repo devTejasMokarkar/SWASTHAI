@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Medication, ScanResult } from "../types";
-import { Pill, Activity, Plus, Search, ShieldAlert, Sparkles, Check, Bell, BellOff, Trash2, Camera, AlertCircle, X, CheckCircle2, Clock } from "lucide-react";
+import { Medication, ScanResult, MedicationReminder, HealthReminder } from "../types";
+import { Pill, Activity, Plus, Search, ShieldAlert, Sparkles, Check, Bell, BellOff, Trash2, Camera, AlertCircle, X, CheckCircle2, Clock, Droplets, Footprints, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { ReminderForm } from "./ui/ReminderForm";
+import { HealthReminderInput } from "./ui/HealthReminderInput";
+import { getSmartDefaults } from "../utils/smartDefaults";
 
 const REMINDER_INTERVALS = [
   { label: "Every 10 minutes", value: "10min" },
@@ -20,6 +23,9 @@ interface MedicationsProps {
   onToggleReminder: (id: string) => void;
   onDeleteMedication: (id: string) => void;
   token: string | null;
+  activeDiseases?: string[];
+  healthReminders?: HealthReminder[];
+  onHealthRemindersChange?: (reminders: HealthReminder[]) => void;
 }
 
 export default function Medications({
@@ -29,6 +35,9 @@ export default function Medications({
   onToggleReminder,
   onDeleteMedication,
   token,
+  activeDiseases = [],
+  healthReminders = [],
+  onHealthRemindersChange,
 }: MedicationsProps) {
   // Add Medication Form states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -38,6 +47,7 @@ export default function Medications({
   const [newFrequency, setNewFrequency] = useState("Daily");
   const [newTime, setNewTime] = useState("09:00");
   const [newReminderInterval, setNewReminderInterval] = useState("daily");
+  const [newReminders, setNewReminders] = useState<Omit<MedicationReminder, "id" | "medicationId" | "userId">[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addConflictWarn, setAddConflictWarn] = useState<string | null>(null);
 
@@ -291,6 +301,7 @@ export default function Medications({
             onClick={() => {
               setAddConflictWarn(null);
               setShowAddModal(true);
+              setNewReminders([]);
             }}
             className="flex items-center gap-2 text-primary font-bold text-sm bg-primary/10 hover:bg-primary/20 px-4 py-2.5 rounded-xl transition-colors active:scale-95"
             id="btn-add-med"
@@ -587,19 +598,35 @@ export default function Medications({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
-                    Reminder Interval
-                  </label>
-                  <select
-                    value={newReminderInterval}
-                    onChange={(e) => setNewReminderInterval(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
-                  >
-                    {REMINDER_INTERVALS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-4 mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
+                      Smart Reminders
+                    </label>
+                    {newName && activeDiseases.length > 0 && (
+                      <button type="button" onClick={() => {
+                        const defaults = getSmartDefaults(newName, activeDiseases)
+                        if (defaults.length > 0) setNewReminders(defaults.map(d => ({
+                          ...d,
+                          startDate: new Date().toISOString().split("T")[0],
+                          endDate: null,
+                          noEndDate: true,
+                          notificationSound: "default",
+                          snooze: 10,
+                          enabled: true,
+                        })))
+                      }}
+                        className="text-[10px] font-bold text-primary hover:text-primary-container cursor-pointer">
+                        Auto-fill from diseases
+                      </button>
+                    )}
+                  </div>
+                  <ReminderForm
+                    reminders={newReminders}
+                    onChange={setNewReminders}
+                    medicationName={newName}
+                    activeDiseases={activeDiseases}
+                  />
                 </div>
 
                 <div className="pt-4 flex gap-3">
