@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    { "source": "/api/auth/(.*)", "destination": "/api/auth" },
+    { "source": "/api/credits/(.*)", "destination": "/api/credits" },
+    { "source": "/api/files/upload", "destination": "/api/upload-file" },
+    { "source": "/api/files/(.*)", "destination": "/api/files" },
+    { "source": "/api/gemini/(.*)", "destination": "/api/gemini" },
+    { "source": "/api/medications/(.*)", "destination": "/api/medications" },
+    { "source": "/api/metrics/(.*)", "destination": "/api/metrics" },
+    { "source": "/api/sessions/(.*)", "destination": "/api/sessions" },
+    { "source": "/api/vitals/(.*)", "destination": "/api/vitals" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/**/*.ts": { "maxDuration": 60 }
+  }
+}

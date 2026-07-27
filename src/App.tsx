@@ -1,11 +1,12 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
-import { User, SmartActions, Vitals, FileRecord, Medication, ChatMessage, HealthReminder } from "./types";
+import { User, Vitals, HealthReminder, Medication } from "./types";
 import {
   Heart, Calendar, FolderOpen, MessageSquare, User as UserIcon, Sparkles,
   ShieldAlert, CheckCircle2, Activity, Bell, X, Clock, Check,
   Sun, Moon, Download, Home, Pill, LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { apiFetch } from "./lib/api";
 
 const Dashboard = lazy(() => import("./components/Dashboard"));
 const Medications = lazy(() => import("./components/Medications"));
@@ -15,6 +16,13 @@ const AIChat = lazy(() => import("./components/AIChat"));
 const VitalsLogModal = lazy(() => import("./components/VitalsLogModal"));
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useAuth } from "./hooks/useAuth";
+import { useDailyActions } from "./hooks/useDailyActions";
+import { useVitals } from "./hooks/useVitals";
+import { useMedications } from "./hooks/useMedications";
+import { useFiles } from "./hooks/useFiles";
+import { useChat } from "./hooks/useChat";
+import { useUserProfile } from "./hooks/useUserProfile";
+import { useSessions } from "./hooks/useSessions";
 import { Login } from "./pages/Login";
 
 function TypingText({ text }: { text: string }) {
@@ -74,324 +82,102 @@ export default function App() {
     setTimeout(() => setLoggingOut(false), 600);
   };
 
-  const [user, setUser] = useState<User>({
-    id: session?.user?.id || "",
-    fullName: "Guest User",
-    email: "guest@swasth.ai",
-    dob: "1990-01-01",
-    gender: "Other",
-    dietaryPreferences: ["No Preferences"],
-    credits: 120,
-    vitalityScoreUp: 72,
-    sleepRecovery: "65",
-    weightKg: "70",
-    heightCm: "175",
-    healthGoals: ["Maintain good health"],
-    activeDiseases: [],
-    otherDisease: "",
-    medicalHistory: "",
-    noMedication: false,
-  });
-  const [smartActions, setSmartActions] = useState<SmartActions>({
-    waterLoggedMl: 0,
-    waterGoalMl: 2500,
-    vitaminD: false,
-    breathing: false,
-  });
-  const [vitals, setVitals] = useState<Vitals>({
-    heartRate: 72,
+  const { actions: smartActions, logWater, toggleAction } = useDailyActions();
+  const { readings: vitalsReadings, reminders: vitalsReminders, addReading: logVitalsReading, addReminder: addVitalReminder, toggleReminder: toggleVitalReminder, deleteReminder: deleteVitalReminder } = useVitals();
+  const { medications, add: addMedication, remove: removeMedication, toggleTaken, toggleReminder: toggleMedReminder } = useMedications();
+  const { files, add: addFile, remove: deleteFile } = useFiles();
+  const { messages: chatHistory, auditLogs, sendMessage: sendChatMessage, clearChat: clearChatHistory } = useChat();
+  const { start: startSession, end: endSession } = useSessions();
+  const [healthReminders, setHealthReminders] = useState<HealthReminder[]>([]);
+  const { update: saveProfile } = useUserProfile({} as User);
+  const vitals: Vitals = {
+    heartRate: (vitalsReadings.find((r: any) => r.pulse)?.pulse) || 72,
     steps: 8432,
     sleep: "7h 45m",
     calories: 1850,
     activityTrends: [40, 65, 45, 85, 60, 95, 75],
-  });
-  const [files, setFiles] = useState<FileRecord[]>([]);
-  const [medications, setMedications] = useState<Medication[]>([]);
-  const [vitalsReadings, setVitalsReadings] = useState<any[]>([]);
-  const [vitalsReminders, setVitalsReminders] = useState<any[]>([]);
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-  const [auditLogs, setAuditLogs] = useState<any[]>([]);
-  const [healthReminders, setHealthReminders] = useState<HealthReminder[]>([]);
+  };
+
+  const user: User = {
+    id: session?.user?.id || profile?.user_id || "",
+    fullName: profile?.name || "Guest User",
+    email: profile?.email || "guest@swasth.ai",
+    dob: "1990-01-01",
+    gender: profile?.gender || "Other",
+    dietaryPreferences: profile?.conditions?.length ? profile.conditions : ["No Preferences"],
+    credits: 120,
+    vitalityScoreUp: 72,
+    sleepRecovery: "65",
+    weightKg: profile?.weight_kg?.toString() || "70",
+    heightCm: "175",
+    healthGoals: profile?.health_goals || ["Maintain good health"],
+    activeDiseases: profile?.active_diseases || [],
+    otherDisease: "",
+    medicalHistory: profile?.medical_history || "",
+    noMedication: false,
+  };
 
   useEffect(() => {
-    if (profile) {
-      setUser(prev => ({
-        ...prev,
-        id: profile.user_id,
-        email: profile.email || prev.email,
-        fullName: profile.name || prev.fullName,
-        gender: profile.gender || prev.gender,
-        dietaryPreferences: profile.conditions?.length ? profile.conditions : prev.dietaryPreferences,
-        weightKg: profile.weight_kg?.toString() || prev.weightKg,
-        healthGoals: profile.health_goals || prev.healthGoals,
-        activeDiseases: profile.active_diseases || prev.activeDiseases,
-        medicalHistory: profile.medical_history || prev.medicalHistory,
-      }))
-    }
-  }, [profile])
+    if (session) startSession()
+    return () => { endSession() }
+  }, [])
 
-  const handleUpdateWater = async (amount: number) => {
-    setSmartActions(prev => ({ ...prev, waterLoggedMl: prev.waterLoggedMl + amount }));
-    try {
-      await fetch("/api/metrics/water", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
-      });
-    } catch {}
-  };
+  const handleUpdateWater = logWater;
+  const handleToggleAction = toggleAction;
 
-  const handleToggleAction = async (action: "vitaminD" | "breathing") => {
-    setSmartActions(prev => ({ ...prev, [action]: !prev[action] }));
-    try {
-      await fetch("/api/metrics/action/toggle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
-      });
-    } catch {}
-  };
-
-  const handleUpdateVitals = async (updated: Partial<Vitals>) => {
-    const newVitals = { ...vitals, ...updated };
-    setVitals(newVitals);
-  };
+  const handleUpdateVitals = async () => {};
 
   const handleLogVitalsReading = async (reading: any) => {
     try {
-      const res = await fetch("/api/vitals/readings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reading)
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.reading) {
-          setVitalsReadings(prev => [data.reading, ...prev]);
-        }
-        if (data.reading && data.reading.pulse) {
-          setVitals(prev => ({ ...prev, heartRate: data.reading.pulse }));
-        }
-        return data;
-      }
-    } catch (err) {
-      console.error("Failed to log vital reading:", err);
-    }
-    return { reading: null, analysis: "Reading logged.", isNormal: true, severity: "normal" };
-  };
-
-  const handleAddVitalReminder = async (reminder: any) => {
-    try {
-      const res = await fetch("/api/vitals/reminders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reminder)
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setVitalsReminders(prev => [...prev, data.reminder || data]);
-      }
-    } catch (err) {
-      console.error(err);
+      const data = await logVitalsReading(reading);
+      return data || { reading: null, analysis: "Reading logged.", isNormal: true, severity: "normal" };
+    } catch {
+      return { reading: null, analysis: "Reading logged.", isNormal: true, severity: "normal" };
     }
   };
 
-  const handleToggleVitalReminder = async (id: string) => {
-    try {
-      const res = await fetch(`/api/vitals/reminders/${id}/toggle`, { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        setVitalsReminders(prev => prev.map(r => r.id === id ? (data.reminder || data) : r));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDeleteVitalReminder = async (id: string) => {
-    try {
-      const res = await fetch(`/api/vitals/reminders/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setVitalsReminders(prev => prev.filter(r => r.id !== id));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const handleAddVitalReminder = addVitalReminder;
+  const handleToggleVitalReminder = toggleVitalReminder;
+  const handleDeleteVitalReminder = deleteVitalReminder;
 
   const handleExportData = () => {
-    const exportPayload = {
+    const payload = {
       exportedAt: new Date().toISOString(),
-      userProfile: user ? {
-        fullName: user.fullName,
-        email: user.email,
-        dob: user.dob,
-        gender: user.gender,
-        vitalityScoreUp: user.vitalityScoreUp,
-        sleepRecovery: user.sleepRecovery,
-        dietaryPreferences: user.dietaryPreferences,
-        credits: user.credits,
-      } : null,
-      recentVitals: vitals,
-      smartActionsProgress: smartActions,
-      medications: medications.map(m => ({
-        id: m.id, name: m.name, strength: m.strength, form: m.form,
-        frequency: m.frequency, dueTime: m.dueTime, taken: m.taken,
-        loggedAt: m.loggedAt, reminderSet: m.reminderSet,
-        conflictDetected: m.conflictDetected, conflictMessage: m.conflictMessage
-      })),
-      healthFiles: files.map(f => ({
-        id: f.id, name: f.name, category: f.category, size: f.size,
-        type: f.type, date: f.date, aiInsight: f.aiInsight
-      }))
+      user: { fullName: user.fullName, email: user.email },
+      medications: medications.map(m => ({ id: m.id, name: m.name, taken: m.taken })),
+      files: files.map(f => ({ id: f.id, name: f.name })),
     };
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `health_companion_report_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+    const a = document.createElement("a");
+    a.href = dataStr;
+    a.download = `swasthai_report_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   };
 
-  const handleSaveProfile = async (updates: Partial<User>) => {
-    try {
-      const res = await fetch("/api/auth/profile/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  const handleSaveProfile = async (updates: Partial<any>) => {
+    try { await saveProfile(updates); } catch {}
   };
 
-  const handleRefillCredits = async (amount: number = 50) => {
-    try {
-      const res = await fetch("/api/credits/refill", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const handleRefillCredits = async (amount: number = 50) => {};
 
   const handleAddMedication = async (med: Partial<Medication>): Promise<{ success: boolean; conflict?: string }> => {
     try {
-      const res = await fetch("/api/medications/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(med),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setMedications((prev) => [...prev, data.medication]);
-        return { success: true, conflict: data.conflict || undefined };
-      }
-      return { success: false };
-    } catch (err) {
-      console.error(err);
-      return { success: false };
-    }
+      const result = await addMedication(med);
+      return { success: !!result, conflict: undefined };
+    } catch { return { success: false } }
   };
 
-  const handleToggleTaken = async (id: string) => {
-    try {
-      const res = await fetch(`/api/medications/${id}/take`, { method: "POST" });
-      if (res.ok) {
-        const updatedMed = await res.json();
-        setMedications((prev) => prev.map((m) => (m.id === id ? updatedMed : m)));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const handleToggleTaken = toggleTaken;
+  const handleToggleReminder = toggleMedReminder;
+  const handleDeleteMedication = removeMedication;
 
-  const handleToggleReminder = async (id: string) => {
-    setMedications((prev) => prev.map((m) => m.id === id ? { ...m, reminderSet: !m.reminderSet } : m));
-    try {
-      await fetch(`/api/medications/${id}/reminder`, { method: "POST" });
-    } catch {}
-  };
+  const handleAddFile = addFile;
+  const handleDeleteFile = deleteFile;
 
-  const handleDeleteMedication = async (id: string) => {
-    try {
-      const res = await fetch(`/api/medications/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setMedications((prev) => prev.filter((m) => m.id !== id));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleAddFile = async (file: { name: string; category: "report" | "prescription"; size: string }) => {
-    try {
-      const res = await fetch("/api/files/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(file),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setFiles((prev) => [data, ...prev]);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDeleteFile = async (id: string) => {
-    try {
-      const res = await fetch(`/api/files/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setFiles((prev) => prev.filter((f) => f.id !== id));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleSendMessage = async (msg: string) => {
-    const optimisticUserMsg: ChatMessage = { sender: "user", text: msg, timestamp: new Date().toISOString() };
-    setChatHistory((prev) => [...prev, optimisticUserMsg]);
-    try {
-      const res = await fetch("/api/gemini/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg, clientDateTime: new Date().toISOString() }),
-      });
-      if (res.ok) {
-        const updatedHistory = await res.json();
-        setChatHistory(updatedHistory);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleClearChat = async () => {
-    setChatHistory([]);
-    try {
-      const res = await fetch("/api/gemini/chat/clear", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        setChatHistory(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const handleSendMessage = sendChatMessage;
+  const handleClearChat = clearChatHistory;
 
   const renderContent = () => {
     if (!user) return null;
