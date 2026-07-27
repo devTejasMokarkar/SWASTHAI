@@ -50,6 +50,7 @@ const extraGoals = [
 export function Step1PersonalProfile({ data, onChange }: Step1Props) {
   const [showMoreDiet, setShowMoreDiet] = useState(false)
   const [showMoreGoals, setShowMoreGoals] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const dietRef = useRef<HTMLDivElement>(null)
   const goalsRef = useRef<HTMLDivElement>(null)
 
@@ -126,22 +127,23 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
           <input
             type="text"
             value={data.fullName}
-            onChange={e => update("fullName", e.target.value)}
+            onChange={e => { update("fullName", e.target.value); setErrors(p => ({ ...p, fullName: '' })); }}
             placeholder="Your full name"
-            className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
+            className={`w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${errors.fullName ? 'border-rose-400' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`}
           />
+          {errors.fullName && <p className="text-[10px] text-rose-500 font-semibold">{errors.fullName}</p>}
         </div>
 
         <div className="space-y-1">
           <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-            Date of Birth
+            Date of Birth <span className="text-rose-500">*</span>
           </label>
           <div className="flex items-center gap-2">
             <input
               type="date"
               value={data.dob}
-              onChange={e => update("dob", e.target.value)}
-              className="flex-1 h-10 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
+              onChange={e => { update("dob", e.target.value); setErrors(p => ({ ...p, dob: '' })); }}
+              className={`flex-1 h-10 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${errors.dob ? 'border-rose-400' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`}
             />
             {data.dob && (
               <span className="text-[11px] font-bold text-primary whitespace-nowrap shrink-0">
@@ -149,20 +151,21 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
               </span>
             )}
           </div>
+          {errors.dob && <p className="text-[10px] text-rose-500 font-semibold">{errors.dob}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="space-y-1">
           <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
-            Gender
+            Gender <span className="text-rose-500">*</span>
           </label>
           <div className="grid grid-cols-3 gap-1">
             {["Male", "Female", "Other"].map(gen => (
               <button
                 key={gen}
                 type="button"
-                onClick={() => update("gender", gen)}
+                onClick={() => { update("gender", gen); setErrors(p => ({ ...p, gender: '' })); }}
                 className={`h-9 flex items-center justify-center rounded-lg border font-bold text-[10px] md:text-xs transition-all cursor-pointer ${
                   data.gender === gen
                     ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
@@ -173,6 +176,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
               </button>
             ))}
           </div>
+          {errors.gender && <p className="text-[10px] text-rose-500 font-semibold">{errors.gender}</p>}
         </div>
 
         <div className="space-y-1">
@@ -182,12 +186,11 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
           <input
             type="number"
             value={data.weight}
-            onChange={e => update("weight", e.target.value)}
+            onChange={e => { update("weight", e.target.value); setErrors(p => ({ ...p, weight: '' })); }}
             placeholder="70"
-            min="20"
-            max="300"
-            className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
+            className={`w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${errors.weight ? 'border-rose-400' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`}
           />
+          {errors.weight && <p className="text-[10px] text-rose-500 font-semibold">{errors.weight}</p>}
         </div>
 
         <div className="space-y-1">
@@ -197,12 +200,11 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
           <input
             type="number"
             value={data.height}
-            onChange={e => update("height", e.target.value)}
+            onChange={e => { update("height", e.target.value); setErrors(p => ({ ...p, height: '' })); }}
             placeholder="170"
-            min="50"
-            max="300"
-            className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm"
+            className={`w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${errors.height ? 'border-rose-400' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`}
           />
+          {errors.height && <p className="text-[10px] text-rose-500 font-semibold">{errors.height}</p>}
         </div>
       </div>
 

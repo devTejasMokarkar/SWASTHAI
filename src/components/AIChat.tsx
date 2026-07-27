@@ -31,10 +31,9 @@ const localRiskDictionary = {
   },
   highGlycemic: {
     condition: (user: any, meds: Medication[]) => {
-      // Focus on users who may have diabetic profiles or taking Metformin, or general safety
       const isDiabetic = meds.some(m => m.name.toLowerCase().includes("metformin")) || 
                          user?.dietaryPreferences?.some((p: string) => p.toLowerCase().includes("diabet"));
-      return isDiabetic || true;
+      return isDiabetic;
     },
     alert: "Glycemic Warning: Suggested sugar source (e.g., sugar, honey, juice, maple syrup, high-glycemic carb) causes rapid blood glucose spikes, directly opposing diabetes management.",
     action: "Opt for low-glycemic, fiber-rich foods instead. Seek medical consultation or check with a clinical provider to monitor long-term glucose patterns."
@@ -823,15 +822,15 @@ export default function AIChat({
                                         <div className="flex items-center gap-3 pt-0.5">
                                           <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold">
                                             <Clock className="w-3 h-3" />
-                                            <span>{log.duration ? `${(log.duration / 1000).toFixed(1)}s` : "1.2s"}</span>
+                                            <span>{log.duration ? `${(log.duration / 1000).toFixed(1)}s` : "—"}</span>
                                           </div>
                                           <span className="w-px h-3 bg-slate-800/50" />
                                           <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold">
                                             <span className="w-3 h-3 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[6px] font-bold">Δ</span>
-                                            <span>{log.tokens ? `${log.tokens} tokens` : "452 tokens"}</span>
+                                            <span>{log.tokens ? `${log.tokens} tokens` : "—"}</span>
                                           </div>
                                           <span className="w-px h-3 bg-slate-800/50" />
-                                          <span className="text-[10px] text-slate-500 font-semibold">{log.model || "GPT-5"}</span>
+                                          <span className="text-[10px] text-slate-500 font-semibold">{log.model || "—"}</span>
                                         </div>
 
                                         {/* Copy button on hover */}
@@ -860,7 +859,7 @@ export default function AIChat({
                                           <div className="space-y-1.5">
                                             <span className="text-[8px] font-bold uppercase tracking-widest text-primary block">Tier 1: Deterministic Retrieval</span>
                                             <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800/50 space-y-1.5">
-                                              <p className="text-slate-400 font-semibold leading-relaxed">• Profile: {log.retrievedContext?.profile?.fullName || "Sarah"} ({log.retrievedContext?.profile?.gender || "Female"}, diet: {log.retrievedContext?.profile?.dietaryPreferences?.join(", ")})</p>
+                                              <p className="text-slate-400 font-semibold leading-relaxed">• Profile: {log.retrievedContext?.profile?.fullName || "—"} ({log.retrievedContext?.profile?.gender || "—"}, diet: {log.retrievedContext?.profile?.dietaryPreferences?.join(", ") || "—"})</p>
                                               <p className="text-slate-400 font-semibold leading-relaxed">• Vitals: {log.retrievedContext?.vitals?.heartRate} BPM, {log.retrievedContext?.vitals?.steps} steps, {log.retrievedContext?.vitals?.sleep} sleep</p>
                                               <p className="text-slate-400 font-semibold leading-relaxed">• Medications: {log.retrievedContext?.medications?.length > 0 ? log.retrievedContext.medications.map((m: any) => m.name).join(", ") : "None logged"}</p>
                                             </div>
@@ -1030,7 +1029,7 @@ export default function AIChat({
                       <div className="text-[10px] text-slate-400 font-mono space-y-2 pl-1 leading-normal border-l border-slate-800/50 font-semibold">
                         <div>
                           <span className="text-primary font-bold">[Tier 1 Deterministic profile]</span>
-                          <p>• Name: {diagnosticResult.retrievedContext?.profile?.fullName || "Sarah"}</p>
+                          <p>• Name: {diagnosticResult.retrievedContext?.profile?.fullName || "—"}</p>
                           <p>• Dietary prefs: {diagnosticResult.retrievedContext?.profile?.dietaryPreferences?.join(", ") || "None"}</p>
                           <p>• Current Vitals: HR {diagnosticResult.retrievedContext?.vitals?.heartRate} BPM, Steps {diagnosticResult.retrievedContext?.vitals?.steps}</p>
                         </div>
@@ -1190,11 +1189,11 @@ export default function AIChat({
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-2 text-[9px] text-slate-500 font-semibold">
-                                  <span>{log.model || "GPT-5"}</span>
+                                  <span>{log.model || "—"}</span>
                                   <span className="w-px h-2.5 bg-slate-800/50" />
-                                  <span>{log.duration ? `${(log.duration / 1000).toFixed(1)}s` : "1.2s"}</span>
+                                  <span>{log.duration ? `${(log.duration / 1000).toFixed(1)}s` : "—"}</span>
                                   <span className="w-px h-2.5 bg-slate-800/50" />
-                                  <span>{log.tokens ? `${log.tokens} tok` : "452 tok"}</span>
+                                  <span>{log.tokens ? `${log.tokens} tok` : "—"}</span>
                                 </div>
                               </div>
 
@@ -1203,7 +1202,7 @@ export default function AIChat({
                                   <div>
                                     <span className="text-primary font-bold uppercase tracking-widest text-[7px] block mb-1">Tier 1 Retrieval</span>
                                     <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/50 space-y-1">
-                                      <p className="text-slate-400 font-semibold">• {log.retrievedContext?.profile?.fullName || "Sarah"} ({log.retrievedContext?.profile?.gender || "Female"}, diet: {log.retrievedContext?.profile?.dietaryPreferences?.join(", ")})</p>
+                                      <p className="text-slate-400 font-semibold">• {log.retrievedContext?.profile?.fullName || "—"} ({log.retrievedContext?.profile?.gender || "—"}, diet: {log.retrievedContext?.profile?.dietaryPreferences?.join(", ") || "—"})</p>
                                       <p className="text-slate-400 font-semibold">• HR {log.retrievedContext?.vitals?.heartRate}, Steps {log.retrievedContext?.vitals?.steps}</p>
                                       <p className="text-slate-400 font-semibold">• Meds: {log.retrievedContext?.medications?.length || 0} active</p>
                                     </div>

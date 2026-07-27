@@ -167,8 +167,34 @@ export function MedicationInput({
                         </div>
                         <div className="space-y-1">
                           <label className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Strength</label>
-                          <input type="text" value={med.strength} onChange={e => updateMed(i, "strength", e.target.value)} placeholder="500 mg"
-                            className="w-full h-8 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-xs font-semibold" />
+                          <div className="flex gap-1">
+                            <input type="number" min="0.1" step="0.1"
+                              value={med.strength.replace(/[^0-9.]/g, '')}
+                              onChange={e => {
+                                const val = e.target.value;
+                                const unit = med.strength.replace(/[\d.\s]/g, '').trim() || 'mg';
+                                updateMed(i, "strength", val ? `${val} ${unit}` : '');
+                              }}
+                              placeholder="500"
+                              className="flex-1 min-w-0 h-8 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-xs font-semibold"
+                            />
+                            <select
+                              value={med.strength.replace(/[\d.\s]/g, '').trim() || 'mg'}
+                              onChange={e => {
+                                const num = med.strength.replace(/[a-zA-Z%\/\s]/g, '').trim();
+                                const unit = e.target.value;
+                                updateMed(i, "strength", num ? `${num} ${unit}` : `${unit}`);
+                              }}
+                              className="w-14 h-8 px-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-xs font-semibold appearance-none"
+                            >
+                              <option value="mg">mg</option>
+                              <option value="mcg">mcg</option>
+                              <option value="g">g</option>
+                              <option value="ml">ml</option>
+                              <option value="IU">IU</option>
+                              <option value="%">%</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
 

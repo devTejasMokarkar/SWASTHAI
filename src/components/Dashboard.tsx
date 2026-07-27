@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { User, SmartActions, Vitals, Medication, MedicationReminder, HealthReminder, ReminderStatus } from "../types";
 import { Activity, Droplet, Pill, Wind, Heart, Footprints, Moon, Flame, Plus, ChevronRight, X, Sparkles, Clock, Calendar, Utensils, Apple, Info, ShieldAlert, Candy, Zap, MessageSquare, Bell, Check, ChevronDown, RotateCcw, Settings } from "lucide-react";
 import WellnessHydrationModal from "./WellnessHydrationModal";
+import { getDietRecommendation } from "../utils/dietRecommendations";
 
 import { motion, AnimatePresence } from "motion/react";
 import confetti from "canvas-confetti";
@@ -102,6 +103,7 @@ interface DashboardProps {
   medications?: Medication[];
   healthReminders?: HealthReminder[];
   onReminderStatus?: (reminderId: string, type: "medication" | "health", action: "taken" | "skipped" | "snoozed") => void;
+  loading?: boolean;
 }
 
 export default function Dashboard({
@@ -116,6 +118,7 @@ export default function Dashboard({
   medications = [],
   healthReminders = [],
   onReminderStatus,
+  loading = false,
 }: DashboardProps) {
   const [showLogModal, setShowLogModal] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
@@ -124,6 +127,7 @@ export default function Dashboard({
   const [logCalories, setLogCalories] = useState(vitals.calories);
   const [showFullReport, setShowFullReport] = useState(false);
   const [showWellnessModal, setShowWellnessModal] = useState(false);
+  const [quickLogErrors, setQuickLogErrors] = useState<Record<string, string>>({});
   
   const [prevWater, setPrevWater] = useState(smartActions.waterLoggedMl);
   const [triggerConfetti, setTriggerConfetti] = useState(false);
@@ -146,6 +150,13 @@ export default function Dashboard({
   }, [smartActions.waterLoggedMl, smartActions.waterGoalMl, prevWater]);
 
   const currentHour = new Date().getHours();
+  const dietPlan = useMemo(() => getDietRecommendation(user), [user.dietaryPreferences, user.activeDiseases, user.weightKg, user.heightCm]);
+  const isDiabetic = (user.dietaryPreferences || []).some(p =>
+    p.toLowerCase().includes("diabet") || p.toLowerCase().includes("sugar") || p.toLowerCase().includes("glucose") || p.toLowerCase().includes("metformin")
+  ) || (user.activeDiseases || []).some(d =>
+    d.toLowerCase().includes("diabet")
+  );
+
   let greeting = "Hello";
   let greetingSubtext = "";
   if (currentHour >= 5 && currentHour < 12) {
@@ -159,11 +170,16 @@ export default function Dashboard({
   }
 
   const handleSaveLogs = () => {
-    onUpdateVitals({
-      steps: Number(logSteps),
-      heartRate: Number(logHeartRate),
-      calories: Number(logCalories),
-    });
+    const errs: Record<string, string> = {};
+    const s = Number(logSteps);
+    if (isNaN(s) || s < 0 || s > 100000) errs.steps = "Steps: 0-100,000";
+    const hr = Number(logHeartRate);
+    if (isNaN(hr) || hr < 30 || hr > 250) errs.hr = "Heart rate: 30-250 BPM";
+    const c = Number(logCalories);
+    if (isNaN(c) || c < 0 || c > 10000) errs.calories = "Calories: 0-10,000 kcal";
+    setQuickLogErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+    onUpdateVitals({ steps: s, heartRate: hr, calories: c });
     setShowLogModal(false);
   };
 
@@ -272,8 +288,8 @@ export default function Dashboard({
                       <span className="bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] px-3.5 py-1.5 rounded-full font-black uppercase tracking-widest flex items-center gap-1 border border-amber-200 dark:border-amber-500/30">
                         <Zap className="w-3 h-3" /> 1 Credit/Day Auto-Deducted
                       </span>
-                      <span className={`text-[10px] px-3.5 py-1.5 rounded-full font-black uppercase tracking-widest shadow-sm border ${currentHour >= 5 && currentHour < 17 ? "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30" : "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30"}`}>
-                        {user.dietaryPreferences?.some(p => p.toLowerCase().includes("diabet") || p.toLowerCase().includes("sugar") || p.toLowerCase().includes("glucose") || p.toLowerCase().includes("metformin")) ? "Diabetic Protocol" : "Balanced Protocol"}
+                      <span className={`text-[10px] px-3.5 py-1.5 rounded-full font-black uppercase tracking-widest shadow-sm border ${isDiabetic ? "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30" : currentHour >= 5 && currentHour < 17 ? "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30" : "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30"}`}>
+                        {isDiabetic ? "Diabetic Protocol" : "Balanced Protocol"}
                       </span>
                     </div>
                     <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white tracking-tight flex items-center gap-2 sm:gap-3">
@@ -285,7 +301,6 @@ export default function Dashboard({
                   </div>
                 </div>
 
-                {/* Dynamic meal listing based on local time */}
                 <div className="space-y-4 mt-6">
                   {currentHour >= 5 && currentHour < 17 ? (
                     <>
@@ -293,23 +308,16 @@ export default function Dashboard({
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/80 dark:to-slate-900/80 p-5 border border-slate-200/60 dark:border-slate-700/60 rounded-3xl shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
                           <span className="text-xs font-black text-primary uppercase block mb-2 tracking-wide">Breakfast suggestion</span>
-                          {user.dietaryPreferences?.some(p => p.toLowerCase().includes("diabet") || p.toLowerCase().includes("sugar") || p.toLowerCase().includes("glucose") || p.toLowerCase().includes("metformin")) ? (
-                            <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
-                              <Utensils className="w-4 h-4 inline-block mr-1 text-primary" />
-                              Warm steel-cut oatmeal topped with sugar-free walnuts and chia seeds. <span className="text-rose-500 dark:text-rose-400 font-bold font-mono text-[11px] block mt-2 bg-rose-50 dark:bg-rose-500/10 p-2 rounded-lg border border-rose-100 dark:border-rose-500/20"><ShieldAlert className="w-3 h-3 inline-block mr-1" />Glycemic spike control: No sweet fruits!</span>
-                            </p>
-                          ) : (
-                            <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
-                              <Apple className="w-4 h-4 inline-block mr-1 text-primary" />
-                              Fresh Whole Apple or sliced pear accompanied by simple high-fiber grains and mixed raw nuts.
-                            </p>
-                          )}
+                          <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
+                            <Apple className="w-4 h-4 inline-block mr-1 text-primary" />
+                            {dietPlan.breakfast}
+                          </p>
                         </div>
                         <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/80 dark:to-slate-900/80 p-5 border border-slate-200/60 dark:border-slate-700/60 rounded-3xl shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
                           <span className="text-xs font-black text-secondary uppercase block mb-2 tracking-wide">Lunch suggestion</span>
                           <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
                               <Utensils className="w-4 h-4 inline-block mr-1 text-secondary" />
-                              Complete vegetarian balanced lunch: 2-3 soft whole-wheat chapatis, protein-packed lentil dal, seasonal dry curry, and a small portion of steamed brown rice.
+                              {dietPlan.lunch}
                           </p>
                         </div>
                       </div>
@@ -321,7 +329,7 @@ export default function Dashboard({
                         <span className="text-xs font-black text-primary uppercase block mb-2 tracking-wide">Dinner suggestion</span>
                         <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
                             <Utensils className="w-4 h-4 inline-block mr-1 text-primary" />
-                            Light Evening Dinner: 1-2 soft chapatis paired with a healthy seasonal dry vegetable curry, nutritious warm dal, and a light portion of steamed rice. Take at least 2 hours before resting.
+                            {dietPlan.dinner}
                         </p>
                       </div>
                     </>
@@ -527,6 +535,18 @@ export default function Dashboard({
 
       {/* Health Insights Grid */}
       <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6" id="vitals-grid">
+        {loading ? (
+          <>
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} className="bg-white/90 dark:bg-slate-900/90 border border-slate-100 dark:border-slate-800 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-sm animate-pulse">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-slate-200 dark:bg-slate-700 mb-2 sm:mb-3 md:mb-4" />
+                <div className="h-3 w-20 bg-slate-200 dark:bg-slate-700 rounded mb-2" />
+                <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded" />
+              </div>
+            ))}
+          </>
+        ) : (
+        <>
         {/* Heart Rate */}
         <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(239,68,68,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-heart-rate">
           <motion.div
@@ -586,6 +606,7 @@ export default function Dashboard({
             {vitals.calories} <span className="text-[10px] sm:text-sm font-bold text-slate-400 dark:text-slate-500">kcal</span>
           </p>
         </div>
+        </>)}
       </section>
 
       {/* Activity Trends Section Removed */}
@@ -623,9 +644,10 @@ export default function Dashboard({
                   <input 
                     type="number"
                     value={logSteps}
-                    onChange={(e) => setLogSteps(Number(e.target.value))}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                    onChange={(e) => { setLogSteps(Number(e.target.value)); setQuickLogErrors(p => ({ ...p, steps: '' })); }}
+                    className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${quickLogErrors.steps ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`}
                   />
+                  {quickLogErrors.steps && <p className="text-[10px] font-semibold text-rose-500 mt-1">{quickLogErrors.steps}</p>}
                 </div>
 
                 <div>
@@ -635,9 +657,10 @@ export default function Dashboard({
                   <input 
                     type="number"
                     value={logHeartRate}
-                    onChange={(e) => setLogHeartRate(Number(e.target.value))}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                    onChange={(e) => { setLogHeartRate(Number(e.target.value)); setQuickLogErrors(p => ({ ...p, hr: '' })); }}
+                    className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${quickLogErrors.hr ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`}
                   />
+                  {quickLogErrors.hr && <p className="text-[10px] font-semibold text-rose-500 mt-1">{quickLogErrors.hr}</p>}
                 </div>
 
                 <div>
@@ -647,9 +670,10 @@ export default function Dashboard({
                   <input 
                     type="number"
                     value={logCalories}
-                    onChange={(e) => setLogCalories(Number(e.target.value))}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                    onChange={(e) => { setLogCalories(Number(e.target.value)); setQuickLogErrors(p => ({ ...p, calories: '' })); }}
+                    className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${quickLogErrors.calories ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`}
                   />
+                  {quickLogErrors.calories && <p className="text-[10px] font-semibold text-rose-500 mt-1">{quickLogErrors.calories}</p>}
                 </div>
               </div>
 
@@ -699,35 +723,35 @@ export default function Dashboard({
                 <div className="p-4 bg-primary/5 dark:bg-primary/10 border border-primary/10 dark:border-primary/20 rounded-2xl flex items-start gap-3">
                   <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <p className="text-primary dark:text-slate-200 font-medium text-xs leading-normal">
-                    AI Clinical Dietitian Note: Your plan dynamically accommodates your {user.dietaryPreferences?.some(p => p.toLowerCase().includes("diabet") || p.toLowerCase().includes("sugar") || p.toLowerCase().includes("glucose") || p.toLowerCase().includes("metformin")) ? "Diabetic profile" : "Standard Vegetarian profile"} and active time window. We strictly restrict sweet fruits and optimize glycemic index bounds to preserve systemic glucose harmony.
+                    {dietPlan.clinicalNote}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 rounded-xl">
                     <span className="text-xs text-on-surface-variant dark:text-slate-400 block font-medium">Glycemic Index (GI) Target</span>
-                    <span className="text-lg font-bold text-on-surface dark:text-slate-100 mt-1 block">&lt; 53 GI (Low)</span>
+                    <span className="text-lg font-bold text-on-surface dark:text-slate-100 mt-1 block">{dietPlan.glycemicIndex}</span>
                     <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-1 inline-block">✓ Glucose spike safe</span>
                   </div>
 
                   <div className="p-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 rounded-xl">
                     <span className="text-xs text-on-surface-variant dark:text-slate-400 block font-medium">Est. Daily Calorie Intake</span>
-                    <span className="text-lg font-bold text-on-surface dark:text-slate-100 mt-1 block">1,850 - 2,100 kcal</span>
+                    <span className="text-lg font-bold text-on-surface dark:text-slate-100 mt-1 block">{dietPlan.calorieEstimate}</span>
                     <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-1 inline-block">✓ Balanced energy output</span>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-on-surface dark:text-slate-100 mb-2">Dynamic Time-of-Day Dietary Rules</h4>
+                  <h4 className="font-bold text-on-surface dark:text-slate-100 mb-2">Dietary Notes</h4>
                   <p className="text-xs">
-                    Your nourishment roadmap enforces strict circadian windows. In the morning and afternoon, a robust balanced breakfast and wholesome lunch (e.g. wheat chapatis, curry, protein dal, and small portion of rice) are essential to drive baseline metabolism. Conversely, evening and night hours restrict intake to a lighter, streamlined dinner (omitting heavy breakfast/lunch grains) to minimize overnight glycemic drift and cardiovascular load.
+                    {dietPlan.notes}
                   </p>
                 </div>
 
                 <div>
                   <h4 className="font-bold text-on-surface dark:text-slate-100 mb-2">Clinical Pre-Consultation Home Care Priority</h4>
                   <p className="text-xs">
-                    Swasth-AI champions conservative home-based supportive remedies for minor self-limiting health disturbances (e.g. common cold, mild throat scratchiness, simple fatigue). Utilizing pure steam therapy, steady warm saline gargles, physical rest, and maintaining a robust 2500ml water hydration budget are powerful primary interventions. You should seek formal doctor visits and clinical care primarily for major, severe, or persistent symptoms.
+                    {dietPlan.homeCareNote}
                   </p>
                 </div>
               </div>

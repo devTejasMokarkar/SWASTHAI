@@ -86,6 +86,7 @@ export default function ProfileSetup({
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [reminderMedIndex, setReminderMedIndex] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
 
   const diseasesRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -151,9 +152,30 @@ export default function ProfileSetup({
     ? allDiseases.filter(d => d.toLowerCase().includes(diseaseSearch.toLowerCase()))
     : allDiseases;
 
+  const validateProfile = () => {
+    const errors: Record<string, string> = {};
+    const name = fullName.trim();
+    if (!name) errors.fullName = "Name is required";
+    else if (name.length < 2 || name.length > 100) errors.fullName = "Name must be 2-100 characters";
+    if (!dob) errors.dob = "Date of birth is required";
+    else {
+      const birth = new Date(dob);
+      const age = Math.floor((Date.now() - birth.getTime()) / 3.15576e+10);
+      if (isNaN(age) || age < 1 || age > 120) errors.dob = "Enter a valid date of birth";
+    }
+    if (!gender) errors.gender = "Gender is required";
+    const w = parseFloat(weightKg);
+    if (!weightKg || isNaN(w) || w < 20 || w > 300) errors.weightKg = "Enter a valid weight (20-300 kg)";
+    const h = parseFloat(heightCm);
+    if (!heightCm || isNaN(h) || h < 50 || h > 250) errors.heightCm = "Enter a valid height (50-250 cm)";
+    setProfileErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validateProfile()) return;
     await onSaveProfile({
-      fullName, dob, gender,
+      fullName: fullName.trim(), dob, gender,
       dietaryPreferences: [diet],
       weightKg, heightCm,
       healthGoals: [goal],
@@ -238,25 +260,29 @@ export default function ProfileSetup({
 
         <div className="space-y-1.5">
           <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider" htmlFor="full_name">Full Name</label>
-          <input type="text" id="full_name" value={fullName} onChange={e => setFullName(e.target.value)}
-            className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm" />
+          <input type="text" id="full_name" value={fullName} onChange={e => { setFullName(e.target.value); setProfileErrors(p => ({ ...p, fullName: '' })); }}
+            className={`w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.fullName ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`} />
+          {profileErrors.fullName && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.fullName}</p>}
         </div>
 
-        <div className="flex gap-2.5">
-          <div className="flex-1 space-y-1.5">
+        <div className="flex gap-2.5 flex-wrap sm:flex-nowrap">
+          <div className="flex-1 min-w-[140px] space-y-1.5">
             <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Date of Birth</label>
-            <input type="date" value={dob} onChange={e => setDob(e.target.value)}
-              className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary outline-none font-semibold text-sm" />
+            <input type="date" value={dob} onChange={e => { setDob(e.target.value); setProfileErrors(p => ({ ...p, dob: '' })); }}
+              className={`w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.dob ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`} />
+            {profileErrors.dob && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.dob}</p>}
           </div>
-          <div className="flex-1 space-y-1.5">
+          <div className="flex-1 min-w-[100px] space-y-1.5">
             <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Weight (kg)</label>
-            <input type="number" value={weightKg} onChange={e => setWeightKg(e.target.value)} placeholder="70" min="20" max="300"
-              className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary outline-none font-semibold text-sm" />
+            <input type="number" value={weightKg} onChange={e => { setWeightKg(e.target.value); setProfileErrors(p => ({ ...p, weightKg: '' })); }} placeholder="70"
+              className={`w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.weightKg ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`} />
+            {profileErrors.weightKg && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.weightKg}</p>}
           </div>
-          <div className="flex-1 space-y-1.5">
+          <div className="flex-1 min-w-[100px] space-y-1.5">
             <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Height (cm)</label>
-            <input type="number" value={heightCm} onChange={e => setHeightCm(e.target.value)} placeholder="170" min="50" max="300"
-              className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary outline-none font-semibold text-sm" />
+            <input type="number" value={heightCm} onChange={e => { setHeightCm(e.target.value); setProfileErrors(p => ({ ...p, heightCm: '' })); }} placeholder="170"
+              className={`w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.heightCm ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`} />
+            {profileErrors.heightCm && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.heightCm}</p>}
           </div>
         </div>
 
@@ -266,7 +292,7 @@ export default function ProfileSetup({
             {["Male", "Female", "Other"].map(gen => {
               const active = gender === gen;
               return (
-                <button key={gen} type="button" onClick={() => setGender(gen)}
+                <button key={gen} type="button" onClick={() => { setGender(gen); setProfileErrors(p => ({ ...p, gender: '' })); }}
                   className={`flex-1 h-11 rounded-xl border text-sm font-bold transition-all cursor-pointer ${
                     active
                       ? "bg-primary border-primary text-white"
@@ -275,6 +301,7 @@ export default function ProfileSetup({
               );
             })}
           </div>
+          {profileErrors.gender && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.gender}</p>}
         </div>
       </div>
 

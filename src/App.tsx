@@ -24,6 +24,7 @@ import { useChat } from "./hooks/useChat";
 import { useUserProfile } from "./hooks/useUserProfile";
 import { useSessions } from "./hooks/useSessions";
 import { Login } from "./pages/Login";
+import { useToast, ToastContainer, showToast } from "./hooks/useToast";
 
 function TypingText({ text }: { text: string }) {
   const [displayed, setDisplayed] = useState("");
@@ -53,6 +54,7 @@ function TypingText({ text }: { text: string }) {
 }
 
 export default function App() {
+  const { toasts: toastList, dismiss: dismissToast } = useToast();
   const [activeTab, setActiveTab] = useState<"today" | "files" | "profile" | "medicine">("today");
   const [showChatOverlay, setShowChatOverlay] = useState(false);
   const [showVitalsLogModal, setShowVitalsLogModal] = useState(false);
@@ -74,6 +76,16 @@ export default function App() {
   }, [darkMode]);
 
   const { session, profile, loading: authLoading, signOut } = useAuth();
+  const [creditBalance, setCreditBalance] = useState(0);
+
+  useEffect(() => {
+    if (!session?.access_token) return;
+    fetch('/api/credits/balance', {
+      headers: { Authorization: `Bearer ${session.access_token}` }
+    }).then(r => r.json()).then(d => {
+      if (d?.success) setCreditBalance(d.data?.balance ?? 0);
+    }).catch(() => {});
+  }, [session]);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -90,26 +102,27 @@ export default function App() {
   const { start: startSession, end: endSession } = useSessions();
   const [healthReminders, setHealthReminders] = useState<HealthReminder[]>([]);
   const { update: saveProfile } = useUserProfile({} as User);
+  const latestPulse = vitalsReadings.find((r: any) => r.pulse)?.pulse;
   const vitals: Vitals = {
-    heartRate: (vitalsReadings.find((r: any) => r.pulse)?.pulse) || 72,
-    steps: 8432,
-    sleep: "7h 45m",
-    calories: 1850,
-    activityTrends: [40, 65, 45, 85, 60, 95, 75],
+    heartRate: latestPulse || 72,
+    steps: 0,
+    sleep: "--",
+    calories: 0,
+    activityTrends: [],
   };
 
   const user: User = {
     id: session?.user?.id || profile?.user_id || "",
     fullName: profile?.name || "Guest User",
     email: profile?.email || "guest@swasth.ai",
-    dob: "1990-01-01",
+    dob: profile?.dob || "",
     gender: profile?.gender || "Other",
     dietaryPreferences: profile?.conditions?.length ? profile.conditions : ["No Preferences"],
-    credits: 120,
+    credits: creditBalance || 120,
     vitalityScoreUp: 72,
     sleepRecovery: "65",
-    weightKg: profile?.weight_kg?.toString() || "70",
-    heightCm: "175",
+    weightKg: profile?.weight_kg?.toString() || "",
+    heightCm: profile?.height_cm?.toString() || "",
     healthGoals: profile?.health_goals || ["Maintain good health"],
     activeDiseases: profile?.active_diseases || [],
     otherDisease: "",
@@ -130,8 +143,10 @@ export default function App() {
   const handleLogVitalsReading = async (reading: any) => {
     try {
       const data = await logVitalsReading(reading);
+      if (data?.success) showToast("Vitals logged", "success");
       return data || { reading: null, analysis: "Reading logged.", isNormal: true, severity: "normal" };
     } catch {
+      showToast("Failed to log vitals", "error");
       return { reading: null, analysis: "Reading logged.", isNormal: true, severity: "normal" };
     }
   };
@@ -157,24 +172,58 @@ export default function App() {
   };
 
   const handleSaveProfile = async (updates: Partial<any>) => {
-    try { await saveProfile(updates); } catch {}
+    try {
+      await saveProfile(updates);
+      showToast("Profile saved successfully", "success");
+    } catch { showToast("Failed to save profile", "error"); }
   };
 
-  const handleRefillCredits = async (amount: number = 50) => {};
+  const handleRefillCredits = async (amount: number = 50) => {
+    try {
+      await apiFetch('/api/credits/refill', {
+        method: 'POST',
+        body: JSON.stringify({ amount, feature: 'manual_refill' }),
+      });
+      showToast(`${amount} credits added`, "success");
+      if (session?.access_token) {
+        const d = await fetch('/api/credits/balance', { headers: { Authorization: `Bearer ${session.access_token}` } }).then(r => r.json());
+        if (d?.success) setCreditBalance(d.data?.balance ?? 0);
+      }
+    } catch { showToast("Failed to refill credits", "error"); }
+  };
 
   const handleAddMedication = async (med: Partial<Medication>): Promise<{ success: boolean; conflict?: string }> => {
     try {
       const result = await addMedication(med);
+      if (result) showToast(`${med.name} added`, "success");
       return { success: !!result, conflict: undefined };
-    } catch { return { success: false } }
+    } catch {
+      showToast("Failed to add medication", "error");
+      return { success: false };
+    }
   };
 
   const handleToggleTaken = toggleTaken;
   const handleToggleReminder = toggleMedReminder;
   const handleDeleteMedication = removeMedication;
 
-  const handleAddFile = addFile;
-  const handleDeleteFile = deleteFile;
+  const handleAddFile = async (file: any) => {
+    try {
+      const result = await addFile(file);
+      if (result) showToast("File uploaded", "success");
+      return result;
+    } catch {
+      showToast("Failed to upload file", "error");
+    }
+  };
+  const handleDeleteFile = async (id: string) => {
+    try {
+      await deleteFile(id);
+      showToast("File deleted", "info");
+    } catch {
+      showToast("Failed to delete file", "error");
+    }
+  };
 
   const handleSendMessage = sendChatMessage;
   const handleClearChat = clearChatHistory;
@@ -196,6 +245,7 @@ export default function App() {
             onOpenChat={() => setShowChatOverlay(true)}
             medications={medications}
             healthReminders={healthReminders}
+            loading={false}
           />
         );
       case "files":
@@ -278,7 +328,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-on-surface dark:text-slate-100 font-sans antialiased transition-colors duration-300">
+    <>
+      <ToastContainer toasts={toastList} dismiss={dismissToast} />
+      <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-on-surface dark:text-slate-100 font-sans antialiased transition-colors duration-300">
       <div className="h-dvh flex flex-col pb-32 overflow-hidden">
         <header className="fixed top-0 w-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 z-50 flex justify-between items-center px-4 md:px-12 h-16 shadow-sm transition-colors duration-300">
           <div className="flex items-center gap-2 md:gap-3 min-w-0">
@@ -291,7 +343,7 @@ export default function App() {
           <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
             {user && (
               <div className="hidden md:flex bg-primary/10 px-4 py-1.5 rounded-full border border-primary/10 shadow-sm">
-                <span className="font-bold text-xs text-primary">{user.credits || 120} Credits</span>
+                <span className="font-bold text-xs text-primary">{user.credits} Credits</span>
               </div>
             )}
 
@@ -588,5 +640,6 @@ export default function App() {
         </AnimatePresence>
       </div>
     </div>
+    </>
   );
 }

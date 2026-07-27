@@ -57,9 +57,32 @@ export function OnboardingWizard() {
     setData(prev => ({ ...prev, step2 }))
   }, [])
 
+  const validateStep1 = () => {
+    const s1 = data.step1
+    const errs: string[] = []
+    if (!s1.fullName.trim()) errs.push("Name is required")
+    else if (s1.fullName.trim().length < 2) errs.push("Name must be at least 2 characters")
+    if (!s1.dob) errs.push("Date of birth is required")
+    else {
+      const age = Math.floor((Date.now() - new Date(s1.dob).getTime()) / 3.15576e+10)
+      if (isNaN(age) || age < 1 || age > 120) errs.push("Enter a valid date of birth")
+    }
+    if (!s1.gender) errs.push("Gender is required")
+    if (s1.weight) {
+      const w = parseFloat(s1.weight)
+      if (isNaN(w) || w < 20 || w > 300) errs.push("Weight must be 20-300 kg")
+    }
+    if (s1.height) {
+      const h = parseFloat(s1.height)
+      if (isNaN(h) || h < 50 || h > 250) errs.push("Height must be 50-250 cm")
+    }
+    return errs
+  }
+
   const goNext = () => {
     if (step === 1) {
-      if (!data.step1.fullName.trim()) return
+      const errs = validateStep1()
+      if (errs.length > 0) return
       sessionStorage.setItem("swasth_pending_profile", JSON.stringify({
         fullName: data.step1.fullName.trim(),
         dob: data.step1.dob,
@@ -122,6 +145,15 @@ export function OnboardingWizard() {
           </div>
           <h1 className="text-lg font-extrabold tracking-tight text-primary">Swasth AI</h1>
         </div>
+
+        {step < 3 && (
+          <div className="flex items-center justify-end mb-2">
+            <div className="flex items-center gap-2 text-xs text-on-surface-variant">
+              <span>Already registered?</span>
+              <LoginButton size="medium" shape="pill" text="signin_with" />
+            </div>
+          </div>
+        )}
 
         <StepIndicator currentStep={step} totalSteps={3} />
 

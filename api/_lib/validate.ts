@@ -78,4 +78,28 @@ export const sessionStartSchema = z.object({
   deviceInfo: z.record(z.string(), z.any()).optional(),
 })
 
+export const medicationCreateSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100),
+  strength: z.string().min(1, "Strength is required"),
+  form: z.string().default("Tablet"),
+  frequency: z.string().default("Daily"),
+  dueTime: z.string().min(1, "Time is required"),
+  reminderInterval: z.string().optional(),
+})
+
+export const profileUpdateSchema = z.object({
+  fullName: z.string().min(1).max(100).optional(),
+  dob: z.string().optional(),
+  gender: z.string().optional(),
+  dietaryPreferences: z.array(z.string()).optional(),
+  weightKg: z.string().optional(),
+  heightCm: z.string().optional(),
+  healthGoals: z.array(z.string()).optional(),
+  activeDiseases: z.array(z.string()).optional(),
+  otherDisease: z.string().optional(),
+  medicalHistory: z.string().optional(),
+  noMedication: z.boolean().optional(),
+  profileMedications: z.array(z.any()).optional(),
+})
+
 export const paginationMeta = (page: number, limit: number, total: number) => ({ page, limit, total })

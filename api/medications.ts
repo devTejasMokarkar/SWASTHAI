@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { authenticate } from './_lib/authenticate'
 import { supabaseAdmin } from './_lib/supabaseAdmin'
 import { ok, created, noContent, notFound, handleError } from './_lib/apiResponse'
+import { validateBody, medicationCreateSchema } from './_lib/validate'
 
 function getIdFromPath(req: VercelRequest): string | undefined {
   const parts = (req.url || '').split('?')[0].split('/')
@@ -26,7 +27,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!id && req.method === 'POST') {
-      const body = typeof req.body === 'object' ? req.body : {}
+      const body = validateBody(req.body, medicationCreateSchema, res)
+      if (!body) return
       const { data, error } = await supabaseAdmin
         .from('medications')
         .insert({ user_id: userId, ...body })

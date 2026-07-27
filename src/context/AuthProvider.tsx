@@ -59,6 +59,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const raw = sessionStorage.getItem('swasth_pending_profile')
     if (!raw) return
     try {
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (existing) {
+        sessionStorage.removeItem('swasth_pending_profile')
+        return
+      }
+
       const data = JSON.parse(raw)
       const updates: Record<string, any> = {}
       if (data.fullName) updates.name = data.fullName

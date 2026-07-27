@@ -26,9 +26,42 @@ export default function VitalsLogModal({ isOpen, onClose, onLogVitalsReading }: 
   });
   const [isLoggingVitals, setIsLoggingVitals] = useState(false);
   const [vitalsFeedback, setVitalsFeedback] = useState<any | null>(null);
+  const [vitalErrors, setVitalErrors] = useState<Record<string, string>>({});
+
+  const validateVitals = (): boolean => {
+    const errs: Record<string, string> = {};
+    if (vitalsType === "blood_sugar") {
+      const v = parseFloat(sugarVal);
+      if (!sugarVal || isNaN(v)) errs.sugar = "Glucose value is required";
+      else if (sugarUnit === "mg/dL" && (v < 20 || v > 600)) errs.sugar = "Must be 20-600 mg/dL";
+      else if (sugarUnit === "mmol/L" && (v < 1.1 || v > 33.3)) errs.sugar = "Must be 1.1-33.3 mmol/L";
+    } else if (vitalsType === "blood_pressure") {
+      const s = parseInt(systolic);
+      const d = parseInt(diastolic);
+      if (!systolic || isNaN(s) || s < 50 || s > 250) errs.systolic = "Systolic must be 50-250 mmHg";
+      if (!diastolic || isNaN(d) || d < 30 || d > 150) errs.diastolic = "Diastolic must be 30-150 mmHg";
+      if (s && d && s <= d) errs.diastolic = "Diastolic must be lower than systolic";
+      if (pulse) {
+        const p = parseInt(pulse);
+        if (isNaN(p) || p < 30 || p > 250) errs.pulse = "Pulse must be 30-250 BPM";
+      }
+    } else if (vitalsType === "temperature") {
+      const v = parseFloat(tempVal);
+      if (!tempVal || isNaN(v)) errs.temp = "Temperature is required";
+      else if (tempUnit === "F" && (v < 86 || v > 113)) errs.temp = "Must be 86-113 °F";
+      else if (tempUnit === "C" && (v < 30 || v > 45)) errs.temp = "Must be 30-45 °C";
+    } else if (vitalsType === "spo2") {
+      const v = parseInt(spo2Val);
+      if (!spo2Val || isNaN(v) || v < 50 || v > 100) errs.spo2 = "SpO2 must be 50-100%";
+    }
+    setVitalErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   const handleLogVitalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setVitalErrors({});
+    if (!validateVitals()) return;
     setIsLoggingVitals(true);
     try {
       let payload: any = { type: vitalsType };
@@ -104,7 +137,8 @@ export default function VitalsLogModal({ isOpen, onClose, onLogVitalsReading }: 
                       <button type="button" onClick={() => setSugarUnit("mmol/L")} className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${sugarUnit === "mmol/L" ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm" : "text-slate-400 dark:text-slate-500"}`}>mmol/L</button>
                     </div>
                   </div>
-                  <input type="number" step="0.1" required placeholder={sugarUnit === "mg/dL" ? "e.g. 110" : "e.g. 6.1"} value={sugarVal} onChange={(e) => setSugarVal(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold" />
+                  <input type="number" step="0.1" placeholder={sugarUnit === "mg/dL" ? "e.g. 110" : "e.g. 6.1"} value={sugarVal} onChange={(e) => { setSugarVal(e.target.value); setVitalErrors(p => ({ ...p, sugar: '' })); }} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${vitalErrors.sugar ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-pink-500'}`} />
+                  {vitalErrors.sugar && <p className="text-[10px] font-semibold text-rose-500 mt-1">{vitalErrors.sugar}</p>}
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">Reading Context</label>
@@ -120,16 +154,18 @@ export default function VitalsLogModal({ isOpen, onClose, onLogVitalsReading }: 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">Systolic (mmHg)</label>
-                    <input type="number" required placeholder="e.g. 120" value={systolic} onChange={(e) => setSystolic(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold" />
+                    <input type="number" placeholder="e.g. 120" value={systolic} onChange={(e) => { setSystolic(e.target.value); setVitalErrors(p => ({ ...p, systolic: '' })); }} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${vitalErrors.systolic ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-pink-500'}`} />
+                    {vitalErrors.systolic && <p className="text-[10px] font-semibold text-rose-500 mt-1">{vitalErrors.systolic}</p>}
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">Diastolic (mmHg)</label>
-                    <input type="number" required placeholder="e.g. 80" value={diastolic} onChange={(e) => setDiastolic(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold" />
+                    <input type="number" placeholder="e.g. 80" value={diastolic} onChange={(e) => { setDiastolic(e.target.value); setVitalErrors(p => ({ ...p, diastolic: '' })); }} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${vitalErrors.diastolic ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-pink-500'}`} />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">Pulse Rate (BPM) <span className="text-[10px] text-slate-400 dark:text-slate-500 lowercase">(optional)</span></label>
-                  <input type="number" placeholder="e.g. 72" value={pulse} onChange={(e) => setPulse(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold" />
+                  <input type="number" placeholder="e.g. 72" value={pulse} onChange={(e) => { setPulse(e.target.value); setVitalErrors(p => ({ ...p, pulse: '' })); }} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${vitalErrors.pulse ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-pink-500'}`} />
+                  {vitalErrors.pulse && <p className="text-[10px] font-semibold text-rose-500 mt-1">{vitalErrors.pulse}</p>}
                 </div>
               </div>
             ) : vitalsType === "temperature" ? (
@@ -142,14 +178,16 @@ export default function VitalsLogModal({ isOpen, onClose, onLogVitalsReading }: 
                       <button type="button" onClick={() => setTempUnit("C")} className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${tempUnit === "C" ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm" : "text-slate-400 dark:text-slate-500"}`}>°C</button>
                     </div>
                   </div>
-                  <input type="number" step="0.1" required placeholder={tempUnit === "F" ? "e.g. 98.6" : "e.g. 37.0"} value={tempVal} onChange={(e) => setTempVal(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold" />
+                  <input type="number" step="0.1" placeholder={tempUnit === "F" ? "e.g. 98.6" : "e.g. 37.0"} value={tempVal} onChange={(e) => { setTempVal(e.target.value); setVitalErrors(p => ({ ...p, temp: '' })); }} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${vitalErrors.temp ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-pink-500'}`} />
+                  {vitalErrors.temp && <p className="text-[10px] font-semibold text-rose-500 mt-1">{vitalErrors.temp}</p>}
                 </div>
               </div>
             ) : (
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1.5">Blood Oxygen (SpO2 %)</label>
-                  <input type="number" required placeholder="e.g. 98" value={spo2Val} onChange={(e) => setSpo2Val(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold" />
+                  <input type="number" placeholder="e.g. 98" value={spo2Val} onChange={(e) => { setSpo2Val(e.target.value); setVitalErrors(p => ({ ...p, spo2: '' })); }} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${vitalErrors.spo2 ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-pink-500'}`} />
+                  {vitalErrors.spo2 && <p className="text-[10px] font-semibold text-rose-500 mt-1">{vitalErrors.spo2}</p>}
                 </div>
               </div>
             )}

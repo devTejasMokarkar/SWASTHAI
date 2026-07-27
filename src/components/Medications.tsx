@@ -42,7 +42,8 @@ export default function Medications({
   // Add Medication Form states
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState("");
-  const [newStrength, setNewStrength] = useState("");
+  const [newStrengthVal, setNewStrengthVal] = useState("");
+  const [newStrengthUnit, setNewStrengthUnit] = useState("mg");
   const [newForm, setNewForm] = useState("Tablet");
   const [newFrequency, setNewFrequency] = useState("Daily");
   const [newTime, setNewTime] = useState("09:00");
@@ -50,6 +51,7 @@ export default function Medications({
   const [newReminders, setNewReminders] = useState<Omit<MedicationReminder, "id" | "medicationId" | "userId">[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addConflictWarn, setAddConflictWarn] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<{ name?: string; strength?: string; time?: string }>({});
 
   const reminderTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
@@ -103,28 +105,41 @@ export default function Medications({
 
   // Scanner states
   const [scannerActive, setScannerActive] = useState(false);
-  const [scanResult, setScanResult] = useState<Partial<ScanResult> | null>({
-    identifiedName: "Lisinopril 10mg",
-    interactionCheck: "Conflict Detected with Ibuprofen. Lisinopril reduces clearance of NSAIDs.",
-    conflict: true,
-  });
+  const [scanResult, setScanResult] = useState<Partial<ScanResult> | null>(null);
   const [customScanInput, setCustomScanInput] = useState("");
   const [isScanning, setIsScanning] = useState(false);
 
   // Hydration detail state
   const [showHydrationDetail, setShowHydrationDetail] = useState(false);
 
+  const validateMedForm = () => {
+    const errors: { name?: string; strength?: string; time?: string } = {};
+    const name = newName.trim();
+    if (!name) errors.name = "Medication name is required";
+    else if (name.length < 2) errors.name = "Name must be at least 2 characters";
+    else if (name.length > 100) errors.name = "Name is too long";
+    const strengthNum = newStrengthVal.trim();
+    if (!strengthNum) errors.strength = "Strength is required";
+    else if (isNaN(Number(strengthNum)) || Number(strengthNum) <= 0) errors.strength = "Enter a valid number";
+    if (!newTime) errors.time = "Time is required";
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleAddMed = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName || !newStrength) return;
+    setFormErrors({});
+    if (!validateMedForm()) return;
 
     setIsSubmitting(true);
     setAddConflictWarn(null);
 
     try {
+      const strengthVal = newStrengthVal.trim();
+      const strength = strengthVal ? `${strengthVal} ${newStrengthUnit}` : "";
       const res = await onAddMedication({
         name: newName,
-        strength: newStrength,
+        strength,
         form: newForm,
         frequency: newFrequency,
         dueTime: newTime,
@@ -134,9 +149,8 @@ export default function Medications({
       if (res.conflict) {
         setAddConflictWarn(res.conflict);
       } else {
-        // Reset and close
         setNewName("");
-        setNewStrength("");
+        setNewStrengthVal("");
         setShowAddModal(false);
       }
     } catch (err) {
@@ -295,7 +309,7 @@ export default function Medications({
         <div className="flex justify-between items-end mb-6">
           <div>
             <h2 className="text-2xl font-bold text-on-surface dark:text-slate-100">Active Medications</h2>
-            <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-0.5">Scheduled for today, Oct 24</p>
+            <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-0.5">Scheduled for {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
           </div>
           <button 
             onClick={() => {
@@ -525,12 +539,12 @@ export default function Medications({
                   </label>
                   <input 
                     type="text"
-                    required
                     placeholder="e.g. Lisinopril, Amoxicillin, Ibuprofen"
                     value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                    onChange={(e) => { setNewName(e.target.value); setFormErrors(p => ({ ...p, name: undefined })); }}
+                    className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${formErrors.name ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`}
                   />
+                  {formErrors.name && <p className="text-[10px] font-semibold text-rose-500 mt-1">{formErrors.name}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -538,14 +552,30 @@ export default function Medications({
                     <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
                       Strength
                     </label>
-                    <input 
-                      type="text"
-                      required
-                      placeholder="e.g. 10mg, 500mg"
-                      value={newStrength}
-                      onChange={(e) => setNewStrength(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
-                    />
+                    <div className="flex gap-2">
+                      <input 
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        placeholder="e.g. 10"
+                        value={newStrengthVal}
+                        onChange={(e) => { setNewStrengthVal(e.target.value); setFormErrors(p => ({ ...p, strength: undefined })); }}
+                        className={`flex-1 min-w-0 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${formErrors.strength ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`}
+                      />
+                      <select
+                        value={newStrengthUnit}
+                        onChange={(e) => setNewStrengthUnit(e.target.value)}
+                        className="w-20 px-3 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold appearance-none"
+                      >
+                        <option value="mg">mg</option>
+                        <option value="mcg">mcg</option>
+                        <option value="g">g</option>
+                        <option value="ml">ml</option>
+                        <option value="IU">IU</option>
+                        <option value="%">%</option>
+                      </select>
+                    </div>
+                    {formErrors.strength && <p className="text-[10px] font-semibold text-rose-500 mt-1">{formErrors.strength}</p>}
                   </div>
 
                   <div>
@@ -592,9 +622,10 @@ export default function Medications({
                     <input 
                       type="time"
                       value={newTime}
-                      onChange={(e) => setNewTime(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                      onChange={(e) => { setNewTime(e.target.value); setFormErrors(p => ({ ...p, time: undefined })); }}
+                      className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 focus:outline-none text-sm font-semibold ${formErrors.time ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`}
                     />
+                    {formErrors.time && <p className="text-[10px] font-semibold text-rose-500 mt-1">{formErrors.time}</p>}
                   </div>
                 </div>
 

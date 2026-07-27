@@ -1,7 +1,9 @@
-import { GoogleLogin } from '@react-oauth/google'
+import { GoogleLogin, type GoogleLoginProps } from '@react-oauth/google'
 import { useAuth } from '../hooks/useAuth'
 
-export function LoginButton() {
+type Props = Pick<GoogleLoginProps, 'size' | 'shape' | 'text'>
+
+export function LoginButton({ size = 'large', shape = 'pill', text = 'continue_with' }: Props) {
   const { signInWithGoogle } = useAuth()
 
   return (
@@ -15,9 +17,9 @@ export function LoginButton() {
         }
       }}
       onError={() => console.error('Google Login failed')}
-      size="large"
-      shape="pill"
-      text="continue_with"
+      size={size}
+      shape={shape}
+      text={text}
     />
   )
 }
