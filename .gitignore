@@ -6,4 +6,9 @@ coverage/
 *.log
 .env*
 !.env.example
+client_secret_*.json
 .vercel
+
+# Local/test scripts containing secrets
+check-tables.ts
+verify-sarah.ts
