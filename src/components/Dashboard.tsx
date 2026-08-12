@@ -238,39 +238,20 @@ export default function Dashboard({
         {triggerConfetti && <WaterConfetti />}
       </AnimatePresence>
 
-      {/* Flash Greeting Section */}
-      <section className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 md:gap-6 relative" id="greeting-section">
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
-        <div className="relative z-10 flex flex-col items-start">
-          <motion.h1 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="text-xl md:text-3xl font-extrabold tracking-tight flex items-center flex-wrap gap-2"
-          >
-            <span className="bg-gradient-to-br from-primary via-blue-500 to-emerald-400 bg-clip-text text-transparent pb-0.5 drop-shadow-sm break-words">
-              {greeting}, {user.fullName || "Sarah"}.
-            </span>
-            {user.dob && (
-              <span className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wide border border-slate-200/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap">
-                {Math.floor((new Date().getTime() - new Date(user.dob).getTime()) / 3.15576e+10)} yrs
-              </span>
-            )}
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-            className="text-sm md:text-base text-on-surface-variant dark:text-slate-400 max-w-2xl mt-1 leading-relaxed font-medium"
-          >
-            {greetingSubtext}
-          </motion.p>
+      <div className="hero">
+        <div>
+          <h1>Good afternoon, Guest User.</h1>
+          <p>Here's your reading for the rest of the day.</p>
         </div>
-        
-        {/* Date and Time display */}
-        <ClockDisplay />
-      </section>
-
+        <div className="stamp">
+          <div>
+            <div className="day">Wednesday</div>
+            <div className="date">Aug 12, 2026</div>
+          </div>
+          <div className="divider"></div>
+          <div className="time">01:47 PM</div>
+        </div>
+      </div>
       {/* Main Bento Grid */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6" id="bento-grid">
         {/* Featured Insight Card: AI Diet Recommendation */}
@@ -351,71 +332,50 @@ export default function Dashboard({
           </div>
         </div>
 
-        {/* Smart Actions List */}
-        <div className="md:col-span-4 flex flex-col justify-between gap-5" id="smart-actions-panel">
-          <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2 pb-1.5">
-            Smart Actions
-          </h3>
+        {/* Smart Actions */}
+        <section className="card actions-card">
+          <h3>Smart Actions</h3>
 
-          {/* Water log action */}
-          <div 
-            onClick={() => onUpdateWater(500)}
-            className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-blue-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col gap-3 sm:gap-5 group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-1"
-            id="action-water"
-          >
-            <div className="flex justify-between items-center w-full gap-2">
-              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner shrink-0">
-                  <Droplet className="w-5 h-5 sm:w-6 sm:h-6 fill-primary/20 dark:fill-primary/40" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-extrabold text-on-surface dark:text-white text-sm sm:text-base truncate">Log 500ml Water</p>
-                  <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 font-semibold truncate">
-                    Progress: {smartActions.waterLoggedMl}ml / {smartActions.waterGoalMl}ml
-                  </p>
-                </div>
-              </div>
-              <button 
-                className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all duration-300 font-black shadow-sm shrink-0 ${
-                  smartActions.waterLoggedMl >= smartActions.waterGoalMl 
-                    ? "border-emerald-500 bg-gradient-to-br from-emerald-400 to-emerald-500 text-white shadow-emerald-500/30" 
-                    : "border-primary/30 group-hover:border-primary text-primary group-hover:bg-primary/5"
-                }`}
-              >
-                {smartActions.waterLoggedMl >= smartActions.waterGoalMl ? "✓" : "+"}
-              </button>
-            </div>
-
-            {/* Visual Progress Bar */}
-            <div className="w-full">
-              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
-                <div className="flex items-center gap-2">
-                  <span>Hydration Goal</span>
-                  <button type="button" onClick={e => { e.stopPropagation(); setShowWellnessModal(true); }}
-                    className="p-1 hover:bg-primary/10 rounded-lg transition-colors cursor-pointer" title="Wellness settings">
-                    <Settings className="w-3 h-3 text-slate-400 hover:text-primary" />
-                  </button>
-                </div>
-                <span className={smartActions.waterLoggedMl >= smartActions.waterGoalMl ? "text-emerald-500" : "text-primary"}>
-                  {Math.round(Math.min((smartActions.waterLoggedMl / smartActions.waterGoalMl) * 100, 100))}%
-                </span>
-              </div>
-              <div className="w-full h-3.5 bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden border border-slate-200/40 dark:border-slate-700/30 p-0.5 shadow-inner">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${Math.min((smartActions.waterLoggedMl / smartActions.waterGoalMl) * 100, 100)}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className={`h-full rounded-full shadow-sm ${
-                    smartActions.waterLoggedMl >= smartActions.waterGoalMl 
-                      ? "bg-gradient-to-r from-emerald-400 to-teal-400" 
-                      : "bg-gradient-to-r from-primary via-blue-400 to-cyan-400"
-                  }`}
-                />
-              </div>
-            </div>
+        <div class="action-item">
+          <div class="a-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0014 0c0-4.5-7-13-7-13z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
           </div>
+          <div class="a-body">
+            <div class="a-title">Log 500ml water</div>
+            <div class="a-progress"><div id="waterFill"></div></div>
+            <div class="a-meta"><span id="waterLabel">0ml / 2500ml</span><span id="waterPct">0%</span></div>
+          </div>
+          <button class="plus-btn" id="waterBtn" aria-label="Log 500ml water">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
 
-          {/* Vitamin D action */}
+        <div class="action-item" id="vitaminItem">
+          <div class="a-icon pink">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8.5 15.5l7-7M9 5l1.5-1.5a4 4 0 015.66 5.66L14.5 10.5M15 19l-1.5 1.5a4 4 0 01-5.66-5.66L9.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="a-body">
+            <div class="a-title">Take Vitamin D</div>
+            <div class="a-sub">Morning dosage</div>
+          </div>
+          <button class="check-btn" data-target="vitaminItem" aria-label="Mark Vitamin D taken">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="action-item" id="breathItem">
+          <div class="a-icon orange">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 10h10a3 3 0 100-3M4 14h13a3 3 0 110 3M4 6h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="a-body">
+            <div class="a-title">3-minute breathing</div>
+            <div class="a-sub">Stress reduction</div>
+          </div>
+          <button class="check-btn" data-target="breathItem" aria-label="Mark breathing exercise done">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </section>          {/* Vitamin D action */}
           <div 
             onClick={() => onToggleAction("vitaminD")}
             className="bg-white/90 dark:bg-slate-900/90 hover:bg-gradient-to-r hover:from-white hover:to-purple-50/50 dark:hover:from-slate-800 dark:hover:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] flex justify-between items-center group cursor-pointer transition-all duration-300 hover:shadow-[0_10px_30px_-10px_rgba(168,85,247,0.3)] hover:-translate-y-1"
@@ -468,7 +428,6 @@ export default function Dashboard({
           </div>
 
         </div>
-      </div>
 
       <WellnessHydrationModal
         isOpen={showWellnessModal}
@@ -533,83 +492,51 @@ export default function Dashboard({
         </section>
       )}
 
-      {/* Health Insights Grid */}
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6" id="vitals-grid">
-        {loading ? (
-          <>
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} className="bg-white/90 dark:bg-slate-900/90 border border-slate-100 dark:border-slate-800 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-sm animate-pulse">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-slate-200 dark:bg-slate-700 mb-2 sm:mb-3 md:mb-4" />
-                <div className="h-3 w-20 bg-slate-200 dark:bg-slate-700 rounded mb-2" />
-                <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded" />
-              </div>
-            ))}
-          </>
-        ) : (
-        <>
-        {/* Heart Rate */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(239,68,68,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-heart-rate">
-          <motion.div
-            animate={{ scale: [1, 1.18, 1, 1, 1] }}
-            transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-red-100 to-red-200 dark:from-red-500/20 dark:to-red-600/10 text-red-600 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300"
-          >
-            <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-red-500/80 dark:fill-red-500" />
-          </motion.div>
-          <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Heart Rate</p>
-          <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
-            {vitals.heartRate} <span className="text-[10px] sm:text-sm font-bold text-slate-400 dark:text-slate-500">BPM</span>
-          </p>
+      <div className="vitals">
+    <div className="vital-card">
+      <div className="v-top">
+        <div className="v-icon heart">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.35-9.5-9C1 8 2.5 4 6.5 4c2 0 3.5 1.2 5.5 3.5C14 5.2 15.5 4 17.5 4 21.5 4 23 8 21.5 12 19 16.65 12 21 12 21z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
         </div>
+        <div className="v-trend">STEADY</div>
+      </div>
+      <div className="v-label">Heart Rate</div>
+      <div className="v-value">72<span>bpm</span></div>
+    </div>
 
-        {/* Steps */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(59,130,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-steps">
-          <motion.div
-            animate={{ y: [0, -3, 0, 3, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-600/10 text-primary flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300"
-          >
-            <Footprints className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-          </motion.div>
-          <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Steps</p>
-          <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
-            {vitals.steps.toLocaleString()}
-          </p>
+    <div className="vital-card">
+      <div className="v-top">
+        <div className="v-icon steps">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 4a2 2 0 100 4 2 2 0 000-4zM6 20l1.5-6L5 12l1-4M15 8a2 2 0 100 4 2 2 0 000-4zM18 20l-1.5-6L19 12l-1-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
+        <div className="v-trend">GOAL 8,000</div>
+      </div>
+      <div className="v-label">Steps</div>
+      <div className="v-value">0<span>today</span></div>
+    </div>
 
-        {/* Sleep */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-sleep">
-          <motion.div
-            animate={{ y: [0, -5, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-600/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300"
-          >
-            <Moon className="w-5 h-5 sm:w-6 sm:h-6 fill-purple-500/80 dark:fill-purple-400" />
-          </motion.div>
-          <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sleep</p>
-          <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
-            {vitals.sleep}
-          </p>
+    <div className="vital-card">
+      <div className="v-top">
+        <div className="v-icon sleep">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
         </div>
+        <div className="v-trend">GOAL 8h</div>
+      </div>
+      <div className="v-label">Sleep</div>
+      <div className="v-value">0<span>hrs</span></div>
+    </div>
 
-        {/* Calories */}
-        <div className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-3 sm:p-4 md:p-6 rounded-[1.5rem] sm:rounded-[2rem] flex flex-col items-center text-center shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-[0_10px_40px_-10px_rgba(249,115,22,0.3)] transition-all duration-300 hover:-translate-y-2 cursor-default" id="vital-calories">
-          <motion.div
-            animate={{ scale: [1, 1.08, 1, 0.95, 1], rotate: [0, 2, 0, -2, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-500/20 dark:to-orange-600/10 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-inner group-hover:scale-110 transition-transform duration-300"
-          >
-            <Flame className="w-5 h-5 sm:w-6 sm:h-6 fill-orange-500/80 dark:fill-orange-400" />
-          </motion.div>
-          <p className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Calories</p>
-          <p className="text-xl sm:text-2xl md:text-3xl font-black text-on-surface dark:text-white mt-1 sm:mt-2 flex items-baseline gap-1">
-            {vitals.calories} <span className="text-[10px] sm:text-sm font-bold text-slate-400 dark:text-slate-500">kcal</span>
-          </p>
+    <div className="vital-card">
+      <div className="v-top">
+        <div className="v-icon water">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0014 0c0-4.5-7-13-7-13z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
         </div>
-        </>)}
-      </section>
-
-      {/* Activity Trends Section Removed */}
+        <div className="v-trend" id="hydTrend">0%</div>
+      </div>
+      <div className="v-label">Hydration</div>
+      <div className="v-value" id="hydValue">0<span>ml</span></div>
+    </div>
+  </div>      {/* Activity Trends Section Removed */}
 
 
 

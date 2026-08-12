@@ -332,68 +332,33 @@ export default function App() {
       <ToastContainer toasts={toastList} dismiss={dismissToast} />
       <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-on-surface dark:text-slate-100 font-sans antialiased transition-colors duration-300">
       <div className="h-dvh flex flex-col pb-32 overflow-hidden">
-        <header className="fixed top-0 w-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 z-50 flex justify-between items-center px-4 md:px-12 h-16 shadow-sm transition-colors duration-300">
-          <div className="flex items-center gap-2 md:gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <Activity className="w-5 h-5 animate-pulse" />
-            </div>
-            <h1 className="text-xl font-extrabold tracking-tight text-primary truncate">Swasth AI</h1>
-          </div>
-
-          <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
-            {user && (
-              <div className="hidden md:flex bg-primary/10 px-4 py-1.5 rounded-full border border-primary/10 shadow-sm">
-                <span className="font-bold text-xs text-primary">{user.credits} Credits</span>
+<header>
+          <div class="wrap">
+            <div class="brand">
+              <div class="brand-mark">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12h4l1.5-5L11 19l2.5-11L15 12h7"/>
+                </svg>
               </div>
-            )}
-
-            <button
-              onClick={handleExportData}
-              className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-transparent hover:bg-primary/5 text-primary border-2 border-primary/30 hover:border-primary rounded-xl text-xs font-black transition-all hover:scale-[1.02] cursor-pointer shadow-sm"
-              title="Export Health Data Report"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Export Report</span>
-            </button>
-
-            <button
-              onClick={() => setShowReminderModal(true)}
-              className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary rounded-lg transition-colors cursor-pointer relative"
-              title="View All Reminders"
-            >
-              <Bell className="w-5 h-5" />
-              {(medications.some(m => !m.taken) || healthReminders.some(r => r.enabled)) && (
-                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary rounded-lg transition-colors cursor-pointer"
-              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {darkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-600" />}
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className="p-3 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-on-surface-variant dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
-              title="Sign Out"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
-
-            <div
-              onClick={() => setActiveTab("profile")}
-              className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner cursor-pointer hover:border-primary transition-all relative group flex items-center justify-center bg-slate-50 dark:bg-slate-800"
-              title="Profile Settings"
-            >
-              {profile?.name ? (
-                <span className="text-xs font-bold text-primary">{profile.name.charAt(0).toUpperCase()}</span>
-              ) : (
-                <UserIcon className="w-5 h-5 text-primary" />
-              )}
+              <div>
+                <div class="brand-name">Swasth AI</div>
+                <div class="brand-sub">Health Companion</div>
+              </div>
             </div>
+            <nav class="actions">
+              <button class="pill credits"><span class="dot"></span>120 <span class="full">Credits</span></button>
+              <button class="pill"><span class="full">Export Report</span> ↓</button>
+              <button class="icon-btn" title="Notifications" aria-label="Notifications">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              </button>
+              <button class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              </button>
+              <button class="icon-btn" title="Log out" aria-label="Log out">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="avatar">G</div>
+            </nav>
           </div>
         </header>
 

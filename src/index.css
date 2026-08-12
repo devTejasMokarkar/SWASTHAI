@@ -13,26 +13,28 @@
   --color-inverse-surface: var(--inverse-surface);
 }
 
-:root {
-  --primary: #4f46e5;
-  --primary-container: #3730a3;
-  --secondary: #db2777;
-  --secondary-container: #9d174d;
-  --tertiary: #0d9488;
-  --on-surface: #0f172a;
-  --on-surface-variant: #475569;
-  --inverse-surface: #020617;
-}
+:root{
+  --bg:#0A0A16;
+  --surface:#14122A99;
+  --surface-solid:#15132B;
+  --surface-raised:#1C1938;
+  --border:rgba(255,255,255,0.08);
+  --border-strong:rgba(255,255,255,0.15);
+  --ink:#F3F1FA;
+  --ink-muted:#A9A4C4;
+  --ink-faint:#6F6B93;
 
-.dark {
-  --primary: #818cf8;
-  --primary-container: #4f46e5;
-  --secondary: #f472b6;
-  --secondary-container: #db2777;
-  --tertiary: #2dd4bf;
-  --on-surface: #f8fafc;
-  --on-surface-variant: #94a3b8;
-  --inverse-surface: #f8fafc;
+  --violet:#8B5CF6;
+  --violet-soft:#A78BFA;
+  --pink:#EC4899;
+  --blue:#3B82F6;
+  --green:#22C55E;
+  --orange:#F59E0B;
+
+  --grad-brand: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+  --grad-text: linear-gradient(90deg, #A78BFA 0%, #60A5FA 60%, #38BDF8 100%);
+  --grad-btn: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  --shadow: 0 24px 60px -30px rgba(0,0,0,0.7);
 }
 
 @layer utilities {
@@ -41,7 +43,7 @@
   --almanac-ink: #221B3A;
   --almanac-ink-muted: #4A3F66;
   --almanac-ink-faint: #5E5580;
-, Safari and Opera */
+  , Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -60,94 +62,69 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top, 0px);
   }
-}
 
-@keyframes scan {
+  @keyframes scan {
 
-  0%,
-  100% {
-    top: 5%;
-    opacity: 0.1;
+    0%,
+    100% {
+      top: 5%;
+      opacity: 0.1;
+    }
+
+    50% {
+      top: 95%;
+      opacity: 1;
+    }
   }
 
-  50% {
-    top: 95%;
-    opacity: 1;
-  }
-}
+  /* Premium Global Scrollbar Styling */
+  @layer base {
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
 
-/* Custom glass card layout */
-.glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-.dark .glass-card {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
+    ::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.2);
+      border-radius: 20px;
+      transition: background 0.3s ease;
+    }
 
-/* Prevent double-tap zoom on interactive elements */
-button, a, input, select, textarea, [role="button"] {
-  touch-action: manipulation;
-}
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 0.4);
+    }
 
-/* Fluid typography base */
-html {
-  font-size: clamp(14px, 0.5vw + 13px, 16px);
-}
+    .dark ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.2);
+    }
 
-/* Premium Global Scrollbar Styling */
-@layer base {
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.4);
+    }
+
+    /* Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(71, 85, 105, 0.2) transparent;
+    }
   }
 
-  ::-webkit-scrollbar-track {
-    background: transparent;
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
-  ::-webkit-scrollbar-thumb {
-    background: rgba(71, 85, 105, 0.2);
-    border-radius: 20px;
-    transition: background 0.3s ease;
+  .animate-gradient {
+    animation: gradient-shift 3s ease infinite;
   }
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(71, 85, 105, 0.4);
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
   }
-
-  .dark ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.2);
-  }
-
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.4);
-  }
-
-  /* Firefox */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(71, 85, 105, 0.2) transparent;
-  }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.animate-gradient {
-  animation: gradient-shift 3s ease infinite;
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(40px); }
-  to { opacity: 1; transform: translateX(0); }
 }
