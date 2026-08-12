@@ -37,7 +37,11 @@
 
 @layer utilities {
 
-  /* Hide scrollbar for Chrome, Safari and Opera */
+  /* Hide scrollbar for Chrome
+  --almanac-ink: #221B3A;
+  --almanac-ink-muted: #4A3F66;
+  --almanac-ink-faint: #5E5580;
+, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
