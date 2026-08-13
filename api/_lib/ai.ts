@@ -70,7 +70,9 @@ async function generateContentWithRetry(params: any, maxRetries = 3, delayMs = 1
 }
 
 export async function getEmbedding(text: string): Promise<number[]> {
-  if (!ai) return mockVector(text)
+  if (!ai) {
+    throw new Error('Embedding API key is required for dynamic vector search')
+  }
 
   try {
     const response: any = await ai.models.embedContent({
@@ -80,15 +82,8 @@ export async function getEmbedding(text: string): Promise<number[]> {
     if (response.embedding?.values) return response.embedding.values
     throw new Error('No embedding values')
   } catch {
-    console.error('[Swasth-AI] Embedding failed, using mock')
-    return mockVector(text)
+    throw new Error('Embedding request failed')
   }
-}
-
-function mockVector(text: string): number[] {
-  const vec: number[] = []
-  for (let i = 0; i < 768; i++) vec.push(Math.sin(i + text.length) * 0.1)
-  return vec
 }
 
 export function cosineSimilarity(a: number[], b: number[]): number {

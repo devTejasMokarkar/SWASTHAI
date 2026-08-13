@@ -5,6 +5,7 @@ import { ok, created, handleError } from './_lib/apiResponse'
 import { validateBody, chatMessageSchema, scanSchema } from './_lib/validate'
 import { generateChat, getEmbedding, cosineSimilarity } from './_lib/ai'
 import { validateAiOutput, containsDiagnosticContent, hasDisclaimer } from './_lib/safety'
+import { loadProjectGraphContext } from './_lib/projectGraph'
 
 function getSubPath(req: VercelRequest): string {
   const url = req.url || ''
@@ -85,6 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const filesStr = topMatches
         .map(m => `- "${m.name}" (${(m.similarity * 100).toFixed(1)}% match) -> ${m.aiInsight || ''}`)
         .join('\n')
+      const graphifyStr = loadProjectGraphContext()
 
       const now = new Date()
       const hour = now.getHours()
@@ -104,6 +106,9 @@ Vitals: ${vitalsStr}
 
 Relevant Health Records:
 ${filesStr || '- No matching files'}
+
+Project Map (Graphify):
+${graphifyStr || '- Graphify map unavailable'}
 
 INSTRUCTIONS:
 1. Answer warmly (max 180 words), grounded in the retrieved context.
@@ -142,6 +147,7 @@ INSTRUCTIONS:
             profile,
             medications: medications.map((m: any) => ({ name: m.name, dose: m.dose || m.strength })),
             files: topMatches,
+            graphify: graphifyStr,
           } as any,
           safety_warnings: safety.warnings,
         }),

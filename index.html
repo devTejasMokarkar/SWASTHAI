@@ -4,10 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Swasth AI</title>
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem('health_companion_dark')
+          const shouldUseDark = stored === null ? true : stored === 'true'
+          document.documentElement.classList.toggle('dark', shouldUseDark)
+        } catch {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

@@ -1,6 +1,8 @@
 node_modules/
 build/
 dist/
+graphify/
+graphify-out/
 coverage/
 .DS_Store
 *.log

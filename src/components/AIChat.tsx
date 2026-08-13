@@ -18,6 +18,13 @@ interface AIChatProps {
   token: string | null;
 }
 
+function extractGraphifyContext(auditLogs: any[]): string {
+  const latest = [...auditLogs]
+    .reverse()
+    .find(entry => typeof entry?.retrieved_context?.graphify === "string" && entry.retrieved_context.graphify.trim());
+  return latest?.retrieved_context?.graphify || "";
+}
+
 const localRiskDictionary = {
   grapefruit: {
     condition: (user: any, meds: Medication[]) => meds.some(m => m.name.toLowerCase().includes("atorvastatin") || m.name.toLowerCase().includes("statin")),
@@ -161,6 +168,7 @@ export default function AIChat({
   const [diagnosticResult, setDiagnosticResult] = useState<any>(null);
   const [runningDiagnostics, setRunningDiagnostics] = useState<boolean>(false);
   const [diagnosticError, setDiagnosticError] = useState<string | null>(null);
+  const graphifyContext = extractGraphifyContext(auditLogs);
 
   const runDiagnostics = async () => {
     setRunningDiagnostics(true);
@@ -209,7 +217,7 @@ export default function AIChat({
   const handleSuggestedQuery = async (query: string) => {
     const context = buildProfileContext(user, medications);
     setUserInput(query);
-    await onSendMessage(`${context}\n\n${query}`);
+    await onSendMessage(`${context}${graphifyContext ? `\n\n[Project Graph]\n${graphifyContext}` : ""}\n\n${query}`);
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -253,6 +261,7 @@ export default function AIChat({
     if (u.healthGoals?.length) parts.push(`Goals: ${u.healthGoals.join(", ")}`);
     if (u.medicalHistory) parts.push(`Medical History: ${u.medicalHistory}`);
     if (meds.length > 0) parts.push(`Medications: ${meds.map(m => `${m.name}${m.strength ? " "+m.strength : ""}`).join(", ")}`);
+    if (graphifyContext) parts.push(`Project Graph: ${graphifyContext}`);
     return `[User Profile: ${parts.join(" | ")}]`;
   }
 

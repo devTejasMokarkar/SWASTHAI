@@ -60,6 +60,7 @@ export default function App() {
   const [showVitalsLogModal, setShowVitalsLogModal] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const stored = localStorage.getItem("health_companion_dark");
     return stored === null ? true : stored === "true";
@@ -74,6 +75,12 @@ export default function App() {
       localStorage.setItem("health_companion_dark", "false");
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    if (localStorage.getItem("health_companion_dark") === null) {
+      setDarkMode(true);
+    }
+  }, []);
 
   const { session, profile, loading: authLoading, signOut } = useAuth();
   const [creditBalance, setCreditBalance] = useState(0);
@@ -94,6 +101,8 @@ export default function App() {
     setTimeout(() => setLoggingOut(false), 600);
   };
 
+  const handleToggleDarkMode = () => setDarkMode(prev => !prev);
+
   const { actions: smartActions, logWater, toggleAction } = useDailyActions();
   const { readings: vitalsReadings, reminders: vitalsReminders, addReading: logVitalsReading, addReminder: addVitalReminder, toggleReminder: toggleVitalReminder, deleteReminder: deleteVitalReminder } = useVitals();
   const { medications, add: addMedication, remove: removeMedication, toggleTaken, toggleReminder: toggleMedReminder } = useMedications();
@@ -104,26 +113,26 @@ export default function App() {
   const { update: saveProfile } = useUserProfile({} as User);
   const latestPulse = vitalsReadings.find((r: any) => r.pulse)?.pulse;
   const vitals: Vitals = {
-    heartRate: latestPulse || 72,
+    heartRate: latestPulse || 0,
     steps: 0,
-    sleep: "--",
+    sleep: "",
     calories: 0,
     activityTrends: [],
   };
 
   const user: User = {
     id: session?.user?.id || profile?.user_id || "",
-    fullName: profile?.name || "Guest User",
-    email: profile?.email || "guest@swasth.ai",
+    fullName: profile?.name || "",
+    email: profile?.email || "",
     dob: profile?.dob || "",
     gender: profile?.gender || "Other",
-    dietaryPreferences: profile?.conditions?.length ? profile.conditions : ["No Preferences"],
-    credits: creditBalance || 120,
-    vitalityScoreUp: 72,
-    sleepRecovery: "65",
+    dietaryPreferences: profile?.conditions?.length ? profile.conditions : [],
+    credits: creditBalance || 0,
+    vitalityScoreUp: 0,
+    sleepRecovery: "",
     weightKg: profile?.weight_kg?.toString() || "",
     heightCm: profile?.height_cm?.toString() || "",
-    healthGoals: profile?.health_goals || ["Maintain good health"],
+    healthGoals: profile?.health_goals || [],
     activeDiseases: profile?.active_diseases || [],
     otherDisease: "",
     medicalHistory: profile?.medical_history || "",
@@ -330,39 +339,97 @@ export default function App() {
   return (
     <>
       <ToastContainer toasts={toastList} dismiss={dismissToast} />
-      <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-on-surface dark:text-slate-100 font-sans antialiased transition-colors duration-300">
-      <div className="h-dvh flex flex-col pb-32 overflow-hidden">
-<header>
-          <div class="wrap">
-            <div class="brand">
-              <div class="brand-mark">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2 12h4l1.5-5L11 19l2.5-11L15 12h7"/>
-                </svg>
-              </div>
-              <div>
-                <div class="brand-name">Swasth AI</div>
-                <div class="brand-sub">Health Companion</div>
-              </div>
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.10),_transparent_34%),linear-gradient(180deg,_#f8fafc_0%,_#ffffff_55%,_#eef2ff_100%)] dark:bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.16),_transparent_34%),linear-gradient(180deg,_#020617_0%,_#0f172a_55%,_#020617_100%)] text-on-surface dark:text-slate-100 font-sans antialiased transition-colors duration-300">
+      <div className="h-dvh flex flex-col pb-32 overflow-hidden max-w-[1600px] mx-auto">
+        <header className="fixed top-0 w-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 z-50 flex justify-between items-center px-4 md:px-12 h-16 shadow-sm transition-colors duration-300">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Activity className="w-5 h-5 animate-pulse" />
             </div>
-            <nav class="actions">
-              <button class="pill credits"><span class="dot"></span>120 <span class="full">Credits</span></button>
-              <button class="pill"><span class="full">Export Report</span> ↓</button>
-              <button class="icon-btn" title="Notifications" aria-label="Notifications">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <h1 className="text-xl font-extrabold tracking-tight text-primary truncate">Swasth AI</h1>
+          </div>
+
+          <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
+            {user && (
+              <div className="hidden md:flex bg-primary/10 px-4 py-1.5 rounded-full border border-primary/10 shadow-sm">
+                <span className="font-bold text-xs text-primary">{user.credits} Credits</span>
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowReminderModal(true)}
+              className="relative p-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary rounded-lg transition-colors cursor-pointer"
+              title="View All Reminders"
+            >
+              <Bell className="w-5 h-5" />
+              {(medications.some(m => !m.taken) || healthReminders.some(r => r.enabled)) && (
+                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping" />
+              )}
+            </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setProfileMenuOpen(prev => !prev)}
+                className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner cursor-pointer hover:border-primary transition-all relative group flex items-center justify-center bg-slate-50 dark:bg-slate-800"
+                title="Profile Settings"
+              >
+                {profile?.name?.trim() ? (
+                  <span className="text-xs font-bold text-primary">{profile.name.trim().charAt(0).toUpperCase()}</span>
+                ) : (
+                  <UserIcon className="w-5 h-5 text-primary" />
+                )}
               </button>
-              <button class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-              </button>
-              <button class="icon-btn" title="Log out" aria-label="Log out">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="avatar">G</div>
-            </nav>
+
+              {profileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl shadow-2xl p-2 z-50">
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab("profile"); setProfileMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-primary/5 text-left transition-colors"
+                  >
+                    <UserIcon className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold text-on-surface dark:text-slate-100">Edit Profile</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { handleExportData(); setProfileMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-primary/5 text-left transition-colors"
+                  >
+                    <Download className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold text-on-surface dark:text-slate-100">Export Report</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowReminderModal(true); setProfileMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-primary/5 text-left transition-colors"
+                  >
+                    <Bell className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold text-on-surface dark:text-slate-100">View Reminders</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { handleToggleDarkMode(); setProfileMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-primary/5 text-left transition-colors"
+                  >
+                    {darkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
+                    <span className="text-sm font-semibold text-on-surface dark:text-slate-100">{darkMode ? "Light Mode" : "Dark Mode"}</span>
+                  </button>
+                  <div className="my-2 h-px bg-slate-200/80 dark:bg-slate-800/80" />
+                  <button
+                    type="button"
+                    onClick={() => { handleLogout(); setProfileMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 text-left transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 text-rose-500" />
+                    <span className="text-sm font-semibold text-rose-500">Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        <main className="pt-24 px-4 md:px-12 max-w-[1440px] w-full mx-auto flex-1 flex flex-col min-h-0 overflow-y-auto">
+        <main className="pt-24 px-4 md:px-12 w-full mx-auto flex-1 flex flex-col min-h-0 overflow-y-auto">
           <AnimatePresence mode="wait">
             {user ? (
               <div key={activeTab} className="flex-1 flex flex-col min-h-0">
@@ -389,7 +456,7 @@ export default function App() {
           </AnimatePresence>
         </main>
 
-        <nav className="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center h-20 px-4 pb-safe bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-xl rounded-t-2xl transition-colors duration-300">
+        <nav className="fixed bottom-0 left-0 w-full z-40 flex md:hidden justify-between items-center h-20 px-4 pb-safe bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-xl rounded-t-2xl transition-colors duration-300">
           <button
             onClick={() => setActiveTab("today")}
             className={`flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[56px] min-h-[56px] ${activeTab === "today" ? "text-primary bg-primary/10 dark:bg-primary/20" : "text-on-surface-variant hover:bg-slate-50 dark:hover:bg-slate-800"}`}
@@ -432,7 +499,7 @@ export default function App() {
         </nav>
 
         {user && (
-          <div className="fixed right-6 bottom-28 md:bottom-24 z-30 flex flex-col items-center">
+          <div className="fixed right-4 sm:right-6 bottom-24 md:bottom-24 z-30 flex flex-col items-center">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

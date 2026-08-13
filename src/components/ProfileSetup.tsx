@@ -52,7 +52,7 @@ export default function ProfileSetup({
   token,
   onRefillCredits,
 }: ProfileSetupProps) {
-  const [fullName, setFullName] = useState(user.fullName || "Guest User");
+  const [fullName, setFullName] = useState(user.fullName || "");
   const [dob, setDob] = useState(user.dob || "1990-01-01");
   const [gender, setGender] = useState(user.gender || "Other");
   const [diet, setDiet] = useState(
