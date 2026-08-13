@@ -48,6 +48,7 @@ export default function Medications({
   const [newFrequency, setNewFrequency] = useState("Daily");
   const [newTime, setNewTime] = useState("09:00");
   const [newReminderInterval, setNewReminderInterval] = useState("daily");
+  const [newDurationMonths, setNewDurationMonths] = useState<string>("");
   const [newReminders, setNewReminders] = useState<Omit<MedicationReminder, "id" | "medicationId" | "userId">[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addConflictWarn, setAddConflictWarn] = useState<string | null>(null);
@@ -137,6 +138,7 @@ export default function Medications({
     try {
       const strengthVal = newStrengthVal.trim();
       const strength = strengthVal ? `${strengthVal} ${newStrengthUnit}` : "";
+      const durationMonths = newDurationMonths ? parseInt(newDurationMonths, 10) : undefined;
       const res = await onAddMedication({
         name: newName,
         strength,
@@ -144,6 +146,7 @@ export default function Medications({
         frequency: newFrequency,
         dueTime: newTime,
         reminderInterval: newReminderInterval,
+        ...(durationMonths ? { duration_months: durationMonths } : {}),
       });
 
       if (res.conflict) {
@@ -151,6 +154,7 @@ export default function Medications({
       } else {
         setNewName("");
         setNewStrengthVal("");
+        setNewDurationMonths("");
         setShowAddModal(false);
       }
     } catch (err) {
@@ -627,6 +631,23 @@ export default function Medications({
                     />
                     {formErrors.time && <p className="text-[10px] font-semibold text-rose-500 mt-1">{formErrors.time}</p>}
                   </div>
+                </div>
+
+                {/* Duration field */}
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
+                    Duration (months) <span className="font-normal normal-case text-on-surface-variant/60 ml-1">optional</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="120"
+                    placeholder="e.g. 3"
+                    value={newDurationMonths}
+                    onChange={(e) => setNewDurationMonths(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                  />
+                  <p className="text-[10px] text-on-surface-variant mt-1">How long you'll be taking this medicine.</p>
                 </div>
 
                 <div className="border-t border-slate-100 dark:border-slate-800 pt-4 mt-4">

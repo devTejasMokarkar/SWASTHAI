@@ -336,8 +336,8 @@ export function OnboardingWizard() {
               ))}
             </div>
             <div className="finish-cta">
-              <p>Sign in with Google to save this profile and enter your dashboard.</p>
-              <LoginButton size="large" shape="pill" text="signin_with" />
+              <p>Sign up with Google to save this profile and enter your dashboard.</p>
+              <LoginButton size="large" shape="pill" text="signup_with" />
             </div>
             <div className="spacer" />
           </div>

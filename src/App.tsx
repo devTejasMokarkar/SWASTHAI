@@ -3,10 +3,11 @@ import { User, Vitals, HealthReminder, Medication } from "./types";
 import {
   Heart, Calendar, FolderOpen, MessageSquare, User as UserIcon, Sparkles,
   ShieldAlert, CheckCircle2, Activity, Bell, X, Clock, Check,
-  Sun, Moon, Download, Home, Pill, LogOut
+  Sun, Moon, Download, Home, Pill, LogOut, ScanLine
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { apiFetch } from "./lib/api";
+import { apiFetch, logUserActivity } from "./lib/api";
+import ScanUploadModal from "./components/ui/ScanUploadModal";
 
 const Dashboard = lazy(() => import("./components/Dashboard"));
 const Medications = lazy(() => import("./components/Medications"));
@@ -59,6 +60,7 @@ export default function App() {
   const [showChatOverlay, setShowChatOverlay] = useState(false);
   const [showVitalsLogModal, setShowVitalsLogModal] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
+  const [showScanModal, setShowScanModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -204,7 +206,10 @@ export default function App() {
   const handleAddMedication = async (med: Partial<Medication>): Promise<{ success: boolean; conflict?: string }> => {
     try {
       const result = await addMedication(med);
-      if (result) showToast(`${med.name} added`, "success");
+      if (result) {
+        showToast(`${med.name} added`, "success");
+        logUserActivity("add_medication", { name: med.name, strength: med.strength, frequency: med.frequency });
+      }
       return { success: !!result, conflict: undefined };
     } catch {
       showToast("Failed to add medication", "error");
@@ -499,55 +504,77 @@ export default function App() {
         </nav>
 
         {user && (
-          <div className="fixed right-4 sm:right-6 bottom-24 md:bottom-24 z-30 flex flex-col items-center">
+          <div className="fixed right-4 sm:right-6 bottom-24 md:bottom-24 z-30 flex flex-col items-center gap-3">
+            {/* Scan FAB */}
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.5 }}
-              className="flex items-center gap-1.5 mb-1.5"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6, duration: 0.4 }}
+              className="flex flex-col items-center gap-1"
             >
-              <motion.span
-                animate={{ rotate: [0, 15, -10, 15, 0] }}
-                transition={{ repeat: Infinity, duration: 2, repeatDelay: 3, ease: "easeInOut" }}
-                className="text-lg"
-              >
-                👋
-              </motion.span>
-              <motion.span
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.4, duration: 0.4 }}
-                className="text-[13px] font-black bg-gradient-to-r from-primary via-purple-500 to-indigo-500 bg-clip-text text-transparent bg-[length:200%_100%] animate-gradient drop-shadow-sm"
-              >
-                HeCo
-              </motion.span>
-            </motion.div>
-
-            <div className="relative">
-              <motion.div
-                animate={{ scale: [1, 1.12, 1], opacity: [0.3, 0.6, 0.3] }}
-                transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full bg-primary/30 dark:bg-primary/20 blur-xl"
-              />
-
               <motion.button
-                onClick={() => setShowChatOverlay(true)}
+                onClick={() => setShowScanModal(true)}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
-                animate={{
-                  boxShadow: [
-                    "0 0 0 0 rgba(99,102,241,0.4)",
-                    "0 0 0 14px rgba(99,102,241,0)",
-                    "0 0 0 0 rgba(99,102,241,0)",
-                  ],
-                }}
-                transition={{ repeat: Infinity, duration: 2.5, ease: "easeOut" }}
-                className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-indigo-600 text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center cursor-pointer relative z-10"
-                title="Ask He-Co AI"
-                id="btn-chat-fab"
+                className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30 flex items-center justify-center cursor-pointer"
+                title="Scan Medicine / Upload Report"
+                id="btn-scan-fab"
               >
-                <MessageSquare className="w-6 h-6" />
+                <ScanLine className="w-5 h-5" />
               </motion.button>
+              <span className="text-[10px] font-bold text-on-surface-variant/70">Scan</span>
+            </motion.div>
+
+            {/* HeCo FAB */}
+            <div className="flex flex-col items-center gap-1">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1, duration: 0.5 }}
+                className="flex items-center gap-1.5"
+              >
+                <motion.span
+                  animate={{ rotate: [0, 15, -10, 15, 0] }}
+                  transition={{ repeat: Infinity, duration: 2, repeatDelay: 3, ease: "easeInOut" }}
+                  className="text-base"
+                >
+                  👋
+                </motion.span>
+                <motion.span
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1.4, duration: 0.4 }}
+                  className="text-[12px] font-black bg-gradient-to-r from-primary via-purple-500 to-indigo-500 bg-clip-text text-transparent drop-shadow-sm"
+                >
+                  HeCo
+                </motion.span>
+              </motion.div>
+
+              <div className="relative">
+                <motion.div
+                  animate={{ scale: [1, 1.12, 1], opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                  className="absolute inset-0 rounded-full bg-primary/30 dark:bg-primary/20 blur-xl"
+                />
+                <motion.button
+                  onClick={() => setShowChatOverlay(true)}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                  animate={{
+                    boxShadow: [
+                      "0 0 0 0 rgba(99,102,241,0.4)",
+                      "0 0 0 14px rgba(99,102,241,0)",
+                      "0 0 0 0 rgba(99,102,241,0)",
+                    ],
+                  }}
+                  transition={{ repeat: Infinity, duration: 2.5, ease: "easeOut" }}
+                  className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-indigo-600 text-white shadow-xl hover:shadow-primary/35 flex items-center justify-center cursor-pointer relative z-10"
+                  title="Ask He-Co AI"
+                  id="btn-chat-fab"
+                >
+                  <MessageSquare className="w-6 h-6" />
+                </motion.button>
+              </div>
             </div>
           </div>
         )}
@@ -579,6 +606,12 @@ export default function App() {
           isOpen={showVitalsLogModal}
           onClose={() => setShowVitalsLogModal(false)}
           onLogVitalsReading={handleLogVitalsReading}
+        />
+
+        <ScanUploadModal
+          isOpen={showScanModal}
+          onClose={() => setShowScanModal(false)}
+          token={session?.access_token ?? null}
         />
 
         <AnimatePresence>

@@ -85,6 +85,7 @@ export const medicationCreateSchema = z.object({
   frequency: z.string().default("Daily"),
   dueTime: z.string().min(1, "Time is required"),
   reminderInterval: z.string().optional(),
+  duration_months: z.number().int().min(1).max(120).optional(),
 })
 
 export const profileUpdateSchema = z.object({

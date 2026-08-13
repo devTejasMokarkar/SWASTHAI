@@ -121,6 +121,7 @@ export interface Medication {
   loggedAt: string | null;
   reminderSet: boolean;
   reminderInterval?: string;
+  duration_months?: number;
   conflictDetected?: boolean;
   conflictMessage?: string;
 }

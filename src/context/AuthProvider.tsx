@@ -72,26 +72,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = JSON.parse(raw)
       const updates: Record<string, any> = {}
+      
       if (data.fullName) updates.name = data.fullName
-      if (data.dob) updates.age = calculateAge(data.dob)
+      if (data.age) updates.age = Number(data.age)
       if (data.gender) updates.gender = data.gender
-      if (data.weightKg != null) updates.weight_kg = data.weightKg
-      if (data.heightCm != null) updates.height_cm = data.heightCm
-      if (data.dietaryPreferences) updates.conditions = data.dietaryPreferences
-      if (user.email) updates.email = user.email
+      if (data.weight) updates.weight_kg = Number(data.weight)
+      if (data.height) updates.height_cm = Number(data.height)
+      if (data.conditions?.length) updates.conditions = data.conditions
+      if (user.email || data.email) updates.email = user.email || data.email
 
       const extra: Record<string, any> = {}
-      if (data.healthGoals?.length) extra.healthGoals = data.healthGoals
-      if (data.activeDiseases?.length) extra.activeDiseases = data.activeDiseases
-      if (data.medicalHistory) extra.medicalHistory = data.medicalHistory
-      if (data.medications?.length) extra.medications = data.medications
-      if (data.noMedication) extra.noMedication = true
+      if (data.goals?.length) extra.healthGoals = data.goals
+      if (data.activity) extra.activityLevel = data.activity
+      if (data.notes) extra.medicalHistory = data.notes
+
       if (Object.keys(extra).length > 0) {
         updates.history_text = JSON.stringify(extra)
-      }
-
-      if (data.medications?.length) {
-        updates.medications_text = JSON.stringify(data.medications)
       }
 
       await supabase.from('profiles').upsert(
