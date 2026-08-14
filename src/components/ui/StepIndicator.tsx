@@ -19,13 +19,13 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
                     ? "bg-primary shadow-[0_0_8px_-2px_rgba(79,70,229,0.6)] scale-125"
                     : isCompleted
                       ? "bg-primary/60"
-                      : "bg-slate-300 dark:bg-slate-600"
+                      : "bg-slate-300"
                 }`}
               />
               {i < totalSteps - 1 && (
                 <div
                   className={`w-6 h-[2px] rounded-full transition-colors duration-300 ${
-                    isCompleted ? "bg-primary/60" : "bg-slate-200 dark:bg-slate-700"
+                    isCompleted ? "bg-primary/60" : "bg-slate-200"
                   }`}
                 />
               )}
@@ -33,7 +33,7 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
           )
         })}
       </div>
-      <span className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 tracking-wide">
+      <span className="text-[10px] font-bold text-on-surface-variant tracking-wide">
         Step {currentStep} of {totalSteps}
       </span>
     </div>

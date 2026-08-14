@@ -67,7 +67,7 @@ function renderBold(text: string): React.ReactNode {
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i} className="font-bold text-on-surface dark:text-slate-100">{part.slice(2, -2)}</strong>;
+      return <strong key={i} className="font-bold text-on-surface">{part.slice(2, -2)}</strong>;
     }
     return part;
   });
@@ -353,46 +353,60 @@ export default function AIChat({
   return (
     <div
       className="flex flex-col w-full h-full relative overflow-hidden"
-      style={{ paddingBottom: keyboardHeight }}
+      style={{ paddingBottom: keyboardHeight, background: 'var(--surface)', fontFamily: 'var(--font-sans)' }}
       id="ai-chat-view-container"
     >
-      {/* Primary Chat Interface */}
+      {/* ── Primary Chat Interface ── */}
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -15 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col h-full w-full flex-1 bg-transparent"
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.3 }}
+        className="flex flex-col h-full w-full flex-1"
         id="ai-chat-view"
       >
-        {/* Header */}
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/60 px-4 py-2 flex items-center gap-2.5 shrink-0">
-          <div className="w-7 h-7 rounded-[14px] bg-gradient-to-br from-primary to-blue-500 text-white flex items-center justify-center shadow-sm shrink-0">
-            <Sparkles className="w-3.5 h-3.5 fill-white/20" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-sm text-on-surface dark:text-slate-100 truncate leading-tight">
-              He-Co
-            </h3>
 
+        {/* ── Header ── */}
+        <div className="shrink-0 px-4 pt-4 pb-3 flex items-center gap-3"
+          style={{ borderBottom: '1px solid var(--border)' }}>
+
+          {/* Brand mark */}
+          <div className="w-8 h-8 rounded-[12px] flex items-center justify-center shrink-0"
+            style={{ background: 'var(--grad-brand)', boxShadow: '0 4px 12px -4px rgba(124,58,237,0.45)' }}>
+            <Sparkles className="w-4 h-4 text-white" />
           </div>
 
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="text-[15px] font-black tracking-tight leading-none"
+                style={{ fontFamily: 'var(--font-serif)', color: 'var(--text)' }}>
+                He‑Co
+              </h3>
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide"
+                style={{ background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)', color: '#16a34a' }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                online
+              </span>
+            </div>
+            <p className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--muted)' }}>
+              Clinical AI · Drug interactions · Diet plans
+            </p>
+          </div>
+
+          {/* Audit toggle */}
           <button
             type="button"
             onClick={() => setShowAudit(!showAudit)}
-            className={`flex items-center gap-1 px-2 py-1.5 rounded-[14px] text-[10px] font-semibold transition-all duration-200 cursor-pointer shrink-0 ${
-              showAudit 
-                ? "bg-primary/10 text-primary" 
-                : "text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300"
-            }`}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[10px] text-[10px] font-bold transition-all duration-200 cursor-pointer shrink-0"
+            style={showAudit
+              ? { background: 'rgba(124,58,237,0.10)', color: 'var(--violet)', border: '1px solid rgba(124,58,237,0.20)' }
+              : { background: 'var(--surface-2)', color: 'var(--muted)', border: '1px solid var(--border)' }}
             id="btn-toggle-rag-audit"
             aria-label="Toggle audit trail"
           >
             <Database className="w-3.5 h-3.5" />
             {auditLogs.length > 0 && (
-              <span className={`text-[9px] font-bold ${showAudit ? "text-primary" : "text-slate-400 dark:text-slate-500"}`}>
-                {auditLogs.length}
-              </span>
+              <span className="font-black">{auditLogs.length}</span>
             )}
           </button>
 
@@ -400,48 +414,75 @@ export default function AIChat({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-[14px] text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+              className="w-7 h-7 flex items-center justify-center rounded-[10px] transition-colors cursor-pointer"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}
               title="Close chat"
               aria-label="Close chat"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        {/* Messages */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-2 min-h-0 scroll-smooth" id="chat-messages-container">
+        {/* ── Messages ── */}
+        <div ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto px-4 py-4 space-y-3 min-h-0 scroll-smooth"
+          id="chat-messages-container"
+          style={{ background: 'var(--bg)' }}>
+
+          {/* Empty state */}
           {chatHistory.length === 0 && !isLoading && (
-            <div className="flex flex-col items-center justify-center min-h-full py-6 text-center px-2 sm:px-4">
-              <h3 className="text-base font-bold text-on-surface dark:text-slate-100 mb-1.5">Ask me anything</h3>
-              <p className="text-xs text-on-surface-variant dark:text-slate-400 max-w-xs mb-6 leading-relaxed">
+            <div className="flex flex-col items-center justify-center min-h-full py-8 text-center px-4">
+              {/* Icon */}
+              <div className="w-14 h-14 rounded-[18px] mb-5 flex items-center justify-center"
+                style={{ background: 'var(--grad-brand)', boxShadow: '0 8px 24px -8px rgba(124,58,237,0.45)' }}>
+                <Sparkles className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-[17px] font-black mb-1.5"
+                style={{ fontFamily: 'var(--font-serif)', color: 'var(--text)' }}>
+                Ask He‑Co
+              </h3>
+              <p className="text-[12px] leading-relaxed mb-6 max-w-[22ch]" style={{ color: 'var(--text-dim)' }}>
                 Drug interactions, lab results, meal plans, and health records.
               </p>
-              <div className="grid grid-cols-1 gap-2 w-full max-w-sm">
+
+              {/* Suggestion cards */}
+              <div className="w-full max-w-[320px] space-y-2">
                 {suggestions.map((sug, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleSuggestedQuery(sug.text)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-900/80 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary border border-slate-200 dark:border-slate-800 text-xs font-semibold rounded-2xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_2px_8px_-2px_rgba(79,70,229,0.15)] active:scale-[0.98] cursor-pointer text-on-surface dark:text-slate-300 text-left leading-relaxed"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer rounded-[14px]"
+                    style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
                     aria-label={sug.text}
                   >
-                    <span className="text-base shrink-0">
-                      {sug.type === "conflict" && "💊"}
-                      {sug.type === "report" && "📋"}
-                      {sug.type === "diet" && "🥗"}
+                    <span className="w-8 h-8 rounded-[10px] flex items-center justify-center shrink-0 text-base"
+                      style={{
+                        background: sug.type === "conflict" ? 'rgba(214,64,159,0.10)' : sug.type === "diet" ? 'rgba(34,197,94,0.10)' : 'rgba(124,58,237,0.10)',
+                        border: sug.type === "conflict" ? '1px solid rgba(214,64,159,0.22)' : sug.type === "diet" ? '1px solid rgba(34,197,94,0.22)' : '1px solid rgba(124,58,237,0.22)',
+                      }}>
+                      {sug.type === "conflict" ? "💊" : sug.type === "diet" ? "🥗" : "📋"}
                     </span>
-                    <span className="flex-1">{sug.text}</span>
+                    <span className="text-[12px] font-semibold flex-1 leading-snug" style={{ color: 'var(--text)' }}>
+                      {sug.text}
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--muted)' }} />
                   </button>
                 ))}
               </div>
             </div>
           )}
+
+          {/* Message bubbles */}
           {chatHistory.map((msg, index) => {
             const isAI = msg.sender === "ai";
             const text = msg.text || "";
-            
-            // Check if message contains a clinical safety warning
+
             const isSafetyAlert = text.includes("⚠️ [SWASTH-AI CLINICAL SAFETY ALERT]");
             let alertContent = "";
             let regularContent = text;
@@ -454,151 +495,173 @@ export default function AIChat({
               }
             }
 
-            // Client-side clinical safety validation check — skip issues already flagged by server
             const clientSafetyIssues = isAI ? runClientClinicalSafetyValidator(regularContent, user, medications) : [];
-            const uniqueClientIssues = isSafetyAlert 
+            const uniqueClientIssues = isSafetyAlert
               ? clientSafetyIssues.filter(i => !alertContent.toLowerCase().includes(i.type))
               : clientSafetyIssues;
 
             return (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`flex items-end gap-2 ${isAI ? "justify-start" : "justify-end"}`}
+                transition={{ duration: 0.25 }}
+                className={`flex items-end gap-2.5 ${isAI ? "justify-start" : "justify-end"}`}
                 id={`chat-bubble-${index}`}
               >
                 {isAI && (
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white flex items-center justify-center shadow-md shrink-0 mb-0.5">
-                    <Sparkles className="w-3 h-3 fill-white/20" />
+                  <div className="w-7 h-7 rounded-[10px] flex items-center justify-center shrink-0 mb-0.5"
+                    style={{ background: 'var(--grad-brand)', boxShadow: '0 4px 10px -4px rgba(124,58,237,0.4)' }}>
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
                   </div>
                 )}
-                <div 
-                  className={`max-w-[88%] md:max-w-[82%] px-3 py-2 rounded-2xl text-xs leading-relaxed shadow-sm ${
-                    isAI 
-                      ? "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/60 text-on-surface dark:text-slate-200 rounded-bl-sm font-medium" 
-                      : "bg-primary text-white rounded-br-sm font-semibold"
-                  }`}
-                >
-                  {/* Server Safety Alert */}
+
+                <div className={`max-w-[86%] flex flex-col gap-1.5 ${isAI ? "items-start" : "items-end"}`}>
+
+                  {/* Server Safety Alert banner */}
                   {isSafetyAlert && (
-                    <div className="mb-2 p-2 bg-red-50 dark:bg-red-950/20 border-l-[3px] border-red-500 rounded-r-lg text-[10px] text-red-700 dark:text-red-400 font-medium flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5 text-[9px] text-red-800 dark:text-red-300 font-bold uppercase tracking-wider">
-                        <ShieldAlert className="w-3 h-3 shrink-0 text-red-600" />
-                        <span>Safety Alert</span>
+                    <div className="w-full px-3 py-2.5 rounded-[14px] rounded-bl-sm"
+                      style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <ShieldAlert className="w-3.5 h-3.5 shrink-0" style={{ color: '#dc2626' }} />
+                        <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#dc2626' }}>
+                          Clinical Safety Alert
+                        </span>
                       </div>
-                      <div className="pl-4 text-[9px] opacity-90 space-y-0.5">
+                      <div className="space-y-0.5 pl-5">
                         {alertContent.split("\n").map((line, lIdx) => (
-                          <p key={lIdx} className="leading-relaxed">{line}</p>
+                          <p key={lIdx} className="text-[10px] leading-relaxed" style={{ color: '#b91c1c' }}>{line}</p>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Client Safety Validator */}
+                  {/* Client safety warnings */}
                   {isAI && uniqueClientIssues.length > 0 && (
-                    <div className="mb-2 p-2 bg-amber-50 dark:bg-amber-950/20 border-l-[3px] border-amber-500 rounded-r-lg flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5 text-[9px] text-amber-800 dark:text-amber-300 font-bold uppercase tracking-wide">
-                        <ShieldAlert className="w-3 h-3 shrink-0 text-amber-600 dark:text-amber-400" />
-                        <span>Safety Detector</span>
+                    <div className="w-full px-3 py-2.5 rounded-[14px] rounded-bl-sm"
+                      style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.28)' }}>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <ShieldAlert className="w-3.5 h-3.5 shrink-0" style={{ color: '#d97706' }} />
+                        <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#d97706' }}>
+                          Safety Detector
+                        </span>
                       </div>
-                      <div className="space-y-1 pl-4 text-[9px] leading-relaxed text-amber-900 dark:text-amber-200">
+                      <div className="space-y-1 pl-5">
                         {uniqueClientIssues.map((issue, idx) => (
-                          <div key={idx}>
-                            <span className="font-extrabold">⚠️ {issue.alert}</span>
-                            <span className="ml-1 opacity-80">{issue.action}</span>
+                          <div key={idx} className="text-[10px] leading-relaxed" style={{ color: '#92400e' }}>
+                            <span className="font-bold">⚠️ {issue.alert}</span>
+                            <span className="ml-1 opacity-75">{issue.action}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* AI Response Text */}
-                  <div className="space-y-2">
-                    {regularContent.split("\n").map((line, lIdx) => {
-                      const tLine = line.trim();
-                      if (!tLine) return null;
-                      
-                      // Filter out redundant disclaimer spam
-                      if (tLine.includes("[Clinical Advice Disclaimer & Wellness Role]") || 
+                  {/* Main bubble */}
+                  <div
+                    className="px-3.5 py-2.5 rounded-[16px] text-[12.5px] leading-relaxed"
+                    style={isAI ? {
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text)',
+                      borderBottomLeftRadius: '4px',
+                      boxShadow: 'var(--shadow-sm)',
+                    } : {
+                      background: 'var(--grad-btn)',
+                      color: 'white',
+                      borderBottomRightRadius: '4px',
+                      boxShadow: '0 4px 14px -4px rgba(124,58,237,0.45)',
+                    }}
+                  >
+                    <div className="space-y-1.5">
+                      {regularContent.split("\n").map((line, lIdx) => {
+                        const tLine = line.trim();
+                        if (!tLine) return null;
+
+                        if (tLine.includes("[Clinical Advice Disclaimer & Wellness Role]") ||
                           tLine.includes("Always seek professional medical guidance. Swasth-AI is a wellness companion") ||
                           tLine.includes("Swasth-AI provides pre-consultation information") ||
                           tLine.includes("Swasth-AI is a wellness companion") ||
                           tLine.includes("always consult your physician for medical decisions") ||
                           tLine === "Swasth-AI provides pre-consultation information and home-care suggestions only. It does not provide formal medical diagnoses or replace physician care.") {
-                        return null;
-                      }
-                      
-                      // Format RAG Citations nicely
-                      if (tLine.startsWith("RAG Citation:") || tLine.startsWith("*Swasth-AI Citations") || tLine.startsWith("**RAG Citation:**")) {
-                        const citationText = tLine.replace("**RAG Citation:**", "").replace("RAG Citation:", "").replace("*Swasth-AI Citations*", "").trim();
-                        const matches = citationText.match(/\[(.*?)\]/g) || [citationText];
-                        return (
-                          <div key={lIdx} className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/40">
-                            {matches.map((match, mIdx) => (
-                              <span key={mIdx} className="bg-primary/5 text-primary dark:text-primary-container px-2 py-0.5 rounded-lg text-[9px] font-semibold flex items-center gap-1 border border-primary/10">
-                                <Database className="w-2.5 h-2.5" />
-                                {match.replace(/\[|\]/g, "")}
+                          return null;
+                        }
+
+                        if (tLine.startsWith("RAG Citation:") || tLine.startsWith("*Swasth-AI Citations") || tLine.startsWith("**RAG Citation:**")) {
+                          const citationText = tLine.replace("**RAG Citation:**", "").replace("RAG Citation:", "").replace("*Swasth-AI Citations*", "").trim();
+                          const matches = citationText.match(/\[(.*?)\]/g) || [citationText];
+                          return (
+                            <div key={lIdx} className="flex flex-wrap gap-1.5 mt-2 pt-2" style={{ borderTop: '1px solid var(--border)' }}>
+                              {matches.map((match, mIdx) => (
+                                <span key={mIdx} className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold"
+                                  style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.18)', color: 'var(--violet)' }}>
+                                  <Database className="w-2.5 h-2.5" />
+                                  {match.replace(/\[|\]/g, "")}
+                                </span>
+                              ))}
+                            </div>
+                          );
+                        }
+
+                        if (tLine.startsWith("Disclaimer:") || tLine.startsWith("⚠️ **Disclaimer**:")) {
+                          return (
+                            <p key={lIdx} className="text-[10px] italic mt-1.5 px-2 py-1.5 rounded-lg"
+                              style={{ color: 'var(--muted)', background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                              <Info className="w-3 h-3 inline-block mr-1" style={{ color: 'var(--muted)' }} />
+                              {tLine.replace("⚠️ **Disclaimer**:", "").replace("Disclaimer:", "").trim()}
+                            </p>
+                          );
+                        }
+
+                        if (/^(Good\s+(Morning|Afternoon|Evening))/i.test(tLine)) {
+                          const rest = tLine.replace(/^(Good\s+(Morning|Afternoon|Evening)[,!.]?)\s*/i, "");
+                          return (
+                            <p key={lIdx} className="leading-relaxed">
+                              <span className="font-semibold" style={{ color: isAI ? 'var(--violet)' : 'rgba(255,255,255,0.9)' }}>
+                                {tLine.match(/^(Good\s+(Morning|Afternoon|Evening))/i)?.[0]}
                               </span>
-                            ))}
-                          </div>
-                        );
-                      }
-                      
-                      // Format Disclaimer cleanly
-                      if (tLine.startsWith("Disclaimer:") || tLine.startsWith("⚠️ **Disclaimer**:")) {
-                        return (
-                          <p key={lIdx} className="text-[9px] text-slate-500 dark:text-slate-400 font-medium italic mt-2 bg-slate-100/50 dark:bg-slate-900/50 p-2 rounded-lg">
-                            <Info className="w-3 h-3 inline-block mr-1 text-slate-400 dark:text-slate-500" />
-                            {tLine.replace("⚠️ **Disclaimer**:", "").replace("Disclaimer:", "").trim()}
-                          </p>
-                        );
-                      }
+                              {rest ? ` ${rest}` : ""}
+                            </p>
+                          );
+                        }
 
-                      // Greeting line (Good Morning/Afternoon/Evening)
-                      if (/^(Good\s+(Morning|Afternoon|Evening))/i.test(tLine)) {
-                        const rest = tLine.replace(/^(Good\s+(Morning|Afternoon|Evening)[,!.]?)\s*/i, "");
-                        return (
-                          <p key={lIdx} className="leading-relaxed text-sm">
-                            <span className="text-primary font-semibold">{tLine.match(/^(Good\s+(Morning|Afternoon|Evening))/i)?.[0]}</span>
-                            {rest ? ` ${rest}` : ""}
-                          </p>
-                        );
-                      }
+                        if (/^[-•*]\s/.test(tLine)) {
+                          const content = tLine.replace(/^[-•*]\s+/, "");
+                          return (
+                            <div key={lIdx} className="flex items-baseline gap-2 ml-1">
+                              <span className="w-1.5 h-1.5 rounded-full shrink-0 mt-2"
+                                style={{ background: isAI ? 'var(--violet)' : 'rgba(255,255,255,0.7)' }} />
+                              <span className="leading-relaxed flex-1">{renderBold(content)}</span>
+                            </div>
+                          );
+                        }
 
-                      // Bullet lines
-                      if (/^[-•*]\s/.test(tLine)) {
-                        const content = tLine.replace(/^[-•*]\s+/, "");
-                        return (
-                          <div key={lIdx} className="flex items-baseline gap-1.5 ml-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
-                            <span className="leading-relaxed text-sm flex-1">{renderBold(content)}</span>
-                          </div>
-                        );
-                      }
+                        return <p key={lIdx} className="leading-relaxed">{renderBold(line)}</p>;
+                      })}
+                    </div>
 
-                      return <p key={lIdx} className="leading-relaxed text-sm">{renderBold(line)}</p>;
-                    })}
+                    <span className="text-[9px] block mt-2 text-right"
+                      style={{ color: isAI ? 'var(--muted)' : 'rgba(255,255,255,0.6)' }}>
+                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </span>
                   </div>
-
-                  <span className={`text-[8px] block mt-1.5 text-right ${isAI ? "text-on-surface-variant dark:text-slate-400" : "text-white/70"}`}>
-                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </span>
                 </div>
               </motion.div>
             );
           })}
 
+          {/* Loading bubble */}
           {isLoading && (
-            <div className="flex items-end gap-2 justify-start" id="chat-bubble-loading">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-blue-500 text-white flex items-center justify-center shadow-sm shrink-0 mb-0.5">
-                <Sparkles className="w-3 h-3 fill-white/20" />
+            <div className="flex items-end gap-2.5 justify-start" id="chat-bubble-loading">
+              <div className="w-7 h-7 rounded-[10px] flex items-center justify-center shrink-0 mb-0.5"
+                style={{ background: 'var(--grad-brand)' }}>
+                <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
-              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/60 px-3.5 py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0s]"></span>
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.15s]"></span>
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.3s]"></span>
+              <div className="px-4 py-3 rounded-[16px] rounded-bl-sm flex items-center gap-1.5"
+                style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+                <span className="w-2 h-2 rounded-full animate-bounce [animation-delay:0s]" style={{ background: 'var(--violet)' }} />
+                <span className="w-2 h-2 rounded-full animate-bounce [animation-delay:0.14s]" style={{ background: 'var(--indigo)' }} />
+                <span className="w-2 h-2 rounded-full animate-bounce [animation-delay:0.28s]" style={{ background: 'var(--magenta)' }} />
               </div>
             </div>
           )}
@@ -606,51 +669,62 @@ export default function AIChat({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <div className="px-4 py-2.5 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800/60 shrink-0">
+        {/* ── Input bar ── */}
+        <div className="shrink-0 px-3 py-3"
+          style={{ borderTop: '1px solid var(--border)', background: 'var(--surface)' }}>
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
-              <input 
+              <input
                 type="text"
                 ref={inputRef}
                 required
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={handleInputKeyDown}
-                placeholder="Ask about medications, lab results, or diet..."
-                className="w-full h-10 px-4 pr-10 rounded-[18px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-medium focus:outline-none focus:border-primary/50 focus:ring-[3px] focus:ring-primary/10 transition-all duration-200 text-on-surface dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                placeholder="Ask about meds, labs, or diet…"
+                className="w-full h-10 px-4 pr-10 text-[13px] font-medium focus:outline-none transition-all duration-200 rounded-[14px]"
+                style={{
+                  background: 'var(--surface-2)',
+                  border: '1.5px solid var(--border)',
+                  color: 'var(--text)',
+                }}
                 aria-label="Chat input"
+                onFocus={e => { e.currentTarget.style.borderColor = 'var(--violet)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124,58,237,0.10)'; }}
+                onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
               />
               {userInput && (
                 <button
                   type="button"
                   onClick={() => setUserInput("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full transition-colors cursor-pointer"
+                  style={{ color: 'var(--muted)' }}
                   aria-label="Clear input"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
-            <button 
+            <button
               type="button"
               onClick={(e) => void handleSend(e)}
               disabled={!userInput.trim() || isLoading}
-              className="w-10 h-10 rounded-[14px] bg-primary hover:bg-primary-container text-white flex items-center justify-center shadow-sm hover:shadow-md hover:shadow-primary/20 transition-all duration-200 disabled:opacity-40 active:scale-[0.97] shrink-0 cursor-pointer"
+              className="w-10 h-10 rounded-[12px] text-white flex items-center justify-center transition-all duration-200 disabled:opacity-35 active:scale-[0.95] shrink-0 cursor-pointer"
+              style={{ background: 'var(--grad-btn)', boxShadow: userInput.trim() ? '0 4px 14px -4px rgba(124,58,237,0.45)' : 'none' }}
               aria-label="Send message"
             >
               <Send className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <p className="text-[9px] text-slate-400 dark:text-slate-500 text-center flex-1 leading-relaxed">
-              AI guidance is educational — always consult your physician.
+          <div className="mt-2 flex items-center justify-between gap-2 px-1">
+            <p className="text-[9.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              For education only — always consult your physician.
             </p>
             <button
               type="button"
-              onClick={onClearChat}
-              className="text-[9px] font-semibold px-2 py-1 rounded-[14px] text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors shrink-0 cursor-pointer"
+              onClick={() => void onClearChat()}
+              className="text-[9.5px] font-bold px-2.5 py-1 rounded-[8px] transition-colors shrink-0 cursor-pointer hover:text-rose-500 hover:bg-rose-50"
+              style={{ color: 'var(--muted)' }}
               aria-label="Clear chat history"
             >
               Clear
@@ -659,258 +733,265 @@ export default function AIChat({
         </div>
       </motion.div>
 
-      {/* Slide-out Agent Audit Log Panel Overlay */}
+      {/* ── Audit Log Slide-over ── */}
       <AnimatePresence>
         {showAudit && (
           <motion.div
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 220 }}
-            className="absolute inset-0 z-30 flex flex-col bg-slate-950 text-slate-100 overflow-hidden"
+            transition={{ type: "spring", damping: 30, stiffness: 260 }}
+            className="absolute inset-0 z-30 flex flex-col overflow-hidden"
+            style={{ background: 'var(--surface)', fontFamily: 'var(--font-sans)' }}
             id="rag-audit-sidebar"
           >
-            {/* ========== Header ========== */}
-            <div className="p-4 border-b border-slate-800/50 flex items-center justify-between shrink-0 bg-slate-950/95 backdrop-blur-md z-10">
+            {/* Header */}
+            <div className="px-4 pt-4 pb-3 flex items-center justify-between shrink-0"
+              style={{ borderBottom: '1px solid var(--border)' }}>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-[14px] bg-gradient-to-br from-primary to-indigo-500 flex items-center justify-center shadow-sm">
+                <div className="w-8 h-8 rounded-[12px] flex items-center justify-center shrink-0"
+                  style={{ background: 'var(--grad-brand)' }}>
                   <Activity className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-white tracking-tight">Audit Log</h3>
-                  <p className="text-[10px] text-slate-500 font-semibold">View AI conversations and actions</p>
+                  <h3 className="text-[14px] font-black tracking-tight"
+                    style={{ fontFamily: 'var(--font-serif)', color: 'var(--text)' }}>
+                    Audit Log
+                  </h3>
+                  <p className="text-[10px]" style={{ color: 'var(--muted)' }}>AI conversations & actions</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
-                  <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold"
+                  style={{ background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)', color: '#16a34a' }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                   Live
                 </span>
-                <button 
+                <button
                   onClick={() => setShowAudit(false)}
-                  className="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-white hover:bg-slate-800/80 rounded-lg transition-all duration-200 cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center rounded-[10px] transition-colors cursor-pointer"
+                  style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}
                   aria-label="Close audit panel"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
-            {/* ========== Tabs ========== */}
-            <div className="flex border-b border-slate-800/40 bg-slate-950/30 shrink-0">
-              <button
-                onClick={() => setAuditTab("logs")}
-                className={`flex-1 py-2.5 text-center text-[10px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
-                  auditTab === "logs" 
-                    ? "text-primary border-b-2 border-primary bg-primary/5" 
-                    : "text-slate-500 hover:text-slate-300 border-b-2 border-transparent"
-                }`}
-              >
-                Audit Trails
-              </button>
-              <button
-                onClick={() => setAuditTab("diagnostics")}
-                className={`flex-1 py-2.5 text-center text-[10px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
-                  auditTab === "diagnostics" 
-                    ? "text-primary border-b-2 border-primary bg-primary/5" 
-                    : "text-slate-500 hover:text-slate-300 border-b-2 border-transparent"
-                }`}
-              >
-                RAG Diagnostics
-              </button>
+            {/* Tabs */}
+            <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+              {(["logs", "diagnostics"] as const).map(tab => (
+                <button key={tab}
+                  onClick={() => setAuditTab(tab)}
+                  className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer"
+                  style={auditTab === tab
+                    ? { color: 'var(--violet)', borderBottom: '2px solid var(--violet)', background: 'rgba(124,58,237,0.04)' }
+                    : { color: 'var(--muted)', borderBottom: '2px solid transparent' }}>
+                  {tab === "logs" ? "Audit Trails" : "RAG Diagnostics"}
+                </button>
+              ))}
             </div>
 
             {auditTab === "logs" ? (
               <>
-                {/* ========== Search & Filters ========== */}
-                <div className="p-4 pb-0 space-y-2.5 shrink-0 bg-slate-950/30 sticky top-[93px] z-10">
+                {/* Search + Filter chips */}
+                <div className="px-3 pt-3 pb-2 shrink-0 space-y-2" style={{ background: 'var(--surface)' }}>
                   <div className="relative">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 pointer-events-none" />
-                    <input 
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none" style={{ color: 'var(--muted)' }} />
+                    <input
                       type="text"
-                      placeholder="Filter audit logs..."
+                      placeholder="Filter audit logs…"
                       value={searchAuditQuery}
                       onChange={(e) => setSearchAuditQuery(e.target.value)}
-                      className="w-full h-10 pl-10 pr-4 rounded-2xl bg-slate-900/80 border border-slate-800/60 text-xs font-semibold text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary/60 focus:ring-[3px] focus:ring-primary/10 transition-all duration-200"
+                      className="w-full h-9 pl-9 pr-4 rounded-[12px] text-[12px] font-medium focus:outline-none transition-all"
+                      style={{ background: 'var(--surface-2)', border: '1.5px solid var(--border)', color: 'var(--text)' }}
                       aria-label="Search audit logs"
                     />
                   </div>
-                  {/* Filter chips */}
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                    {(["All", "Queries", "AI Responses", "Tool Calls", "Errors"] as const).map((chip) => {
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+                    {(["All", "Queries", "AI Responses", "Tool Calls", "Errors"] as const).map(chip => {
                       const chipKey = chip === "All" ? "all" : chip === "Queries" ? "queries" : chip === "AI Responses" ? "responses" : chip === "Tool Calls" ? "tools" : "errors";
                       return (
-                        <button
-                          key={chip}
+                        <button key={chip}
                           onClick={() => setAuditFilterChip(chipKey)}
-                          className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                            auditFilterChip === chipKey
-                              ? "bg-primary/10 text-primary border border-primary/20" 
-                              : "bg-slate-900/60 text-slate-500 border border-slate-800/60 hover:text-slate-300 hover:border-slate-700"
-                          }`}
-                        >
+                          className="px-2.5 py-1 rounded-full text-[9px] font-bold tracking-wide whitespace-nowrap transition-all cursor-pointer"
+                          style={auditFilterChip === chipKey
+                            ? { background: 'rgba(124,58,237,0.10)', color: 'var(--violet)', border: '1px solid rgba(124,58,237,0.22)' }
+                            : { background: 'var(--surface-2)', color: 'var(--muted)', border: '1px solid var(--border)' }}>
                           {chip}
                         </button>
                       );
                     })}
                     {auditFilterChip !== "all" && (
-                      <button
-                        onClick={() => setAuditFilterChip("all")}
-                        className="text-[9px] font-bold text-slate-500 hover:text-slate-300 ml-1 transition-colors"
-                      >
+                      <button onClick={() => setAuditFilterChip("all")}
+                        className="text-[9px] font-bold ml-1 transition-colors cursor-pointer"
+                        style={{ color: 'var(--muted)' }}>
                         Clear
                       </button>
                     )}
                   </div>
                 </div>
 
-                {/* ========== Audit Logs List ========== */}
-                <div className="flex-1 overflow-y-auto p-4 pt-3" id="audit-logs-container">
-                  <style>{`#audit-logs-container::-webkit-scrollbar{width:4px}#audit-logs-container::-webkit-scrollbar-track{background:transparent}#audit-logs-container::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.3);border-radius:4px}#audit-logs-container::-webkit-scrollbar-thumb:hover{background:rgba(139,92,246,0.5)}`}</style>
-
+                {/* Log list */}
+                <div className="flex-1 overflow-y-auto px-3 pb-3 pt-2 space-y-3">
                   {filteredAudits.length > 0 ? (
-                    <div className="space-y-3">
-                      {groupOrder.map((group) => {
+                    <>
+                      {groupOrder.map(group => {
                         const logs = groupedLogs[group];
-                        if (!logs || logs.length === 0) return null;
+                        if (!logs?.length) return null;
                         return (
                           <div key={group}>
-                            <div className="flex items-center gap-2 px-1 mb-3">
-                              <div className="h-px flex-1 bg-slate-800/30" />
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{group}</span>
-                              <div className="h-px flex-1 bg-slate-800/30" />
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
+                              <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--muted)' }}>{group}</span>
+                              <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
                             </div>
                             <div className="space-y-2">
                               {logs.map((log: any) => {
                                 const isExpanded = expandedLogId === log.id;
                                 const isSafe = !log.safetyWarnings || log.safetyWarnings.length === 0;
                                 return (
-                                  <div key={log.id} className="relative pl-5 pb-0.5 group/audit">
-                                    {/* Timeline line */}
-                                    <div className="absolute left-[7px] top-3 bottom-[-8px] w-px bg-slate-800/40" />
-                                    {/* Timeline dot */}
-                                    <div className={`absolute left-0 top-[13px] w-[15px] h-[15px] rounded-full border-2 ${isSafe ? "border-emerald-500/30" : "border-rose-500/30"} bg-slate-950 flex items-center justify-center`}>
-                                      <div className={`w-[5px] h-[5px] rounded-full ${isSafe ? "bg-emerald-400" : "bg-rose-400"}`} />
+                                  <div key={log.id} className="relative pl-4 group/audit">
+                                    {/* Timeline */}
+                                    <div className="absolute left-[5px] top-3 bottom-0 w-px" style={{ background: 'var(--border)' }} />
+                                    <div className="absolute left-0 top-[11px] w-[11px] h-[11px] rounded-full flex items-center justify-center"
+                                      style={{
+                                        background: 'var(--surface)',
+                                        border: `2px solid ${isSafe ? '#22c55e' : '#ef4444'}`,
+                                      }}>
+                                      <div className="w-[4px] h-[4px] rounded-full"
+                                        style={{ background: isSafe ? '#22c55e' : '#ef4444' }} />
                                     </div>
                                     {/* Card */}
-                                    <div 
-                                      className={`rounded-2xl border p-4 transition-all duration-200 cursor-pointer ${
-                                        isExpanded
-                                          ? "bg-slate-900/80 border-primary/20 shadow-md"
-                                          : "bg-slate-900/60 border-slate-800/70 hover:bg-slate-900/80 hover:border-slate-700/70 hover:-translate-y-0.5 hover:shadow-lg"
-                                      }`}
+                                    <div
+                                      className="rounded-[14px] p-3.5 transition-all duration-200 cursor-pointer relative"
+                                      style={isExpanded
+                                        ? { background: 'var(--surface)', border: '1px solid rgba(124,58,237,0.25)', boxShadow: 'var(--shadow-sm)' }
+                                        : { background: 'var(--surface-2)', border: '1px solid var(--border)' }}
                                       onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
                                     >
-                                      <div className="space-y-2.5">
+                                      <div className="space-y-2">
                                         {/* Top row */}
                                         <div className="flex items-center justify-between gap-2">
-                                          <div className="flex items-center gap-2 min-w-0">
-                                            <div className="w-6 h-6 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
-                                              <Bot className="w-3.5 h-3.5" />
+                                          <div className="flex items-center gap-1.5">
+                                            <div className="w-5 h-5 rounded-[7px] flex items-center justify-center"
+                                              style={{ background: 'rgba(124,58,237,0.10)', color: 'var(--violet)' }}>
+                                              <Bot className="w-3 h-3" />
                                             </div>
-                                            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Agent</span>
+                                            <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Agent</span>
                                           </div>
-                                          <div className="flex items-center gap-2 shrink-0">
-                                            <span className="text-[10px] text-slate-500 font-semibold whitespace-nowrap" title={new Date(log.timestamp).toLocaleString()}>
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="text-[9px] font-semibold" style={{ color: 'var(--muted)' }}>
                                               {relativeTime(log.timestamp)}
                                             </span>
-                                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border whitespace-nowrap ${isSafe ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"}`}>
-                                              {isSafe ? "Success" : "Alert"}
+                                            <span className="px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider"
+                                              style={isSafe
+                                                ? { background: 'rgba(34,197,94,0.10)', color: '#16a34a', border: '1px solid rgba(34,197,94,0.25)' }
+                                                : { background: 'rgba(239,68,68,0.10)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
+                                              {isSafe ? "OK" : "Alert"}
                                             </span>
                                           </div>
                                         </div>
 
                                         {/* Query */}
-                                        <div>
-                                          <p className={`text-[13px] font-medium text-slate-200 leading-relaxed ${!isExpanded ? "line-clamp-2" : ""}`}>
-                                            {log.query ? `"${log.query}"` : "No query recorded"}
-                                          </p>
-                                        </div>
+                                        <p className={`text-[12px] font-medium leading-relaxed ${!isExpanded ? "line-clamp-2" : ""}`}
+                                          style={{ color: 'var(--text)' }}>
+                                          {log.query ? `"${log.query}"` : "No query recorded"}
+                                        </p>
 
-                                        {/* Metadata row */}
-                                        <div className="flex items-center gap-3 pt-0.5">
-                                          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold">
+                                        {/* Metadata */}
+                                        <div className="flex items-center gap-2.5">
+                                          <span className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: 'var(--muted)' }}>
                                             <Clock className="w-3 h-3" />
-                                            <span>{log.duration ? `${(log.duration / 1000).toFixed(1)}s` : "—"}</span>
-                                          </div>
-                                          <span className="w-px h-3 bg-slate-800/50" />
-                                          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold">
-                                            <span className="w-3 h-3 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[6px] font-bold">Δ</span>
-                                            <span>{log.tokens ? `${log.tokens} tokens` : "—"}</span>
-                                          </div>
-                                          <span className="w-px h-3 bg-slate-800/50" />
-                                          <span className="text-[10px] text-slate-500 font-semibold">{log.model || "—"}</span>
+                                            {log.duration ? `${(log.duration / 1000).toFixed(1)}s` : "—"}
+                                          </span>
+                                          <span className="w-px h-3" style={{ background: 'var(--border)' }} />
+                                          <span className="text-[10px] font-semibold" style={{ color: 'var(--muted)' }}>
+                                            {log.tokens ? `${log.tokens} tok` : "—"}
+                                          </span>
+                                          <span className="w-px h-3" style={{ background: 'var(--border)' }} />
+                                          <span className="text-[10px] font-semibold truncate" style={{ color: 'var(--muted)' }}>
+                                            {log.model || "—"}
+                                          </span>
                                         </div>
 
-                                        {/* Copy button on hover */}
+                                        {/* Copy hover */}
                                         {log.query && (
                                           <button
-                                            onClick={(e: React.MouseEvent) => {
-                                              e.stopPropagation();
-                                              navigator.clipboard.writeText(log.query);
-                                            }}
-                                            className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 text-slate-500 opacity-0 group-hover/audit:opacity-100 hover:text-primary hover:bg-primary/10 transition-all duration-200"
-                                            aria-label="Copy query to clipboard"
+                                            onClick={(e: React.MouseEvent) => { e.stopPropagation(); navigator.clipboard.writeText(log.query); }}
+                                            className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-[8px] opacity-0 group-hover/audit:opacity-100 transition-all cursor-pointer"
+                                            style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--muted)' }}
+                                            aria-label="Copy query"
                                           >
                                             <Copy className="w-3 h-3" />
                                           </button>
                                         )}
                                       </div>
 
-                                      {/* Expanded details */}
+                                      {/* Expanded */}
                                       {isExpanded && (
                                         <motion.div
                                           initial={{ opacity: 0, height: 0 }}
                                           animate={{ opacity: 1, height: "auto" }}
-                                          className="mt-3 pt-3 border-t border-slate-800/50 space-y-3.5 text-[10px]"
+                                          className="mt-3 pt-3 space-y-3 text-[10px]"
+                                          style={{ borderTop: '1px solid var(--border)' }}
                                         >
                                           {/* Tier 1 */}
-                                          <div className="space-y-1.5">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-primary block">Tier 1: Deterministic Retrieval</span>
-                                            <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800/50 space-y-1.5">
-                                              <p className="text-slate-400 font-semibold leading-relaxed">• Profile: {log.retrievedContext?.profile?.fullName || "—"} ({log.retrievedContext?.profile?.gender || "—"}, diet: {log.retrievedContext?.profile?.dietaryPreferences?.join(", ") || "—"})</p>
-                                              <p className="text-slate-400 font-semibold leading-relaxed">• Vitals: {log.retrievedContext?.vitals?.heartRate} BPM, {log.retrievedContext?.vitals?.steps} steps, {log.retrievedContext?.vitals?.sleep} sleep</p>
-                                              <p className="text-slate-400 font-semibold leading-relaxed">• Medications: {log.retrievedContext?.medications?.length > 0 ? log.retrievedContext.medications.map((m: any) => m.name).join(", ") : "None logged"}</p>
+                                          <div className="space-y-1">
+                                            <span className="text-[8px] font-black uppercase tracking-widest block" style={{ color: 'var(--violet)' }}>
+                                              Tier 1 · Deterministic
+                                            </span>
+                                            <div className="px-3 py-2.5 rounded-[10px] space-y-1"
+                                              style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
+                                              <p style={{ color: 'var(--text-dim)' }}>Profile: {log.retrievedContext?.profile?.fullName || "—"} ({log.retrievedContext?.profile?.gender || "—"})</p>
+                                              <p style={{ color: 'var(--text-dim)' }}>Vitals: {log.retrievedContext?.vitals?.heartRate} BPM · {log.retrievedContext?.vitals?.steps} steps</p>
+                                              <p style={{ color: 'var(--text-dim)' }}>Meds: {log.retrievedContext?.medications?.length > 0 ? log.retrievedContext.medications.map((m: any) => m.name).join(", ") : "None"}</p>
                                             </div>
                                           </div>
 
                                           {/* Tier 2 */}
-                                          <div className="space-y-1.5">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-secondary block">Tier 2: Semantic Similarity</span>
-                                            <div className="space-y-1">
-                                              {log.retrievedContext?.files && log.retrievedContext.files.length > 0 ? (
-                                                log.retrievedContext.files.map((f: any, fIdx: number) => (
-                                                  <div key={fIdx} className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/50 flex items-center justify-between gap-2">
-                                                    <div className="flex items-center gap-2 min-w-0">
-                                                      <FileText className="w-3 h-3 text-slate-500 shrink-0" />
-                                                      <span className="text-[10px] text-slate-400 font-semibold truncate">{f.name}</span>
+                                          <div className="space-y-1">
+                                            <span className="text-[8px] font-black uppercase tracking-widest block" style={{ color: 'var(--indigo)' }}>
+                                              Tier 2 · Semantic
+                                            </span>
+                                            {log.retrievedContext?.files?.length > 0 ? (
+                                              <div className="space-y-1">
+                                                {log.retrievedContext.files.map((f: any, fIdx: number) => (
+                                                  <div key={fIdx} className="flex items-center justify-between px-3 py-2 rounded-[10px]"
+                                                    style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                      <FileText className="w-3 h-3 shrink-0" style={{ color: 'var(--muted)' }} />
+                                                      <span className="truncate" style={{ color: 'var(--text-dim)' }}>{f.name}</span>
                                                     </div>
-                                                    <span className="text-[9px] font-bold text-secondary shrink-0">{(f.similarity * 100).toFixed(1)}%</span>
+                                                    <span className="font-black shrink-0" style={{ color: 'var(--indigo)' }}>{(f.similarity * 100).toFixed(0)}%</span>
                                                   </div>
-                                                ))
-                                              ) : (
-                                                <p className="text-[10px] text-slate-500 italic font-semibold pl-1">No health reports matched above threshold.</p>
-                                              )}
-                                            </div>
+                                                ))}
+                                              </div>
+                                            ) : (
+                                              <p className="italic" style={{ color: 'var(--muted)' }}>No documents matched threshold.</p>
+                                            )}
                                           </div>
 
                                           {/* Safety */}
-                                          <div className="space-y-1.5">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-rose-400 block">Clinical Safety Validation</span>
-                                            <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800/50">
+                                          <div className="space-y-1">
+                                            <span className="text-[8px] font-black uppercase tracking-widest block" style={{ color: '#dc2626' }}>
+                                              Clinical Safety
+                                            </span>
+                                            <div className="px-3 py-2.5 rounded-[10px]"
+                                              style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
                                               {!isSafe ? (
                                                 <div className="space-y-1">
                                                   {log.safetyWarnings.map((warn: string, wIdx: number) => (
-                                                    <p key={wIdx} className="text-[10px] text-rose-400 font-semibold flex items-start gap-1.5 leading-relaxed">
-                                                      <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5 text-rose-400" />
+                                                    <p key={wIdx} className="flex items-start gap-1.5 leading-relaxed" style={{ color: '#dc2626' }}>
+                                                      <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
                                                       {warn}
                                                     </p>
                                                   ))}
                                                 </div>
                                               ) : (
-                                                <p className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1.5 leading-relaxed">
-                                                  <ShieldCheck className="w-3 h-3 shrink-0 text-emerald-400" />
-                                                  Zero drug-diet conflicts triggered. Safe clinical dispatch.
+                                                <p className="flex items-center gap-1.5" style={{ color: '#16a34a' }}>
+                                                  <ShieldCheck className="w-3 h-3 shrink-0" />
+                                                  No drug-diet conflicts. Safe dispatch.
                                                 </p>
                                               )}
                                             </div>
@@ -925,27 +1006,26 @@ export default function AIChat({
                           </div>
                         );
                       })}
-                    </div>
+                    </>
                   ) : (
-                    /* Empty state */
-                    <div className="flex flex-col items-center justify-center text-center py-20 px-6">
-                      <div className="w-14 h-14 rounded-2xl bg-slate-900/80 border border-slate-800/60 flex items-center justify-center mb-4">
-                        <Activity className="w-6 h-6 text-slate-500" />
+                    <div className="flex flex-col items-center justify-center text-center py-16 px-4">
+                      <div className="w-12 h-12 rounded-[14px] flex items-center justify-center mb-3"
+                        style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                        <Activity className="w-5 h-5" style={{ color: 'var(--muted)' }} />
                       </div>
-                      <h4 className="text-sm font-bold text-slate-300 mb-1.5">
+                      <h4 className="text-[13px] font-black mb-1" style={{ color: 'var(--text)' }}>
                         {searchAuditQuery || auditFilterChip !== "all" ? "No matching logs" : "No activity yet"}
                       </h4>
-                      <p className="text-[11px] text-slate-500 font-semibold leading-relaxed max-w-[220px]">
+                      <p className="text-[11px] leading-relaxed max-w-[200px]" style={{ color: 'var(--muted)' }}>
                         {searchAuditQuery || auditFilterChip !== "all"
-                          ? "Try adjusting your search terms or filters."
-                          : "Your AI conversations and actions will appear here."}
+                          ? "Adjust your search or filters."
+                          : "Your AI conversations will appear here."}
                       </p>
                       {(searchAuditQuery || auditFilterChip !== "all") && (
-                        <button
-                          onClick={() => { setSearchAuditQuery(""); setAuditFilterChip("all"); }}
-                          className="mt-4 text-[10px] font-bold text-primary hover:text-primary-container transition-colors"
-                        >
-                          Clear all filters
+                        <button onClick={() => { setSearchAuditQuery(""); setAuditFilterChip("all"); }}
+                          className="mt-4 text-[10px] font-bold transition-colors cursor-pointer"
+                          style={{ color: 'var(--violet)' }}>
+                          Clear filters
                         </button>
                       )}
                     </div>
@@ -953,123 +1033,118 @@ export default function AIChat({
                 </div>
               </>
             ) : (
-              /* Diagnostics Verification tab */
-              <div className="flex-1 overflow-y-auto p-4 space-y-4" id="diagnostics-verification-panel">
-                <style>{`#diagnostics-verification-panel::-webkit-scrollbar{width:4px}#diagnostics-verification-panel::-webkit-scrollbar-track{background:transparent}#diagnostics-verification-panel::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.3);border-radius:4px}#diagnostics-verification-panel::-webkit-scrollbar-thumb:hover{background:rgba(139,92,246,0.5)}`}</style>
-                <div className="bg-slate-900/60 p-4 border border-slate-800/50 rounded-2xl space-y-3">
-                  <h5 className="text-xs font-bold uppercase text-slate-200 tracking-wider flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-primary" />
+              /* Diagnostics tab */
+              <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                <div className="p-4 rounded-[14px] space-y-3"
+                  style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                  <h5 className="text-[11px] font-black uppercase tracking-wide flex items-center gap-2"
+                    style={{ color: 'var(--text)' }}>
+                    <Cpu className="w-4 h-4" style={{ color: 'var(--violet)' }} />
                     RAG Integrity Diagnostics
                   </h5>
-                  <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
-                    Execute a diagnostic routine to verify that Tier 1 (deterministic) and Tier 2 (semantic) health record parameters are correctly resolved, injected, and audited before calling the LLM generation stage.
+                  <p className="text-[10.5px] leading-relaxed" style={{ color: 'var(--text-dim)' }}>
+                    Verify Tier 1 (deterministic) and Tier 2 (semantic) retrieval before the LLM generation stage.
                   </p>
                   <button
                     type="button"
                     onClick={runDiagnostics}
                     disabled={runningDiagnostics}
-                    className="w-full h-10 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center justify-center gap-2 shadow transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                    className="w-full h-10 rounded-[12px] text-white text-[11px] font-black flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
+                    style={{ background: 'var(--grad-btn)', boxShadow: '0 4px 14px -4px rgba(124,58,237,0.45)' }}
                   >
                     {runningDiagnostics ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Running Test Verification Suite...
-                      </>
+                      <><Loader2 className="w-3.5 h-3.5 animate-spin" />Running Diagnostics…</>
                     ) : (
-                      <>
-                        <Play className="w-3.5 h-3.5 fill-current" />
-                        Run Diagnostics Suite
-                      </>
+                      <><Play className="w-3.5 h-3.5 fill-current" />Run Diagnostics Suite</>
                     )}
                   </button>
                 </div>
 
                 {diagnosticError && (
-                  <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[11px] text-rose-400 flex gap-2.5 items-start font-semibold">
-                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                    <p className="leading-relaxed">{diagnosticError}</p>
+                  <div className="p-3 rounded-[12px] flex gap-2 items-start"
+                    style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.22)' }}>
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#dc2626' }} />
+                    <p className="text-[10.5px] leading-relaxed" style={{ color: '#dc2626' }}>{diagnosticError}</p>
                   </div>
                 )}
 
                 {diagnosticResult ? (
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center bg-slate-900/60 p-3 border border-slate-800/50 rounded-xl text-[10px]">
-                      <span className="font-bold text-slate-300 uppercase tracking-wider">Test Suite Status:</span>
-                      {diagnosticResult.success ? (
-                        <span className="bg-emerald-500/10 text-emerald-400 font-bold px-2.5 py-1 rounded border border-emerald-500/20 uppercase tracking-widest text-[9px]">
-                          VERIFIED PASS
-                        </span>
-                      ) : (
-                        <span className="bg-rose-500/10 text-rose-400 font-bold px-2.5 py-1 rounded border border-rose-500/20 uppercase tracking-widest text-[9px]">
-                          VERIFIED FAIL
-                        </span>
-                      )}
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 rounded-[12px]"
+                      style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                      <span className="text-[10px] font-black uppercase tracking-wide" style={{ color: 'var(--text-dim)' }}>
+                        Test Suite Status
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest"
+                        style={diagnosticResult.success
+                          ? { background: 'rgba(34,197,94,0.10)', color: '#16a34a', border: '1px solid rgba(34,197,94,0.25)' }
+                          : { background: 'rgba(239,68,68,0.10)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
+                        {diagnosticResult.success ? "PASS" : "FAIL"}
+                      </span>
                     </div>
 
-                    {/* Steps timeline */}
-                    <div className="space-y-2.5">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 tracking-wider block">Verification Pipeline:</span>
+                    <div className="space-y-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest block" style={{ color: 'var(--muted)' }}>
+                        Verification Pipeline
+                      </span>
                       {diagnosticResult.steps?.map((step: any, sIdx: number) => (
-                        <div key={sIdx} className="p-3 bg-slate-900/60 border border-slate-800/50 rounded-xl flex gap-3 items-start">
+                        <div key={sIdx} className="p-3 rounded-[12px] flex gap-3 items-start"
+                          style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
                           <div className="mt-0.5 shrink-0">
-                            {step.status === "pass" ? (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                            ) : (
-                              <XCircle className="w-4 h-4 text-rose-400" />
-                            )}
+                            {step.status === "pass"
+                              ? <CheckCircle2 className="w-4 h-4" style={{ color: '#22c55e' }} />
+                              : <XCircle className="w-4 h-4" style={{ color: '#ef4444' }} />}
                           </div>
-                          <div className="space-y-1 flex-1 min-w-0">
-                            <div className="flex justify-between items-center gap-2">
-                              <p className="text-xs font-bold text-slate-200 leading-normal truncate">{step.name}</p>
-                              <span className="text-[9px] font-mono text-slate-500 font-bold shrink-0">{step.durationMs}ms</span>
+                          <div className="flex-1 min-w-0 space-y-0.5">
+                            <div className="flex justify-between gap-2">
+                              <p className="text-[11px] font-bold truncate" style={{ color: 'var(--text)' }}>{step.name}</p>
+                              <span className="text-[9px] shrink-0" style={{ fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>{step.durationMs}ms</span>
                             </div>
-                            <p className="text-[10px] text-slate-500 leading-normal font-semibold">{step.details}</p>
+                            <p className="text-[10px]" style={{ color: 'var(--text-dim)' }}>{step.details}</p>
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    {/* Retrieved Context Block */}
-                    <div className="bg-slate-900/60 border border-slate-800/50 p-4 rounded-xl space-y-2.5">
-                      <span className="text-[9px] font-bold uppercase text-primary tracking-widest flex items-center gap-1">
-                        <Layers className="w-3.5 h-3.5" />
-                        Context Payload Dump
+                    <div className="p-3 rounded-[12px] space-y-2"
+                      style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                      <span className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1" style={{ color: 'var(--violet)' }}>
+                        <Layers className="w-3.5 h-3.5" /> Context Payload
                       </span>
-                      <div className="text-[10px] text-slate-400 font-mono space-y-2 pl-1 leading-normal border-l border-slate-800/50 font-semibold">
+                      <div className="pl-1 space-y-2 text-[10px]" style={{ borderLeft: '2px solid var(--border)', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
                         <div>
-                          <span className="text-primary font-bold">[Tier 1 Deterministic profile]</span>
-                          <p>• Name: {diagnosticResult.retrievedContext?.profile?.fullName || "—"}</p>
-                          <p>• Dietary prefs: {diagnosticResult.retrievedContext?.profile?.dietaryPreferences?.join(", ") || "None"}</p>
-                          <p>• Current Vitals: HR {diagnosticResult.retrievedContext?.vitals?.heartRate} BPM, Steps {diagnosticResult.retrievedContext?.vitals?.steps}</p>
+                          <span className="font-bold" style={{ color: 'var(--violet)' }}>[Tier 1 Profile]</span>
+                          <p>Name: {diagnosticResult.retrievedContext?.profile?.fullName || "—"}</p>
+                          <p>Prefs: {diagnosticResult.retrievedContext?.profile?.dietaryPreferences?.join(", ") || "None"}</p>
+                          <p>HR: {diagnosticResult.retrievedContext?.vitals?.heartRate} BPM, Steps: {diagnosticResult.retrievedContext?.vitals?.steps}</p>
                         </div>
-                        <div className="pt-2">
-                          <span className="text-secondary font-bold">[Tier 1 Medications list]</span>
-                          {diagnosticResult.retrievedContext?.medications?.length > 0 ? (
-                            diagnosticResult.retrievedContext.medications.map((m: any, mIdx: number) => (
-                              <p key={mIdx}>• {m.name} ({m.strength}) - {m.frequency}</p>
-                            ))
-                          ) : (
-                            <p className="text-slate-500 italic">No medication found in test context</p>
-                          )}
+                        <div>
+                          <span className="font-bold" style={{ color: 'var(--indigo)' }}>[Tier 1 Medications]</span>
+                          {diagnosticResult.retrievedContext?.medications?.length > 0
+                            ? diagnosticResult.retrievedContext.medications.map((m: any, mIdx: number) => (
+                                <p key={mIdx}>{m.name} ({m.strength}) - {m.frequency}</p>
+                              ))
+                            : <p className="italic" style={{ color: 'var(--muted)' }}>No medications</p>}
                         </div>
-                        <div className="pt-2">
-                          <span className="text-indigo-400 font-bold">[Tier 2 Matched Documents]</span>
-                          {diagnosticResult.retrievedContext?.matchedFiles?.length > 0 ? (
-                            diagnosticResult.retrievedContext.matchedFiles.map((f: any, fIdx: number) => (
-                              <p key={fIdx}>• "{f.name}" (Cosine Similarity: {(f.similarity * 100).toFixed(1)}%)</p>
-                            ))
-                          ) : (
-                            <p className="text-slate-500 italic">No matching reports found</p>
-                          )}
+                        <div>
+                          <span className="font-bold" style={{ color: 'var(--indigo)' }}>[Tier 2 Documents]</span>
+                          {diagnosticResult.retrievedContext?.matchedFiles?.length > 0
+                            ? diagnosticResult.retrievedContext.matchedFiles.map((f: any, fIdx: number) => (
+                                <p key={fIdx}>"{f.name}" ({(f.similarity * 100).toFixed(1)}%)</p>
+                              ))
+                            : <p className="italic" style={{ color: 'var(--muted)' }}>No matching reports</p>}
                         </div>
                       </div>
                     </div>
                   </div>
                 ) : (
                   !runningDiagnostics && (
-                    <div className="text-center py-10 text-slate-500 space-y-2 border border-dashed border-slate-800/50 rounded-2xl bg-slate-950/20">
-                      <CheckSquare className="w-8 h-8 text-slate-600 mx-auto" />
-                      <p className="text-xs font-semibold">Test suite has not been executed yet.</p>
+                    <div className="flex flex-col items-center justify-center py-10 text-center rounded-[14px]"
+                      style={{ border: '1.5px dashed var(--border)' }}>
+                      <CheckSquare className="w-8 h-8 mb-2" style={{ color: 'var(--muted)' }} />
+                      <p className="text-[11px] font-semibold" style={{ color: 'var(--muted)' }}>
+                        Test suite not yet executed.
+                      </p>
                     </div>
                   )
                 )}
@@ -1079,85 +1154,89 @@ export default function AIChat({
         )}
       </AnimatePresence>
 
-      {/* Mobile Audit Drawer */}
+      {/* Mobile Audit Drawer — same design, bottom sheet on small screens */}
       <AnimatePresence>
         {showAudit && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden flex items-end justify-center" id="mobile-audit-modal">
+          <div className="fixed inset-0 z-50 lg:hidden flex items-end justify-center"
+            style={{ background: 'rgba(33,25,53,0.55)', backdropFilter: 'blur(8px)' }}
+            id="mobile-audit-modal">
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="bg-slate-950/95 text-slate-100 w-full max-h-[85vh] rounded-t-3xl flex flex-col overflow-hidden border-t border-slate-800/60"
+              className="w-full max-h-[88vh] flex flex-col overflow-hidden rounded-t-[24px]"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderBottom: 'none' }}
             >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-1 shrink-0">
+                <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} />
+              </div>
+
               {/* Header */}
-              <div className="p-4 border-b border-slate-800/50 flex items-center justify-between shrink-0 bg-slate-950/80">
+              <div className="px-4 pb-3 pt-1 flex items-center justify-between shrink-0"
+                style={{ borderBottom: '1px solid var(--border)' }}>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-[14px] bg-gradient-to-br from-primary to-indigo-500 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-[10px] flex items-center justify-center shrink-0"
+                    style={{ background: 'var(--grad-brand)' }}>
                     <Activity className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-xs text-white">Audit Log</h3>
-                    <p className="text-[9px] text-slate-500 font-semibold">AI conversations and actions</p>
+                    <h3 className="text-[13px] font-black" style={{ fontFamily: 'var(--font-serif)', color: 'var(--text)' }}>
+                      Audit Log
+                    </h3>
+                    <p className="text-[9px]" style={{ color: 'var(--muted)' }}>AI conversations & actions</p>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowAudit(false)}
-                  className="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-white hover:bg-slate-800/80 rounded-lg transition-all cursor-pointer"
-                  aria-label="Close audit panel"
+                  className="w-7 h-7 flex items-center justify-center rounded-[10px] cursor-pointer"
+                  style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}
+                  aria-label="Close audit"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              {/* Mobile tabs */}
-              <div className="flex border-b border-slate-800/40 bg-slate-950/30 shrink-0">
-                <button
-                  onClick={() => setAuditTab("logs")}
-                  className={`flex-1 py-2 text-center text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                    auditTab === "logs" ? "text-primary border-b-2 border-primary" : "text-slate-500 border-b-2 border-transparent"
-                  }`}
-                >
-                  Audit Trails
-                </button>
-                <button
-                  onClick={() => setAuditTab("diagnostics")}
-                  className={`flex-1 py-2 text-center text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                    auditTab === "diagnostics" ? "text-primary border-b-2 border-primary" : "text-slate-500 border-b-2 border-transparent"
-                  }`}
-                >
-                  Diagnostics
-                </button>
+              {/* Tabs */}
+              <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+                {(["logs", "diagnostics"] as const).map(tab => (
+                  <button key={tab}
+                    onClick={() => setAuditTab(tab)}
+                    className="flex-1 py-2.5 text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                    style={auditTab === tab
+                      ? { color: 'var(--violet)', borderBottom: '2px solid var(--violet)' }
+                      : { color: 'var(--muted)', borderBottom: '2px solid transparent' }}>
+                    {tab === "logs" ? "Audit Trails" : "Diagnostics"}
+                  </button>
+                ))}
               </div>
 
               {auditTab === "logs" ? (
                 <>
-                  {/* Mobile Search + Filter chips */}
-                  <div className="p-3 pb-0 space-y-2.5 shrink-0 bg-slate-950/30">
+                  {/* Search */}
+                  <div className="px-3 pt-3 pb-2 space-y-2 shrink-0">
                     <div className="relative">
-                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 w-3.5 h-3.5 pointer-events-none" />
-                      <input 
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none" style={{ color: 'var(--muted)' }} />
+                      <input
                         type="text"
-                        placeholder="Search logs..."
+                        placeholder="Search logs…"
                         value={searchAuditQuery}
                         onChange={(e) => setSearchAuditQuery(e.target.value)}
-                        className="w-full h-9 pl-9 pr-3 rounded-2xl bg-slate-900/80 border border-slate-800/60 text-xs font-semibold text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary/60 focus:ring-[3px] focus:ring-primary/10 transition-all duration-200"
-                        aria-label="Search audit logs"
+                        className="w-full h-9 pl-9 pr-3 rounded-[12px] text-[12px] focus:outline-none"
+                        style={{ background: 'var(--surface-2)', border: '1.5px solid var(--border)', color: 'var(--text)' }}
                       />
                     </div>
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                      {(["All", "Queries", "AI Responses", "Tool Calls", "Errors"] as const).map((chip) => {
+                    <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+                      {(["All", "Queries", "AI Responses", "Tool Calls", "Errors"] as const).map(chip => {
                         const chipKey = chip === "All" ? "all" : chip === "Queries" ? "queries" : chip === "AI Responses" ? "responses" : chip === "Tool Calls" ? "tools" : "errors";
                         return (
-                          <button
-                            key={chip}
+                          <button key={chip}
                             onClick={() => setAuditFilterChip(chipKey)}
-                            className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider whitespace-nowrap transition-all cursor-pointer ${
-                              auditFilterChip === chipKey
-                                ? "bg-primary/10 text-primary border border-primary/20" 
-                                : "bg-slate-900/60 text-slate-500 border border-slate-800/60"
-                            }`}
-                          >
+                            className="px-2 py-0.5 rounded-full text-[8px] font-bold whitespace-nowrap cursor-pointer"
+                            style={auditFilterChip === chipKey
+                              ? { background: 'rgba(124,58,237,0.10)', color: 'var(--violet)', border: '1px solid rgba(124,58,237,0.22)' }
+                              : { background: 'var(--surface-2)', color: 'var(--muted)', border: '1px solid var(--border)' }}>
                             {chip}
                           </button>
                         );
@@ -1165,81 +1244,65 @@ export default function AIChat({
                     </div>
                   </div>
 
-                  {/* Mobile Logs List */}
-                  <div className="flex-1 overflow-y-auto p-3 space-y-3" id="mobile-audit-logs">
-                    <style>{`#mobile-audit-logs::-webkit-scrollbar{width:3px}#mobile-audit-logs::-webkit-scrollbar-track{background:transparent}#mobile-audit-logs::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.3);border-radius:4px}`}</style>
+                  {/* Logs */}
+                  <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-2">
                     {filteredAudits.length > 0 ? (
                       filteredAudits.map((log) => {
                         const isExpanded = expandedLogId === log.id;
                         const isSafe = !log.safetyWarnings || log.safetyWarnings.length === 0;
                         return (
-                          <div key={log.id} className="relative pl-4 group/maudit">
-                            <div className="absolute left-[5px] top-3 bottom-[-8px] w-px bg-slate-800/40" />
-                            <div className={`absolute left-0 top-[13px] w-[11px] h-[11px] rounded-full border-2 ${isSafe ? "border-emerald-500/30" : "border-rose-500/30"} bg-slate-950 flex items-center justify-center`}>
-                              <div className={`w-[3.5px] h-[3.5px] rounded-full ${isSafe ? "bg-emerald-400" : "bg-rose-400"}`} />
+                          <div key={log.id} className="relative pl-4">
+                            <div className="absolute left-[5px] top-3 bottom-0 w-px" style={{ background: 'var(--border)' }} />
+                            <div className="absolute left-0 top-[11px] w-[11px] h-[11px] rounded-full flex items-center justify-center"
+                              style={{ background: 'var(--surface)', border: `2px solid ${isSafe ? '#22c55e' : '#ef4444'}` }}>
+                              <div className="w-[3.5px] h-[3.5px] rounded-full" style={{ background: isSafe ? '#22c55e' : '#ef4444' }} />
                             </div>
-                            <div 
-                              className={`rounded-xl border p-3 transition-all duration-200 cursor-pointer ${
-                                isExpanded ? "bg-slate-900/80 border-primary/20" : "bg-slate-900/60 border-slate-800/70 hover:bg-slate-900/80"
-                              }`}
+                            <div
+                              className="rounded-[12px] p-3 transition-all cursor-pointer"
+                              style={isExpanded
+                                ? { background: 'var(--surface)', border: '1px solid rgba(124,58,237,0.25)' }
+                                : { background: 'var(--surface-2)', border: '1px solid var(--border)' }}
                               onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
                             >
-                              <div className="space-y-2">
+                              <div className="space-y-1.5">
                                 <div className="flex items-center justify-between gap-1.5">
-                                  <div className="flex items-center gap-1.5 min-w-0">
-                                    <Bot className="w-3 h-3 text-primary shrink-0" />
-                                    <span className="text-[9px] font-semibold text-slate-500 truncate">{log.query ? `"${log.query.substring(0, 30)}..."` : "No query"}</span>
-                                  </div>
-                                  <div className="flex items-center gap-1.5 shrink-0">
-                                    <span className="text-[9px] text-slate-500 font-semibold whitespace-nowrap">{relativeTime(log.timestamp)}</span>
-                                    <span className={`px-1.5 py-0.5 rounded-full text-[7px] font-bold uppercase border ${isSafe ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"}`}>
-                                      {isSafe ? "Success" : "Alert"}
-                                    </span>
-                                  </div>
+                                  <span className="text-[10px] font-semibold truncate" style={{ color: 'var(--text)' }}>
+                                    {log.query ? `"${log.query.substring(0, 30)}…"` : "No query"}
+                                  </span>
+                                  <span className="px-1.5 py-0.5 rounded-full text-[7px] font-black uppercase shrink-0"
+                                    style={isSafe
+                                      ? { background: 'rgba(34,197,94,0.10)', color: '#16a34a', border: '1px solid rgba(34,197,94,0.25)' }
+                                      : { background: 'rgba(239,68,68,0.10)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
+                                    {isSafe ? "OK" : "Alert"}
+                                  </span>
                                 </div>
-                                <div className="flex items-center gap-2 text-[9px] text-slate-500 font-semibold">
+                                <div className="flex items-center gap-2 text-[9px]" style={{ color: 'var(--muted)' }}>
                                   <span>{log.model || "—"}</span>
-                                  <span className="w-px h-2.5 bg-slate-800/50" />
+                                  <span className="w-px h-2.5" style={{ background: 'var(--border)' }} />
                                   <span>{log.duration ? `${(log.duration / 1000).toFixed(1)}s` : "—"}</span>
-                                  <span className="w-px h-2.5 bg-slate-800/50" />
+                                  <span className="w-px h-2.5" style={{ background: 'var(--border)' }} />
                                   <span>{log.tokens ? `${log.tokens} tok` : "—"}</span>
                                 </div>
                               </div>
-
                               {isExpanded && (
-                                <div className="mt-2.5 pt-2.5 border-t border-slate-800/50 space-y-2.5 text-[9px]">
+                                <div className="mt-2.5 pt-2.5 space-y-2 text-[9px]" style={{ borderTop: '1px solid var(--border)' }}>
                                   <div>
-                                    <span className="text-primary font-bold uppercase tracking-widest text-[7px] block mb-1">Tier 1 Retrieval</span>
-                                    <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/50 space-y-1">
-                                      <p className="text-slate-400 font-semibold">• {log.retrievedContext?.profile?.fullName || "—"} ({log.retrievedContext?.profile?.gender || "—"}, diet: {log.retrievedContext?.profile?.dietaryPreferences?.join(", ") || "—"})</p>
-                                      <p className="text-slate-400 font-semibold">• HR {log.retrievedContext?.vitals?.heartRate}, Steps {log.retrievedContext?.vitals?.steps}</p>
-                                      <p className="text-slate-400 font-semibold">• Meds: {log.retrievedContext?.medications?.length || 0} active</p>
-                                    </div>
+                                    <span className="text-[7px] font-black uppercase tracking-widest block mb-1" style={{ color: 'var(--violet)' }}>T1 Profile</span>
+                                    <p style={{ color: 'var(--text-dim)' }}>{log.retrievedContext?.profile?.fullName || "—"} · HR {log.retrievedContext?.vitals?.heartRate} · Meds: {log.retrievedContext?.medications?.length || 0}</p>
                                   </div>
                                   <div>
-                                    <span className="text-secondary font-bold uppercase tracking-widest text-[7px] block mb-1">Tier 2 Semantic</span>
-                                    <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/50">
-                                      {log.retrievedContext?.files && log.retrievedContext.files.length > 0 ? (
-                                        log.retrievedContext.files.map((f: any, idx: number) => (
-                                          <p key={idx} className="text-slate-400 font-semibold">• {f.name} ({(f.similarity * 100).toFixed(0)}%)</p>
+                                    <span className="text-[7px] font-black uppercase tracking-widest block mb-1" style={{ color: 'var(--indigo)' }}>T2 Files</span>
+                                    {log.retrievedContext?.files?.length > 0
+                                      ? log.retrievedContext.files.map((f: any, idx: number) => (
+                                          <p key={idx} style={{ color: 'var(--text-dim)' }}>• {f.name} ({(f.similarity * 100).toFixed(0)}%)</p>
                                         ))
-                                      ) : (
-                                        <p className="text-slate-500 italic font-semibold">None matched</p>
-                                      )}
-                                    </div>
+                                      : <p style={{ color: 'var(--muted)' }}>None matched</p>}
                                   </div>
                                   <div>
-                                    <span className="text-rose-400 font-bold uppercase tracking-widest text-[7px] block mb-1">Clinical Safety</span>
-                                    <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/50">
-                                      {!isSafe ? (
-                                        <p className="text-rose-400 font-semibold flex items-start gap-1">
-                                          <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
-                                          {log.safetyWarnings[0]}
-                                        </p>
-                                      ) : (
-                                        <p className="text-emerald-400 font-semibold">✓ All clinical rules passed</p>
-                                      )}
-                                    </div>
+                                    <span className="text-[7px] font-black uppercase tracking-widest block mb-1" style={{ color: '#dc2626' }}>Safety</span>
+                                    {!isSafe
+                                      ? <p style={{ color: '#dc2626' }}>{log.safetyWarnings[0]}</p>
+                                      : <p style={{ color: '#16a34a' }}>✓ All rules passed</p>}
                                   </div>
                                 </div>
                               )}
@@ -1248,16 +1311,19 @@ export default function AIChat({
                         );
                       })
                     ) : (
-                      <div className="flex flex-col items-center justify-center text-center py-16 px-6">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-900/80 border border-slate-800/60 flex items-center justify-center mb-3">
-                          <Activity className="w-5 h-5 text-slate-500" />
-                        </div>
-                        <h4 className="text-xs font-bold text-slate-300 mb-1">{searchAuditQuery || auditFilterChip !== "all" ? "No matching logs" : "No activity yet"}</h4>
-                        <p className="text-[10px] text-slate-500 font-semibold leading-relaxed max-w-[200px]">
-                          {searchAuditQuery || auditFilterChip !== "all" ? "Try adjusting your search." : "Your AI conversations will appear here."}
+                      <div className="flex flex-col items-center justify-center text-center py-12 px-4">
+                        <Activity className="w-8 h-8 mb-2" style={{ color: 'var(--muted)' }} />
+                        <p className="text-[11px] font-black mb-1" style={{ color: 'var(--text)' }}>
+                          {searchAuditQuery || auditFilterChip !== "all" ? "No matching logs" : "No activity yet"}
+                        </p>
+                        <p className="text-[10px]" style={{ color: 'var(--muted)' }}>
+                          {searchAuditQuery || auditFilterChip !== "all" ? "Try adjusting your search." : "AI conversations appear here."}
                         </p>
                         {(searchAuditQuery || auditFilterChip !== "all") && (
-                          <button onClick={() => { setSearchAuditQuery(""); setAuditFilterChip("all"); }} className="mt-3 text-[9px] font-bold text-primary transition-colors">Clear filters</button>
+                          <button onClick={() => { setSearchAuditQuery(""); setAuditFilterChip("all"); }}
+                            className="mt-3 text-[9px] font-bold cursor-pointer" style={{ color: 'var(--violet)' }}>
+                            Clear filters
+                          </button>
                         )}
                       </div>
                     )}
@@ -1265,37 +1331,51 @@ export default function AIChat({
                 </>
               ) : (
                 /* Mobile Diagnostics */
-                <div className="flex-1 overflow-y-auto p-3 space-y-3" id="mobile-diagnostics-panel">
-                  <div className="bg-slate-900/60 p-3 border border-slate-800/50 rounded-xl space-y-2.5">
-                    <h5 className="text-[10px] font-bold uppercase text-slate-200 flex items-center gap-1.5">
-                      <Cpu className="w-3 h-3 text-primary" />
-                      Diagnostics
+                <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                  <div className="p-3 rounded-[12px] space-y-2"
+                    style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                    <h5 className="text-[10px] font-black uppercase flex items-center gap-1.5" style={{ color: 'var(--text)' }}>
+                      <Cpu className="w-3 h-3" style={{ color: 'var(--violet)' }} /> Diagnostics
                     </h5>
-                    <p className="text-[9px] text-slate-500 font-semibold leading-relaxed">Verify Tier 1 and Tier 2 health record parameters before LLM generation.</p>
-                    <button type="button" onClick={runDiagnostics} disabled={runningDiagnostics} className="w-full h-9 rounded-xl bg-primary text-white text-[9px] font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer">
-                      {runningDiagnostics ? <><Loader2 className="w-3 h-3 animate-spin" /> Running...</> : <><Play className="w-3 h-3 fill-current" /> Run Suite</>}
+                    <p className="text-[9px] leading-relaxed" style={{ color: 'var(--text-dim)' }}>
+                      Verify Tier 1 and Tier 2 retrieval before LLM generation.
+                    </p>
+                    <button type="button" onClick={runDiagnostics} disabled={runningDiagnostics}
+                      className="w-full h-9 rounded-[10px] text-white text-[9px] font-black flex items-center justify-center gap-1.5 transition-all disabled:opacity-40 cursor-pointer"
+                      style={{ background: 'var(--grad-btn)' }}>
+                      {runningDiagnostics
+                        ? <><Loader2 className="w-3 h-3 animate-spin" /> Running…</>
+                        : <><Play className="w-3 h-3 fill-current" /> Run Suite</>}
                     </button>
                   </div>
                   {diagnosticError && (
-                    <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[9px] text-rose-400 flex gap-2 items-start font-semibold">
-                      <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
-                      <p>{diagnosticError}</p>
+                    <div className="p-2.5 rounded-[10px] flex gap-2 items-start"
+                      style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.22)' }}>
+                      <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" style={{ color: '#dc2626' }} />
+                      <p className="text-[9px]" style={{ color: '#dc2626' }}>{diagnosticError}</p>
                     </div>
                   )}
                   {diagnosticResult && (
-                    <div className="space-y-2.5">
-                      <div className="flex justify-between items-center bg-slate-900/60 p-2.5 border border-slate-800/50 rounded-xl text-[9px]">
-                        <span className="font-bold text-slate-300">Status:</span>
-                        <span className={`px-2 py-0.5 rounded font-bold text-[8px] uppercase tracking-wider border ${diagnosticResult.success ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"}`}>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center p-2.5 rounded-[10px]"
+                        style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                        <span className="text-[9px] font-black uppercase" style={{ color: 'var(--text-dim)' }}>Status</span>
+                        <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase"
+                          style={diagnosticResult.success
+                            ? { background: 'rgba(34,197,94,0.10)', color: '#16a34a', border: '1px solid rgba(34,197,94,0.25)' }
+                            : { background: 'rgba(239,68,68,0.10)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.25)' }}>
                           {diagnosticResult.success ? "Pass" : "Fail"}
                         </span>
                       </div>
                       {diagnosticResult.steps?.map((step: any, sIdx: number) => (
-                        <div key={sIdx} className="p-2.5 bg-slate-900/60 border border-slate-800/50 rounded-xl flex gap-2 items-start">
-                          {step.status === "pass" ? <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0 mt-0.5" /> : <XCircle className="w-3 h-3 text-rose-400 shrink-0 mt-0.5" />}
+                        <div key={sIdx} className="p-2.5 rounded-[10px] flex gap-2 items-start"
+                          style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                          {step.status === "pass"
+                            ? <CheckCircle2 className="w-3 h-3 shrink-0 mt-0.5" style={{ color: '#22c55e' }} />
+                            : <XCircle className="w-3 h-3 shrink-0 mt-0.5" style={{ color: '#ef4444' }} />}
                           <div className="min-w-0">
-                            <p className="text-[9px] font-bold text-slate-200">{step.name}</p>
-                            <p className="text-[8px] text-slate-500 font-semibold">{step.details}</p>
+                            <p className="text-[9px] font-bold" style={{ color: 'var(--text)' }}>{step.name}</p>
+                            <p className="text-[8px]" style={{ color: 'var(--text-dim)' }}>{step.details}</p>
                           </div>
                         </div>
                       ))}

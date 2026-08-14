@@ -38,24 +38,41 @@ export function useToast() {
   return { toasts, dismiss }
 }
 
-const typeStyles: Record<Toast['type'], string> = {
-  success: 'bg-emerald-600 border-emerald-400',
-  error: 'bg-rose-600 border-rose-400',
-  info: 'bg-primary border-primary/60',
+const typeIcon: Record<Toast['type'], string> = {
+  success: '✓',
+  error: '✕',
+  info: 'i',
+}
+
+const typeAccent: Record<Toast['type'], string> = {
+  success: '#22c55e',
+  error: '#D6409F',
+  info: '#7C3AED',
 }
 
 export function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: string) => void }) {
   if (toasts.length === 0) return null
   return (
-    <div className="fixed top-20 right-4 z-[9999] flex flex-col gap-2 max-w-sm">
+    <div className="fixed top-[68px] right-4 z-[9999] flex flex-col gap-2 max-w-sm w-[320px]">
       {toasts.map(t => (
         <div
           key={t.id}
-          className={`${typeStyles[t.type]} text-white px-4 py-3 rounded-xl shadow-xl border text-sm font-semibold flex items-center justify-between gap-3`}
-          style={{ animation: 'slideIn 0.3s ease-out' }}
+          className="toast-enter flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-semibold"
+          style={{
+            background: 'var(--surface, #fff)',
+            border: `1px solid var(--border, #EAE4F7)`,
+            boxShadow: '0 8px 24px rgba(124,58,237,0.12)',
+            color: 'var(--text, #211935)',
+          }}
         >
-          <span>{t.message}</span>
-          <button onClick={() => dismiss(t.id)} className="text-white/70 hover:text-white text-lg leading-none cursor-pointer">×</button>
+          <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[11px] font-black shrink-0"
+            style={{ background: typeAccent[t.type] }}>
+            {typeIcon[t.type]}
+          </span>
+          <span className="flex-1">{t.message}</span>
+          <button onClick={() => dismiss(t.id)}
+            className="text-lg leading-none cursor-pointer shrink-0"
+            style={{ color: 'var(--muted, #9A92B0)' }}>×</button>
         </div>
       ))}
     </div>

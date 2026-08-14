@@ -1,130 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 @import "tailwindcss";
 
-@variant dark (&:where(.dark, .dark *));
-
 @theme {
-  --color-primary: var(--primary);
-  --color-primary-container: var(--primary-container);
-  --color-secondary: var(--secondary);
-  --color-secondary-container: var(--secondary-container);
-  --color-tertiary: var(--tertiary);
-  --color-on-surface: var(--on-surface);
-  --color-on-surface-variant: var(--on-surface-variant);
-  --color-inverse-surface: var(--inverse-surface);
+  --color-primary: var(--violet);
+  --color-primary-container: var(--violet-pale);
+  --color-secondary: var(--indigo);
+  --color-secondary-container: #ede9fe;
+  --color-tertiary: var(--magenta);
+  --color-on-surface: var(--text);
+  --color-on-surface-variant: var(--text-dim);
+  --color-inverse-surface: var(--surface-2);
 }
 
-:root{
-  --bg:#0B0716;
-  --surface:#17102B99;
-  --surface-solid:#17102B;
-  --surface-raised:#22163D;
-  --border:rgba(199,178,255,0.12);
-  --border-strong:rgba(199,178,255,0.2);
-  --ink:#F7F2FF;
-  --ink-muted:#C5B8E8;
-  --ink-faint:#8D7FB1;
+:root {
+  --bg: #F6F4FC;
+  --surface: #FFFFFF;
+  --surface-2: #FBFAFE;
+  --border: #EAE4F7;
+  --border-strong: #DED4F5;
+  --text: #211935;
+  --text-dim: #6B6280;
+  --muted: #9A92B0;
 
-  --violet:#8B5CF6;
-  --violet-soft:#C4B5FD;
-  --pink:#EC4899;
-  --blue:#6366F1;
-  --green:#22C55E;
-  --orange:#F59E0B;
+  --violet: #7C3AED;
+  --violet-600: #6D28D9;
+  --violet-light: #A78BFA;
+  --violet-pale: #ede9fe;
+  --magenta: #D6409F;
+  --amber: #E8952F;
+  --indigo: #5B5BD6;
+  --green: #22c55e;
+  --blue: #3b82f6;
 
-  --grad-brand: linear-gradient(135deg, #8B5CF6 0%, #6366F1 55%, #EC4899 100%);
-  --grad-text: linear-gradient(90deg, #C4B5FD 0%, #A78BFA 40%, #818CF8 75%, #EC4899 100%);
-  --grad-btn: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%);
-  --shadow: 0 24px 60px -30px rgba(20,7,45,0.75);
+  /* Legacy aliases */
+  --primary: var(--violet);
+  --primary-container: var(--violet-pale);
+  --secondary: var(--indigo);
+  --secondary-container: #ede9fe;
+  --tertiary: var(--magenta);
+  --on-surface: var(--text);
+  --on-surface-variant: var(--text-dim);
+  --inverse-surface: var(--surface-2);
+  --surface-solid: var(--surface);
+  --surface-raised: var(--surface-2);
+  --ink: var(--text);
+  --ink-muted: var(--text-dim);
+  --ink-faint: var(--muted);
+  --pink: var(--magenta);
+  --orange: var(--amber);
+  --violet-soft: var(--violet-light);
+
+  --grad-brand: linear-gradient(135deg, var(--violet) 0%, var(--indigo) 55%, var(--magenta) 100%);
+  --grad-text: linear-gradient(90deg, var(--violet) 0%, var(--indigo) 40%, var(--violet-light) 75%, var(--magenta) 100%);
+  --grad-btn: linear-gradient(135deg, var(--violet) 0%, var(--violet-600) 100%);
+
+  --shadow-sm: 0 2px 8px rgba(124,58,237,0.07), 0 1px 3px rgba(124,58,237,0.05);
+  --shadow-md: 0 8px 24px rgba(124,58,237,0.10), 0 3px 8px rgba(124,58,237,0.06);
+  --shadow-lg: 0 20px 50px -12px rgba(124,58,237,0.18), 0 8px 16px rgba(124,58,237,0.07);
+  --shadow: var(--shadow-md);
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
+/* ── Base ─────────────────────────────────────────────────────────────── */
+html, body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.15); border-radius: 20px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.28); }
+* { scrollbar-width: thin; scrollbar-color: rgba(124,58,237,0.15) transparent; }
+
+/* ── Global keyframes (outside @layer so inline style=animation works) ── */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes draw-beat {
+  0%   { stroke-dashoffset: 60; opacity: 1; }
+  50%  { stroke-dashoffset: 0;  opacity: 1; }
+  100% { stroke-dashoffset: -60; opacity: 0.2; }
+}
+
+@keyframes dot-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(124,58,237,0.55); }
+  65%  { box-shadow: 0 0 0 7px rgba(124,58,237,0); }
+  100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); }
+}
+
+@keyframes travel {
+  0%   { stroke-dashoffset: 1400; }
+  60%  { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -1400; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(24px); }
+}
+
+@keyframes ripple-ring {
+  0%   { transform: scale(1);    opacity: 0.7; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes scan {
+  0%, 100% { top: 5%;  opacity: 0.1; }
+  50%       { top: 95%; opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes beat-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.08); }
+}
+
+/* ── Chat FAB ripple ring ─────────────────────────────────────────────── */
+.chat-fab-ripple {
+  position: relative;
+}
+.chat-fab-ripple::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(124,58,237,0.45);
+  animation: ripple-ring 2.2s ease-out infinite;
+  pointer-events: none;
+}
+
+/* ── Credits dot pulse ────────────────────────────────────────────────── */
+.credits-dot {
+  animation: dot-pulse 1.8s ease-in-out infinite;
+}
+
+/* ── ECG beat path in brand mark ──────────────────────────────────────── */
+.ecg-path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: draw-beat 2.4s ease-in-out infinite;
+}
+
+/* ── Pulse divider travel line ────────────────────────────────────────── */
+.pulse-travel {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: travel 5.5s linear infinite;
+}
+
+/* ── Toast animations ─────────────────────────────────────────────────── */
+.toast-enter {
+  animation: slideIn 0.3s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.toast-exit {
+  animation: slideOut 0.25s ease-in forwards;
+}
+
+/* ── Rise (for Tailwind arbitrary animate) ────────────────────────────── */
+/* animate-[rise_0.7s_ease_forwards_Xs] works because keyframe is global  */
+
+/* ── Utilities ────────────────────────────────────────────────────────── */
 @layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* Hide scrollbar for Chrome
-  --almanac-ink: #221B3A;
-  --almanac-ink-muted: #4A3F66;
-  --almanac-ink-faint: #5E5580;
-  , Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
 
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  .font-serif { font-family: var(--font-serif); }
+  .font-mono  { font-family: var(--font-mono); }
 
-  /* Safe area padding for notched devices */
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  .pt-safe {
-    padding-top: env(safe-area-inset-top, 0px);
-  }
-
-  @keyframes scan {
-
-    0%,
-    100% {
-      top: 5%;
-      opacity: 0.1;
-    }
-
-    50% {
-      top: 95%;
-      opacity: 1;
-    }
-  }
-
-  /* Premium Global Scrollbar Styling */
-  @layer base {
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: rgba(71, 85, 105, 0.2);
-      border-radius: 20px;
-      transition: background 0.3s ease;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(71, 85, 105, 0.4);
-    }
-
-    .dark ::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.2);
-    }
-
-    .dark ::-webkit-scrollbar-thumb:hover {
-      background: rgba(148, 163, 184, 0.4);
-    }
-
-    /* Firefox */
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: rgba(71, 85, 105, 0.2) transparent;
-    }
-  }
-
-  @keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  .animate-gradient {
-    animation: gradient-shift 3s ease infinite;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(40px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
+  .animate-gradient { animation: gradient-shift 3s ease infinite; }
 }

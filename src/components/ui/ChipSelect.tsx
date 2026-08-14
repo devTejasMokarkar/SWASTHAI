@@ -44,7 +44,7 @@ export function ChipSelect({
   return (
     <div className={`space-y-1.5 ${className}`}>
       {label && (
-        <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+        <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
           {label}
         </label>
       )}
@@ -64,8 +64,8 @@ export function ChipSelect({
                 size === "sm" ? "text-[10px]" : "text-xs"
               } ${
                 active
-                  ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                  : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
+                  ? "bg-primary/10 border-primary/40 text-primary"
+                  : "bg-slate-50 border-slate-200 text-on-surface-variant hover:border-primary/50 hover:bg-slate-100"
               }`}
             >
               {opt}

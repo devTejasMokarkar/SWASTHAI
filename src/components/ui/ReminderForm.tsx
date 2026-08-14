@@ -102,7 +102,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
   if (reminders.length === 0) {
     return (
       <button type="button" onClick={add}
-        className="w-full h-8 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-[10px] font-bold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-1 cursor-pointer">
+        className="w-full h-8 border-2 border-dashed border-slate-300 rounded-lg text-[10px] font-bold text-on-surface-variant hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-1 cursor-pointer">
         <Bell className="w-3 h-3" />
         Add Medication Reminder
       </button>
@@ -111,7 +111,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
 
   return (
     <div className="space-y-1.5">
-      <label className="text-[9px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+      <label className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-1.5">
         <Bell className="w-3 h-3" />
         Medication Reminder{reminders.length > 1 ? "s" : ""}
         <span className="text-primary font-semibold">({reminders.length})</span>
@@ -127,7 +127,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
           const summary = `${rem.times[0] || "—"} • ${rem.frequency}${rem.foodRelation !== "Any Time" ? ` • ${rem.foodRelation}` : ""}`
 
           return (
-            <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+            <div key={i} className="bg-white border border-slate-200 rounded-lg overflow-hidden">
               {isExpanded ? (
                 <div className="p-2.5 space-y-2">
                   <div className="flex items-center justify-between">
@@ -139,7 +139,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                       <span className="text-[9px] font-bold text-primary uppercase">Reminder #{i + 1}</span>
                     </div>
                     <button type="button" onClick={() => remove(i)}
-                      className="p-0.5 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded text-slate-400 hover:text-rose-500 transition-colors cursor-pointer">
+                      className="p-0.5 hover:bg-rose-50 rounded text-slate-400 hover:text-rose-500 transition-colors cursor-pointer">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -148,13 +148,13 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                     <div className="col-span-2 space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Reminder Name</label>
                       <input type="text" value={rem.reminderName} onChange={e => update(i, "reminderName", e.target.value)}
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
                     </div>
 
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Frequency</label>
                       <select value={rem.frequency} onChange={e => { const v = e.target.value; update(i, "frequency", v); syncTimesToFrequency(i, v) }}
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
                         {FREQUENCIES.map(f => <option key={f} value={f}>{f}</option>)}
                       </select>
                     </div>
@@ -162,7 +162,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Food Relation</label>
                       <select value={rem.foodRelation} onChange={e => update(i, "foodRelation", e.target.value)}
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
                         {FOOD_RELATIONS.map(f => <option key={f} value={f}>{f}</option>)}
                       </select>
                     </div>
@@ -174,7 +174,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                       {rem.times.map((t, tIdx) => (
                         <div key={tIdx} className="flex items-center gap-0.5">
                           <input type="time" value={t} onChange={e => updateTime(i, tIdx, e.target.value)}
-                            className="w-[100px] h-7 px-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
+                            className="w-[100px] h-7 px-2 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
                           {rem.times.length > 1 && (
                             <button type="button" onClick={() => removeTime(i, tIdx)}
                               className="p-0.5 text-slate-400 hover:text-rose-500 cursor-pointer">
@@ -185,7 +185,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                       ))}
                       {rem.frequency === "Custom" && (
                         <button type="button" onClick={() => addTime(i)}
-                          className="h-7 px-2 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-[9px] text-slate-400 hover:text-primary hover:border-primary/50 transition-all flex items-center gap-0.5 cursor-pointer">
+                          className="h-7 px-2 border border-dashed border-slate-300 rounded-lg text-[9px] text-slate-400 hover:text-primary hover:border-primary/50 transition-all flex items-center gap-0.5 cursor-pointer">
                           <Plus className="w-2.5 h-2.5" /> Add
                         </button>
                       )}
@@ -200,7 +200,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                           const active = rem.mealSelection.includes(m)
                           return (
                             <button key={m} type="button" onClick={() => toggleMeal(i, m)}
-                              className={`px-2 h-6 rounded-lg border text-[8px] font-bold transition-all cursor-pointer ${active ? "bg-primary/10 border-primary/40 text-primary" : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-on-surface-variant dark:text-slate-400"}`}>
+                              className={`px-2 h-6 rounded-lg border text-[8px] font-bold transition-all cursor-pointer ${active ? "bg-primary/10 border-primary/40 text-primary" : "bg-slate-50 border-slate-200 text-on-surface-variant"}`}>
                               {m}
                             </button>
                           )
@@ -213,14 +213,14 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Start Date</label>
                       <input type="date" value={rem.startDate} onChange={e => update(i, "startDate", e.target.value)}
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
                     </div>
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">End Date</label>
                       <div className="flex items-center gap-1">
                         <input type="date" value={rem.endDate || ""} onChange={e => update(i, "endDate", e.target.value || null)}
                           disabled={rem.noEndDate}
-                          className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold disabled:opacity-40" />
+                          className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold disabled:opacity-40" />
                         <label className="flex items-center gap-1 text-[8px] text-on-surface-variant cursor-pointer shrink-0">
                           <input type="checkbox" checked={rem.noEndDate} onChange={e => update(i, "noEndDate", e.target.checked)}
                             className="rounded text-primary w-3 h-3" />
@@ -237,7 +237,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                         const active = rem.repeatDays.includes(d)
                         return (
                           <button key={d} type="button" onClick={() => toggleDay(i, d)}
-                            className={`w-7 h-6 rounded-lg text-[8px] font-bold transition-all cursor-pointer ${active ? "bg-primary/10 border border-primary/40 text-primary" : "bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface-variant dark:text-slate-400"}`}>
+                            className={`w-7 h-6 rounded-lg text-[8px] font-bold transition-all cursor-pointer ${active ? "bg-primary/10 border border-primary/40 text-primary" : "bg-slate-50 border border-slate-200 text-on-surface-variant"}`}>
                             {d}
                           </button>
                         )
@@ -249,14 +249,14 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Snooze (min)</label>
                       <select value={rem.snooze} onChange={e => update(i, "snooze", Number(e.target.value))}
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
                         {SNOOZE_OPTIONS.map(s => <option key={s} value={s}>{s} min</option>)}
                       </select>
                     </div>
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Sound</label>
                       <select value={rem.notificationSound} onChange={e => update(i, "notificationSound", e.target.value)}
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
                         <option value="default">Default</option>
                         <option value="gentle">Gentle Chime</option>
                         <option value="urgent">Urgent</option>
@@ -268,7 +268,7 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                   <div className="space-y-0.5">
                     <label className="text-[8px] font-bold text-on-surface-variant uppercase">Notes <span className="font-normal normal-case">(optional)</span></label>
                     <input type="text" value={rem.notes} onChange={e => update(i, "notes", e.target.value)} placeholder="Take with plenty of water"
-                      className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
+                      className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
                   </div>
 
                   <label className="flex items-center gap-1.5 cursor-pointer pt-0.5">
@@ -279,11 +279,11 @@ export function ReminderForm({ reminders, onChange, medicationName, activeDiseas
                 </div>
               ) : (
                 <button type="button" onClick={() => setExpandedIndex(i)}
-                  className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-slate-50 dark:hover:bg-slate-950 transition-colors cursor-pointer text-left">
+                  className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-slate-50 transition-colors cursor-pointer text-left">
                   <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />
                   <Clock className="w-3 h-3 text-primary shrink-0" />
-                  <span className="text-[10px] font-semibold text-on-surface dark:text-slate-200 truncate flex-1">{summary}</span>
-                  <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${rem.enabled ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600" : "bg-slate-100 dark:bg-slate-800 text-slate-400"}`}>
+                  <span className="text-[10px] font-semibold text-on-surface truncate flex-1">{summary}</span>
+                  <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${rem.enabled ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-400"}`}>
                     {rem.enabled ? "On" : "Off"}
                   </span>
                 </button>

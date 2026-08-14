@@ -55,7 +55,7 @@ function ProgressDots({ stage }: { stage: ScanStage }) {
               ? "w-8 bg-primary"
               : i === activeIdx
               ? "w-12 bg-primary animate-pulse"
-              : "w-4 bg-slate-200 dark:bg-slate-800"
+              : "w-4 bg-slate-200"
           }`}
         />
       ))}
@@ -174,16 +174,16 @@ export default function ScanUploadModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 60, scale: 0.96 }}
             transition={{ type: "spring", damping: 28, stiffness: 340 }}
-            className="relative w-full sm:max-w-md bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border-0 sm:border border-slate-200 dark:border-slate-800 overflow-hidden"
+            className="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border-0 sm:border border-slate-200 overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Scan className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold text-on-surface dark:text-slate-100 leading-tight">
+                  <h2 className="text-base font-extrabold text-on-surface leading-tight">
                     {mode === "choose"
                       ? "Scan & Upload"
                       : mode === "medicine"
@@ -199,7 +199,7 @@ export default function ScanUploadModal({
               </div>
               <button
                 onClick={handleClose}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                className="p-2 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5 text-on-surface-variant" />
               </button>
@@ -223,7 +223,7 @@ export default function ScanUploadModal({
                       <button
                         key={m.id}
                         onClick={() => setMode(m.id)}
-                        className={`w-full flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-primary/40 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all group cursor-pointer text-left`}
+                        className={`w-full flex items-center gap-4 p-4 rounded-2xl border border-slate-200 hover:border-primary/40 hover:bg-primary/5 transition-all group cursor-pointer text-left`}
                       >
                         <div
                           className={`w-11 h-11 rounded-xl bg-gradient-to-br ${m.color} flex items-center justify-center shadow-lg ${m.glow} flex-shrink-0`}
@@ -231,7 +231,7 @@ export default function ScanUploadModal({
                           <m.icon className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-on-surface dark:text-slate-100">
+                          <p className="text-sm font-bold text-on-surface">
                             {m.label}
                           </p>
                           <p className="text-[11px] text-on-surface-variant truncate">
@@ -261,9 +261,9 @@ export default function ScanUploadModal({
                         ← Back
                       </button>
                     </div>
-                    <div className="bg-violet-50 dark:bg-violet-950/20 rounded-2xl p-4 flex items-start gap-3">
+                    <div className="bg-violet-50 rounded-2xl p-4 flex items-start gap-3">
                       <FlaskConical className="w-5 h-5 text-violet-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-violet-700 dark:text-violet-300 font-medium">
+                      <p className="text-sm text-violet-700 font-medium">
                         Type the medicine name to check interactions and safety info.
                       </p>
                     </div>
@@ -278,7 +278,7 @@ export default function ScanUploadModal({
                         onChange={(e) => setTextInput(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleTextScan()}
                         autoFocus
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-on-surface focus:outline-none focus:border-primary text-sm font-semibold"
                       />
                     </div>
                     <button
@@ -316,14 +316,14 @@ export default function ScanUploadModal({
                       className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center gap-3 cursor-pointer transition-all ${
                         dragOver
                           ? "border-primary bg-primary/5"
-                          : "border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                          : "border-slate-200 hover:border-primary/50 hover:bg-slate-50"
                       }`}
                     >
                       <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
                         <Upload className="w-7 h-7 text-primary" />
                       </div>
                       <div className="text-center">
-                        <p className="text-sm font-bold text-on-surface dark:text-slate-100">
+                        <p className="text-sm font-bold text-on-surface">
                           Drop file here or click to browse
                         </p>
                         <p className="text-[11px] text-on-surface-variant mt-1">
@@ -373,7 +373,7 @@ export default function ScanUploadModal({
                       </div>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-on-surface dark:text-slate-100">{stageLabel}</p>
+                      <p className="text-sm font-bold text-on-surface">{stageLabel}</p>
                       {fileName && (
                         <p className="text-[11px] text-on-surface-variant mt-1 truncate max-w-[220px]">{fileName}</p>
                       )}
@@ -391,25 +391,25 @@ export default function ScanUploadModal({
                     exit={{ opacity: 0 }}
                     className="space-y-4"
                   >
-                    <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-900/30">
+                    <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl border border-emerald-200">
                       <CheckCircle2 className="w-6 h-6 text-emerald-500 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                        <p className="text-sm font-bold text-emerald-700">
                           Analysis complete
                         </p>
                         {fileName && (
-                          <p className="text-[11px] text-emerald-600/70 dark:text-emerald-500/60 truncate">{fileName}</p>
+                          <p className="text-[11px] text-emerald-600/70 truncate">{fileName}</p>
                         )}
                       </div>
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-200 dark:border-slate-800">
+                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200">
                       <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">AI Insights</p>
-                      <p className="text-sm text-on-surface dark:text-slate-200 leading-relaxed">{result}</p>
+                      <p className="text-sm text-on-surface leading-relaxed">{result}</p>
                     </div>
                     <div className="flex gap-3">
                       <button
                         onClick={reset}
-                        className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-bold text-on-surface dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-on-surface hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         Scan another
                       </button>

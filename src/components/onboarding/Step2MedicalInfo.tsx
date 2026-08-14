@@ -78,23 +78,23 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-base font-extrabold text-on-surface dark:text-slate-100">
+        <h2 className="text-base font-extrabold text-on-surface">
           Help us understand your health
         </h2>
-        <p className="text-[11px] text-on-surface-variant dark:text-slate-400">
+        <p className="text-[11px] text-on-surface-variant">
           This information improves AI accuracy.
         </p>
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+        <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
           Active Diseases / Conditions
         </label>
         <div ref={diseasesRef} className="relative">
           <button
             type="button"
             onClick={() => setShowDiseaseDropdown(!showDiseaseDropdown)}
-            className="w-full min-h-[40px] px-4 py-2.5 flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-left text-sm font-semibold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 transition-all cursor-pointer"
+            className="w-full min-h-[40px] px-4 py-2.5 flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl text-left text-sm font-semibold text-on-surface-variant hover:border-primary/50 transition-all cursor-pointer"
           >
             <span className="flex-1 truncate">
               {data.activeDiseases.length > 0
@@ -105,15 +105,15 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
           </button>
 
           {showDiseaseDropdown && (
-            <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl overflow-hidden">
-              <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+            <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
                 <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 <input
                   type="text"
                   value={diseaseSearch}
                   onChange={e => setDiseaseSearch(e.target.value)}
                   placeholder="Search conditions..."
-                  className="flex-1 bg-transparent text-xs font-semibold text-on-surface dark:text-slate-200 outline-none placeholder:text-slate-400"
+                  className="flex-1 bg-transparent text-xs font-semibold text-on-surface outline-none placeholder:text-slate-400"
                   autoFocus
                 />
               </div>
@@ -125,14 +125,14 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
                       key={disease}
                       type="button"
                       onClick={() => toggleDisease(disease)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors text-left cursor-pointer"
                     >
                       <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                        active ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"
+                        active ? "bg-primary border-primary" : "border-slate-300"
                       }`}>
                         {active && <Check className="w-3 h-3 text-white" />}
                       </div>
-                      <span className="text-xs font-semibold text-on-surface dark:text-slate-200">{disease}</span>
+                      <span className="text-xs font-semibold text-on-surface">{disease}</span>
                     </button>
                   )
                 })}
@@ -149,7 +149,7 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
                         }
                       }}
                       placeholder="Add custom condition..."
-                      className="flex-1 h-8 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold outline-none focus:border-primary"
+                      className="flex-1 h-8 px-3 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold outline-none focus:border-primary"
                     />
                   </div>
                 )}
@@ -162,7 +162,7 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
           <div className="flex flex-wrap gap-1">
             {data.activeDiseases.map(d => (
               <span key={d}
-                className="inline-flex items-center gap-1 h-[32px] px-2.5 bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-full text-[10px] font-bold text-primary"
+                className="inline-flex items-center gap-1 h-[32px] px-2.5 bg-primary/10 border border-primary/30 rounded-full text-[10px] font-bold text-primary"
               >
                 {d}
                 <button type="button" onClick={() => removeDisease(d)} className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer">
@@ -175,7 +175,7 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+        <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
           Medical History & Allergies
         </label>
         <textarea
@@ -184,9 +184,9 @@ export function Step2MedicalInfo({ data, onChange }: Step2Props) {
           onChange={e => { update("medicalHistory", e.target.value); autoResize() }}
           placeholder="E.g. Diabetes Type 2 diagnosed in 2021, penicillin allergy, appendix surgery in 2018, family history of hypertension..."
           rows={2}
-          className="w-full px-4 py-2.5 bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 outline-none font-semibold text-sm resize-y min-h-[64px] cursor-text"
+          className="w-full px-4 py-2.5 bg-white border-2 border-slate-200 text-on-surface rounded-xl focus:border-primary focus:bg-white outline-none font-semibold text-sm resize-y min-h-[64px] cursor-text"
         />
-        <p className="text-[10px] text-on-surface-variant dark:text-slate-500 italic">
+        <p className="text-[10px] text-on-surface-variant italic">
           Include previous illnesses, surgeries, allergies, family medical history, or chronic conditions.
         </p>
       </div>

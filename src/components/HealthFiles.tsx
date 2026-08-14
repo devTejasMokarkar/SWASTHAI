@@ -237,9 +237,9 @@ export default function HealthFiles({
     ];
 
     return (
-      <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-5 rounded-3xl shadow-sm space-y-4">
-        <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="font-extrabold text-sm text-on-surface dark:text-slate-100 flex items-center gap-1.5">
+      <div className="bg-white/85 border border-slate-100 p-5 rounded-3xl shadow-sm space-y-4">
+        <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+          <h3 className="font-extrabold text-sm text-on-surface flex items-center gap-1.5">
             <Calendar className="w-4 h-4 text-pink-500" />
             Vitals Calendar
           </h3>
@@ -247,18 +247,18 @@ export default function HealthFiles({
             <button
               onClick={prevMonth}
               type="button"
-              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
               title="Previous Month"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-xs font-extrabold text-on-surface dark:text-slate-100 px-1 min-w-[90px] text-center">
+            <span className="text-xs font-extrabold text-on-surface px-1 min-w-[90px] text-center">
               {monthNames[month]} {year}
             </span>
             <button
               onClick={nextMonth}
               type="button"
-              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
               title="Next Month"
             >
               <ChevronRight className="w-4 h-4" />
@@ -267,7 +267,7 @@ export default function HealthFiles({
         </div>
 
         {/* Days grid */}
-        <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 dark:text-slate-500">
+        <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400">
           {weekdays.map((wd) => (
             <div key={wd} className="py-1">
               {wd}
@@ -307,8 +307,8 @@ export default function HealthFiles({
                   isSelected
                     ? "bg-pink-500 text-white font-black shadow-md shadow-pink-500/10"
                     : hasReadings
-                    ? "bg-pink-500/5 hover:bg-pink-500/10 text-on-surface dark:text-slate-100"
-                    : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    ? "bg-pink-500/5 hover:bg-pink-500/10 text-on-surface"
+                    : "hover:bg-slate-100 text-slate-600"
                 }`}
               >
                 <span className="text-xs">{dayNum}</span>
@@ -327,7 +327,7 @@ export default function HealthFiles({
             );
           })}
         </div>
-        <div className="flex justify-between items-center text-[9px] font-bold text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/60">
+        <div className="flex justify-between items-center text-[9px] font-bold text-slate-400 pt-2 border-t border-slate-100">
           <span className="flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span>
             Glucose Logs
@@ -351,28 +351,28 @@ export default function HealthFiles({
     return (
       <div className="space-y-8 animate-in fade-in duration-400" id="vitals-dashboard-container">
         {/* Vitals Controls Header panel */}
-        <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-6 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+        <div className="bg-white/85 border border-slate-100 p-6 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
           <div className="space-y-1">
-            <h2 className="text-2xl font-black text-on-surface dark:text-slate-100 flex items-center gap-2">
+            <h2 className="text-2xl font-black text-on-surface flex items-center gap-2">
               <Activity className="w-6 h-6 text-pink-500 animate-pulse" />
               Vitals Analysis & History
             </h2>
-            <p className="text-xs text-on-surface-variant dark:text-slate-400">
+            <p className="text-xs text-on-surface-variant">
               Track cardiovascular and glucose metrics with real-time safety classification.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2.5 items-center">
             {/* Time Window Buttons */}
-            <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/40 dark:border-slate-800/40">
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200/40">
               {(["7d", "30d", "90d"] as const).map((win) => (
                 <button
                   key={win}
                   onClick={() => setVitalsTimeWindow(win)}
                   className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                     vitalsTimeWindow === win
-                      ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm font-extrabold"
-                      : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                      ? "bg-white text-pink-500 shadow-sm font-extrabold"
+                      : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
                   {win === "7d" ? "7 Days" : win === "30d" ? "30 Days" : "90 Days"}
@@ -396,26 +396,26 @@ export default function HealthFiles({
         {/* Dynamic Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Blood Sugar Curve */}
-          <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm flex flex-col justify-between min-h-[280px] sm:min-h-[360px]">
+          <div className="bg-white/85 border border-slate-100 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm flex flex-col justify-between min-h-[280px] sm:min-h-[360px]">
             <div>
               <div className="flex justify-between items-start mb-3 sm:mb-4">
                 <div className="space-y-1">
-                  <h3 className="font-extrabold text-sm sm:text-base text-on-surface dark:text-slate-100 flex items-center gap-2">
+                  <h3 className="font-extrabold text-sm sm:text-base text-on-surface flex items-center gap-2">
                     <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-pink-500 rounded-full inline-block animate-pulse"></span>
                     Blood Glucose Trend
                   </h3>
-                  <p className="text-[10px] sm:text-[11px] text-on-surface-variant dark:text-slate-400">
+                  <p className="text-[10px] sm:text-[11px] text-on-surface-variant">
                     Circadian targets adapt based on selected contexts.
                   </p>
                 </div>
 
                 {/* Sugar Context Filter Dropdown */}
-                <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 py-1.5 px-3 rounded-xl border border-slate-200/40 dark:border-slate-800/40">
+                <div className="flex items-center gap-1.5 bg-slate-50 py-1.5 px-3 rounded-xl border border-slate-200/40">
                   <Filter className="w-3.5 h-3.5 text-slate-400" />
                   <select
                     value={vitalsContextFilter}
                     onChange={(e) => setVitalsContextFilter(e.target.value)}
-                    className="bg-transparent border-none text-[11px] font-bold text-slate-500 dark:text-slate-300 outline-none focus:ring-0 cursor-pointer text-xs"
+                    className="bg-transparent border-none text-[11px] font-bold text-slate-500 outline-none focus:ring-0 cursor-pointer text-xs"
                   >
                     <option value="All">All Contexts</option>
                     <option value="Fasting">Fasting Only</option>
@@ -430,7 +430,7 @@ export default function HealthFiles({
                 <div className="h-[220px] w-full pt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={sugarData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:stroke-slate-800/40" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                       <XAxis dataKey="formattedDate" tick={{ fontSize: 9 }} stroke="#94a3b8" />
                       <YAxis domain={["auto", "auto"]} tick={{ fontSize: 9 }} stroke="#94a3b8" />
                       <Tooltip 
@@ -451,7 +451,7 @@ export default function HealthFiles({
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[220px] flex flex-col items-center justify-center text-center text-slate-400 dark:text-slate-600 gap-2 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                <div className="h-[220px] flex flex-col items-center justify-center text-center text-slate-400 gap-2 border border-dashed border-slate-200 rounded-2xl">
                   <Activity className="w-8 h-8 opacity-40 animate-pulse" />
                   <p className="text-xs font-semibold">No Blood Glucose logs found for this window.</p>
                 </div>
@@ -460,15 +460,15 @@ export default function HealthFiles({
           </div>
 
           {/* Blood Pressure Curves */}
-          <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm flex flex-col justify-between min-h-[280px] sm:min-h-[360px]">
+          <div className="bg-white/85 border border-slate-100 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm flex flex-col justify-between min-h-[280px] sm:min-h-[360px]">
             <div>
               <div className="flex justify-between items-start mb-3 sm:mb-4">
                 <div className="space-y-1">
-                  <h3 className="font-extrabold text-sm sm:text-base text-on-surface dark:text-slate-100 flex items-center gap-2">
+                  <h3 className="font-extrabold text-sm sm:text-base text-on-surface flex items-center gap-2">
                     <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-rose-500 rounded-full inline-block animate-pulse"></span>
                     Blood Pressure Dynamics
                   </h3>
-                  <p className="text-[10px] sm:text-[11px] text-on-surface-variant dark:text-slate-400">
+                  <p className="text-[10px] sm:text-[11px] text-on-surface-variant">
                     Tracks both systolic and diastolic ranges simultaneously.
                   </p>
                 </div>
@@ -478,7 +478,7 @@ export default function HealthFiles({
                 <div className="h-[220px] w-full pt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={bpData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:stroke-slate-800/40" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                       <XAxis dataKey="formattedDate" tick={{ fontSize: 9 }} stroke="#94a3b8" />
                       <YAxis domain={["auto", "auto"]} tick={{ fontSize: 9 }} stroke="#94a3b8" />
                       <Tooltip 
@@ -506,7 +506,7 @@ export default function HealthFiles({
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[220px] flex flex-col items-center justify-center text-center text-slate-400 dark:text-slate-600 gap-2 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                <div className="h-[220px] flex flex-col items-center justify-center text-center text-slate-400 gap-2 border border-dashed border-slate-200 rounded-2xl">
                   <Activity className="w-8 h-8 opacity-40" />
                   <p className="text-xs font-semibold">No Blood Pressure logs found for this window.</p>
                 </div>
@@ -523,9 +523,9 @@ export default function HealthFiles({
             {renderCalendar()}
 
             {/* Reminders sub-panel */}
-            <div className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-6 rounded-3xl shadow-sm space-y-4">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
-                <h3 className="font-extrabold text-sm text-on-surface dark:text-slate-100 flex items-center gap-1.5">
+            <div className="bg-white/85 border border-slate-100 p-6 rounded-3xl shadow-sm space-y-4">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                <h3 className="font-extrabold text-sm text-on-surface flex items-center gap-1.5">
                   <Bell className="w-4 h-4 text-pink-500" />
                   Vitals Checking Reminders
                 </h3>
@@ -538,7 +538,7 @@ export default function HealthFiles({
                     setNewReminderDayOfMonth(1);
                     setShowAddReminderModal(true);
                   }}
-                  className="p-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-pink-500 hover:text-pink-600 transition-colors cursor-pointer"
+                  className="p-1 hover:bg-slate-50 rounded-lg text-pink-500 hover:text-pink-600 transition-colors cursor-pointer"
                   title="Create a new checking reminder"
                 >
                   <Plus className="w-5 h-5" />
@@ -550,30 +550,30 @@ export default function HealthFiles({
                   vitalsReminders.map((rem) => (
                     <div
                       key={rem.id}
-                      className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/40 rounded-xl flex items-center justify-between animate-in fade-in duration-200"
+                      className="p-3 bg-slate-50 border border-slate-200/40 rounded-xl flex items-center justify-between animate-in fade-in duration-200"
                     >
                       <div className="space-y-1 min-w-0 flex-1 pr-2">
                         <div className="flex items-center gap-1.5">
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${rem.type === "blood_sugar" ? "bg-pink-500" : "bg-rose-500"}`}></span>
-                          <p className="text-xs font-extrabold text-on-surface dark:text-slate-100 truncate" title={rem.label}>{rem.label}</p>
+                          <p className="text-xs font-extrabold text-on-surface truncate" title={rem.label}>{rem.label}</p>
                         </div>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold flex flex-wrap items-center gap-1.5 leading-none">
+                          <span className="text-[10px] text-slate-400 font-bold flex flex-wrap items-center gap-1.5 leading-none">
                           <Clock className="w-3 h-3 shrink-0" />
                           <span>{rem.time}</span>
-                          <span className="text-slate-300 dark:text-slate-700">•</span>
-                          <span className="capitalize text-pink-500 dark:text-pink-400 font-extrabold">{rem.frequency || "daily"}</span>
+                          <span className="text-slate-300">•</span>
+                          <span className="capitalize text-pink-500 font-extrabold">{rem.frequency || "daily"}</span>
                           {rem.frequency === "weekly" && rem.days && rem.days.length < 7 && (
                             <>
-                              <span className="text-slate-300 dark:text-slate-700">•</span>
-                              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[140px]" title={rem.days.join(", ")}>
+                              <span className="text-slate-300">•</span>
+                              <span className="text-[9px] text-slate-500 font-medium truncate max-w-[140px]" title={rem.days.join(", ")}>
                                 {rem.days.join(", ")}
                               </span>
                             </>
                           )}
                           {rem.frequency === "monthly" && rem.dayOfMonth && (
                             <>
-                              <span className="text-slate-300 dark:text-slate-700">•</span>
-                              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-medium">
+                              <span className="text-slate-300">•</span>
+                              <span className="text-[9px] text-slate-500 font-medium">
                                 Day {rem.dayOfMonth}
                               </span>
                             </>
@@ -588,8 +588,8 @@ export default function HealthFiles({
                           onClick={() => onToggleVitalReminder && onToggleVitalReminder(rem.id)}
                           className={`text-[10px] font-bold px-2 py-1 rounded-md transition-all cursor-pointer ${
                             rem.active !== false
-                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                              : "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                              ? "bg-emerald-500/10 text-emerald-600"
+                              : "bg-slate-100 text-slate-400"
                           }`}
                         >
                           {rem.active !== false ? "Active" : "Paused"}
@@ -599,7 +599,7 @@ export default function HealthFiles({
                         <button
                           type="button"
                           onClick={() => onDeleteReminder && onDeleteReminder(rem.id)}
-                          className="p-1 text-slate-400 dark:text-slate-500 hover:text-red-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                          className="p-1 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -607,7 +607,7 @@ export default function HealthFiles({
                     </div>
                   ))
                 ) : (
-                  <div className="py-8 text-center text-slate-400 dark:text-slate-600 text-xs">
+                  <div className="py-8 text-center text-slate-400 text-xs">
                     No active vitals reminders. Click + to schedule.
                   </div>
                 )}
@@ -616,9 +616,9 @@ export default function HealthFiles({
           </div>
 
           {/* History table list (2/3 width) */}
-          <div className="lg:col-span-2 bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/80 p-6 rounded-3xl shadow-sm flex flex-col justify-between">
+          <div className="lg:col-span-2 bg-white/85 border border-slate-100 p-6 rounded-3xl shadow-sm flex flex-col justify-between">
             <div>
-              <h3 className="font-extrabold text-sm text-on-surface dark:text-slate-100 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-1.5">
+              <h3 className="font-extrabold text-sm text-on-surface mb-4 pb-2 border-b border-slate-100 flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-pink-500" />
                 Raw Electronic Clinical Logs
               </h3>
@@ -628,10 +628,10 @@ export default function HealthFiles({
                 <div className="mb-4 p-3 bg-pink-500/10 border border-pink-500/25 rounded-2xl flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse"></span>
-                    <span className="text-xs font-bold text-pink-600 dark:text-pink-400">
+                    <span className="text-xs font-bold text-pink-600">
                       Filtered: {selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
-                          <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">
+                          <span className="text-xs text-slate-400 font-bold">
                       ({vitalsReadings.filter((r) => {
                         const rDate = new Date(r.timestamp);
                         return (
@@ -655,7 +655,7 @@ export default function HealthFiles({
               <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-bold">
+                    <tr className="border-b border-slate-100 text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                       <th className="py-1.5 sm:py-2 w-[30%] sm:w-[35%] min-w-[80px] sm:min-w-[100px]">Date/Time</th>
                       <th className="py-1.5 sm:py-2 w-[15%]">Type</th>
                       <th className="py-1.5 sm:py-2 text-right w-[20%]">Value</th>
@@ -663,7 +663,7 @@ export default function HealthFiles({
                       <th className="py-1.5 sm:py-2 text-center w-[15%] sm:w-[15%]">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100/50 dark:divide-slate-800/40 text-[10px] sm:text-xs">
+                  <tbody className="divide-y divide-slate-100/50 text-[10px] sm:text-xs">
                     {(() => {
                       const displayedReadings = selectedDate
                         ? vitalsReadings.filter((r) => {
@@ -677,14 +677,14 @@ export default function HealthFiles({
                         : vitalsReadings;
 
                       return displayedReadings.slice(0, 20).map((r) => (
-                        <tr key={r.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/20">
+                        <tr key={r.id} className="hover:bg-slate-50/50">
                           <td className="py-1.5 sm:py-2.5 text-[9px] sm:text-[10px] font-bold text-slate-500">
                             {new Date(r.timestamp).toLocaleString()}
                           </td>
-                          <td className="py-1.5 sm:py-2.5 font-bold text-on-surface dark:text-slate-200 uppercase text-[9px] sm:text-[10px]">
+                          <td className="py-1.5 sm:py-2.5 font-bold text-on-surface uppercase text-[9px] sm:text-[10px]">
                             {r.type === "blood_sugar" ? "Glucose" : "Pressure"}
                           </td>
-                          <td className="py-1.5 sm:py-2.5 text-right font-black text-on-surface dark:text-slate-100 text-[10px] sm:text-xs">
+                          <td className="py-1.5 sm:py-2.5 text-right font-black text-on-surface text-[10px] sm:text-xs">
                             {r.type === "blood_sugar" 
                               ? `${r.sugarValue} ${r.sugarUnit || "mg/dL"}`
                               : `${r.systolic}/${r.diastolic} mmHg`
@@ -712,7 +712,7 @@ export default function HealthFiles({
                     })()}
                     {vitalsReadings.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="py-8 sm:py-12 text-center text-slate-400 dark:text-slate-600 font-bold text-[10px] sm:text-xs">
+                        <td colSpan={5} className="py-8 sm:py-12 text-center text-slate-400 font-bold text-[10px] sm:text-xs">
                           No logged records yet. Go to "Today" and click "Log Reading" to start!
                         </td>
                       </tr>
@@ -732,17 +732,17 @@ export default function HealthFiles({
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 dark:border-slate-800"
+                className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100"
               >
                 <div className="flex justify-between items-center mb-5">
-                  <h4 className="text-base font-black text-on-surface dark:text-slate-100 flex items-center gap-1.5">
+                  <h4 className="text-base font-black text-on-surface flex items-center gap-1.5">
                     <Bell className="w-5 h-5 text-pink-500 animate-pulse" />
                     Set Vitals Reminder
                   </h4>
                     <button
                       type="button"
                       onClick={() => setShowAddReminderModal(false)}
-                      className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 cursor-pointer"
+                      className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 cursor-pointer"
                     >
                     <X className="w-5 h-5" />
                   </button>
@@ -750,16 +750,16 @@ export default function HealthFiles({
 
                 <form onSubmit={handleCreateReminderSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
                       Vitals Parameter Check
                     </label>
-                    <div className="flex p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/40 rounded-xl">
+                    <div className="flex p-1 bg-slate-100 border border-slate-200/40 rounded-xl">
                       <button
                         type="button"
                         onClick={() => setNewReminderType("blood_sugar")}
                         className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                           newReminderType === "blood_sugar"
-                            ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
+                            ? "bg-white text-pink-500 shadow-sm"
                             : "text-slate-500"
                         }`}
                       >
@@ -770,7 +770,7 @@ export default function HealthFiles({
                         onClick={() => setNewReminderType("blood_pressure")}
                         className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                           newReminderType === "blood_pressure"
-                            ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
+                            ? "bg-white text-pink-500 shadow-sm"
                             : "text-slate-500"
                         }`}
                       >
@@ -780,7 +780,7 @@ export default function HealthFiles({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
                       Check Schedule Time
                     </label>
                     <input
@@ -788,15 +788,15 @@ export default function HealthFiles({
                       required
                       value={newReminderTime}
                       onChange={(e) => setNewReminderTime(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-on-surface focus:outline-none focus:border-pink-500 text-sm font-semibold"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
                       Recurrence Frequency
                     </label>
-                    <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/40 rounded-xl">
+                    <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 border border-slate-200/40 rounded-xl">
                       {(["daily", "weekly", "monthly"] as const).map((freq) => (
                         <button
                           key={freq}
@@ -804,8 +804,8 @@ export default function HealthFiles({
                           onClick={() => setNewReminderFrequency(freq)}
                           className={`py-1.5 text-xs font-bold rounded-lg capitalize transition-all cursor-pointer ${
                             newReminderFrequency === freq
-                              ? "bg-white dark:bg-slate-900 text-pink-500 shadow-sm"
-                              : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                              ? "bg-white text-pink-500 shadow-sm"
+                              : "text-slate-500 hover:text-slate-700"
                           }`}
                         >
                           {freq}
@@ -838,7 +838,7 @@ export default function HealthFiles({
                               className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full text-[8px] sm:text-[10px] font-bold flex items-center justify-center transition-all cursor-pointer ${
                                 isSelected
                                   ? "bg-pink-500 text-white shadow-md shadow-pink-500/10"
-                                  : "bg-slate-100 dark:bg-slate-950 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800"
+                                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                               }`}
                               title={day}
                             >
@@ -852,13 +852,13 @@ export default function HealthFiles({
 
                   {newReminderFrequency === "monthly" && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                      <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
                         Day of Month
                       </label>
                       <select
                         value={newReminderDayOfMonth}
                         onChange={(e) => setNewReminderDayOfMonth(Number(e.target.value))}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold cursor-pointer"
+                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-on-surface focus:outline-none focus:border-pink-500 text-sm font-semibold cursor-pointer"
                       >
                         {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
                           <option key={day} value={day}>
@@ -878,7 +878,7 @@ export default function HealthFiles({
                   )}
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1.5">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
                       Custom Friendly Name <span className="text-[10px] text-slate-400 lowercase">(optional)</span>
                     </label>
                     <input
@@ -886,7 +886,7 @@ export default function HealthFiles({
                       placeholder={newReminderType === "blood_sugar" ? "Fasting Sugar Check" : "Evening BP Check"}
                       value={newReminderLabel}
                       onChange={(e) => setNewReminderLabel(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-pink-500 text-sm font-semibold"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-on-surface focus:outline-none focus:border-pink-500 text-sm font-semibold"
                     />
                   </div>
 
@@ -894,7 +894,7 @@ export default function HealthFiles({
                     <button
                       type="button"
                       onClick={() => setShowAddReminderModal(false)}
-                      className="flex-1 py-3 text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+                      className="flex-1 py-3 text-xs font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -928,13 +928,13 @@ export default function HealthFiles({
         {activeTab !== "vitals" && (
         <section className="relative w-full" id="search-section">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-slate-400 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant w-5 h-5" />
             <input 
               type="text"
               placeholder="Search medical records, labs, or clinical AI insights..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-100 dark:bg-slate-950 border-none ring-1 ring-slate-200 dark:ring-slate-800 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none text-body-md font-semibold text-on-surface dark:text-slate-100"
+              className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-100 border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-primary focus:bg-white transition-all outline-none text-body-md font-semibold text-on-surface"
             />
           </div>
         </section>
@@ -942,13 +942,13 @@ export default function HealthFiles({
 
       {/* Tab Switcher */}
       <div className="flex justify-between items-center flex-wrap gap-4" id="tabs-header-container">
-        <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-fit flex-wrap gap-0.5 sm:gap-1" id="category-tab-switcher">
+        <div className="flex p-1 bg-slate-100 rounded-2xl w-fit flex-wrap gap-0.5 sm:gap-1" id="category-tab-switcher">
           <button 
             onClick={() => setActiveTab("all")}
             className={`px-2.5 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
               activeTab === "all" 
-                ? "bg-white dark:bg-slate-900 text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
-                : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
+                ? "bg-white text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
+                : "text-on-surface-variant hover:bg-white/50"
             }`}
           >
             All
@@ -957,8 +957,8 @@ export default function HealthFiles({
             onClick={() => setActiveTab("report")}
             className={`px-2.5 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
               activeTab === "report" 
-                ? "bg-white dark:bg-slate-900 text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
-                : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
+                ? "bg-white text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
+                : "text-on-surface-variant hover:bg-white/50"
             }`}
           >
             Reports
@@ -967,8 +967,8 @@ export default function HealthFiles({
             onClick={() => setActiveTab("prescription")}
             className={`px-2.5 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
               activeTab === "prescription" 
-                ? "bg-white dark:bg-slate-900 text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
-                : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
+                ? "bg-white text-primary font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
+                : "text-on-surface-variant hover:bg-white/50"
             }`}
           >
             Prescriptions
@@ -977,15 +977,15 @@ export default function HealthFiles({
             onClick={() => setActiveTab("vitals")}
             className={`px-2.5 sm:px-4 md:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
               activeTab === "vitals" 
-                ? "bg-white dark:bg-slate-900 text-pink-500 font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
-                : "text-on-surface-variant dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50"
+                ? "bg-white text-pink-500 font-bold shadow-md shadow-slate-900/5 active-tab-glow" 
+                : "text-on-surface-variant hover:bg-white/50"
             }`}
           >
             Vitals
           </button>
         </div>
 
-        <div className="px-4 py-2 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/10 dark:border-primary/20">
+        <div className="px-4 py-2 bg-primary/5 rounded-xl border border-primary/10">
           <span className="font-bold text-xs text-primary">
             {activeTab === "vitals" ? `Total: ${vitalsReadings.length} Readings` : `Total: ${filteredFiles.length} Files`}
           </span>
@@ -999,8 +999,8 @@ export default function HealthFiles({
           {/* Page Title */}
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-3xl font-extrabold tracking-tight text-on-surface dark:text-slate-100">Health Files</h2>
-              <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-1">Manage your digital health records with AI-powered insights.</p>
+              <h2 className="text-3xl font-extrabold tracking-tight text-on-surface">Health Files</h2>
+              <p className="text-sm text-on-surface-variant mt-1">Manage your digital health records with AI-powered insights.</p>
             </div>
             <button
               onClick={() => setShowAddModal(true)}
@@ -1023,15 +1023,15 @@ export default function HealthFiles({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white/85 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/60 p-4 sm:p-6 rounded-2xl sm:rounded-3xl flex flex-col justify-between group hover:shadow-lg dark:hover:shadow-black/20 transition-all duration-300 relative hover:scale-[1.01]"
+                  className="bg-white/85 border border-slate-100 p-4 sm:p-6 rounded-2xl sm:rounded-3xl flex flex-col justify-between group hover:shadow-lg transition-all duration-300 relative hover:scale-[1.01]"
                   id={`file-card-${file.id}`}
                 >
                   {/* Header block with Type icon & Options button */}
                   <div className="flex items-start justify-between">
                     <div className={`p-3 rounded-2xl ${
                       file.category === "report" 
-                        ? "bg-secondary/10 text-secondary dark:bg-secondary/20" 
-                        : "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400"
+                        ? "bg-secondary/10 text-secondary" 
+                        : "bg-amber-50 text-amber-600"
                     }`}>
                       <FileText className="w-5 h-5" />
                     </div>
@@ -1039,20 +1039,20 @@ export default function HealthFiles({
                     <div className="relative">
                       <button 
                         onClick={() => setActiveMenuId(activeMenuId === file.id ? null : file.id)}
-                        className="text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                        className="text-on-surface-variant hover:text-on-surface p-2 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <MoreVertical className="w-5 h-5" />
                       </button>
 
                       {/* Context Action Menu */}
                       {activeMenuId === file.id && (
-                        <div className="absolute right-0 top-8 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl rounded-xl p-1 z-30 min-w-[120px]">
+                        <div className="absolute right-0 top-8 bg-white border border-slate-100 shadow-xl rounded-xl p-1 z-30 min-w-[120px]">
                           <button 
                             onClick={() => {
                               onDeleteFile(file.id);
                               setActiveMenuId(null);
                             }}
-                            className="w-full text-left px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                            className="w-full text-left px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             Delete File
@@ -1064,19 +1064,19 @@ export default function HealthFiles({
 
                   {/* Title & Stats */}
                   <div className="mt-5">
-                    <h3 className="font-bold text-lg text-on-surface dark:text-slate-100 truncate" title={file.name}>
+                    <h3 className="font-bold text-lg text-on-surface truncate" title={file.name}>
                       {file.name}
                     </h3>
-                    <p className="text-xs text-on-surface-variant dark:text-slate-400 font-medium mt-1">
+                    <p className="text-xs text-on-surface-variant font-medium mt-1">
                       {file.date} • {file.size}
                     </p>
                   </div>
 
                   {/* AI Clinical Insight Section */}
-                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60">
-                    <div className="flex items-start gap-2.5 bg-primary/5 dark:bg-primary/10 p-3.5 rounded-2xl border border-primary/5">
+                  <div className="mt-6 pt-4 border-t border-slate-100">
+                    <div className="flex items-start gap-2.5 bg-primary/5 p-3.5 rounded-2xl border border-primary/5">
                       <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5 animate-pulse" />
-                      <p className="text-xs text-primary dark:text-slate-300 font-bold leading-normal">
+                      <p className="text-xs text-primary font-bold leading-normal">
                         {file.aiInsight}
                       </p>
                     </div>
@@ -1106,16 +1106,16 @@ export default function HealthFiles({
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 30 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md shadow-2xl relative border border-slate-100 dark:border-slate-800 max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl relative border border-slate-100 max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-extrabold text-on-surface dark:text-slate-100 flex items-center gap-2">
+                <h3 className="text-xl font-extrabold text-on-surface flex items-center gap-2">
                   <FolderOpen className="w-5 h-5 text-primary" />
                   Upload Clinical Document
                 </h3>
                 <button 
                   onClick={() => setShowAddModal(false)}
-                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-on-surface-variant dark:text-slate-400 transition-colors cursor-pointer"
+                  className="p-1.5 hover:bg-slate-100 rounded-lg text-on-surface-variant transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1123,48 +1123,48 @@ export default function HealthFiles({
 
               {/* Quick clinical presets */}
               <div className="mb-6">
-                <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">
                   Quick Select Real-World Presets
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   <button 
                     onClick={() => handleAddPreset("Lipid Profile Panel.pdf", "report", "1.8 MB")}
                     disabled={isSubmitting}
-                    className="text-left w-full p-3 bg-slate-50 dark:bg-slate-950 hover:bg-primary/5 dark:hover:bg-primary/10 hover:border-primary/30 border border-slate-200 dark:border-slate-800 rounded-xl transition-all text-xs font-bold text-on-surface dark:text-slate-200 flex justify-between items-center cursor-pointer"
+                    className="text-left w-full p-3 bg-slate-50 hover:bg-primary/5 hover:border-primary/30 border border-slate-200 rounded-xl transition-all text-xs font-bold text-on-surface flex justify-between items-center cursor-pointer"
                   >
                     <span>📈 Lipid Profile Panel (Cholesterol)</span>
-                    <span className="text-[10px] text-on-surface-variant dark:text-slate-400">1.8 MB</span>
+                    <span className="text-[10px] text-on-surface-variant">1.8 MB</span>
                   </button>
 
                   <button 
                     onClick={() => handleAddPreset("Thyroid Panel TSH.pdf", "report", "850 KB")}
                     disabled={isSubmitting}
-                    className="text-left w-full p-3 bg-slate-50 dark:bg-slate-950 hover:bg-primary/5 dark:hover:bg-primary/10 hover:border-primary/30 border border-slate-200 dark:border-slate-800 rounded-xl transition-all text-xs font-bold text-on-surface dark:text-slate-200 flex justify-between items-center cursor-pointer"
+                    className="text-left w-full p-3 bg-slate-50 hover:bg-primary/5 hover:border-primary/30 border border-slate-200 rounded-xl transition-all text-xs font-bold text-on-surface flex justify-between items-center cursor-pointer"
                   >
                     <span>🧪 Thyroid TSH & Metabolic Panel</span>
-                    <span className="text-[10px] text-on-surface-variant dark:text-slate-400">850 KB</span>
+                    <span className="text-[10px] text-on-surface-variant">850 KB</span>
                   </button>
 
                   <button 
                     onClick={() => handleAddPreset("Albuterol Inhaler Refill.png", "prescription", "1.2 MB")}
                     disabled={isSubmitting}
-                    className="text-left w-full p-3 bg-slate-50 dark:bg-slate-950 hover:bg-primary/5 dark:hover:bg-primary/10 hover:border-primary/30 border border-slate-200 dark:border-slate-800 rounded-xl transition-all text-xs font-bold text-on-surface dark:text-slate-200 flex justify-between items-center cursor-pointer"
+                    className="text-left w-full p-3 bg-slate-50 hover:bg-primary/5 hover:border-primary/30 border border-slate-200 rounded-xl transition-all text-xs font-bold text-on-surface flex justify-between items-center cursor-pointer"
                   >
                     <span>💨 Asthma Inhaler Rx (Albuterol)</span>
-                    <span className="text-[10px] text-on-surface-variant dark:text-slate-400">1.2 MB</span>
+                    <span className="text-[10px] text-on-surface-variant">1.2 MB</span>
                   </button>
                 </div>
               </div>
 
               <div className="relative flex py-2 items-center">
-                <div className="flex-grow border-t border-slate-100 dark:border-slate-800/60"></div>
-                <span className="flex-shrink mx-4 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-widest">Or Manual entry</span>
-                <div className="flex-grow border-t border-slate-100 dark:border-slate-800/60"></div>
+                <div className="flex-grow border-t border-slate-100"></div>
+                <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-bold uppercase tracking-widest">Or Manual entry</span>
+                <div className="flex-grow border-t border-slate-100"></div>
               </div>
 
               <form onSubmit={handleCreateFile} className="space-y-4 mt-4">
                 <div>
-                  <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">
                     Document Title
                   </label>
                   <input 
@@ -1173,19 +1173,19 @@ export default function HealthFiles({
                     placeholder="e.g. Complete Metabolic Panel.pdf"
                     value={newFileName}
                     onChange={(e) => setNewFileName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-on-surface focus:outline-none focus:border-primary text-sm font-semibold"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">
                       Category
                     </label>
                     <select 
                       value={newCategory}
                       onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-on-surface focus:outline-none focus:border-primary text-sm font-semibold"
                     >
                       <option value="report">Lab Report</option>
                       <option value="prescription">Prescription</option>
@@ -1193,7 +1193,7 @@ export default function HealthFiles({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">
                       Document Size
                     </label>
                     <input 
@@ -1201,7 +1201,7 @@ export default function HealthFiles({
                       placeholder="e.g. 2.4 MB"
                       value={newSize}
                       onChange={(e) => setNewSize(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 focus:outline-none focus:border-primary text-sm font-semibold"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-on-surface focus:outline-none focus:border-primary text-sm font-semibold"
                     />
                   </div>
                 </div>
@@ -1210,7 +1210,7 @@ export default function HealthFiles({
                   <button 
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 py-3 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
+                    className="flex-1 py-3 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>

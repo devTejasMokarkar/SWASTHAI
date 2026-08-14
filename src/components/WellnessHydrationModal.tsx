@@ -196,8 +196,8 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
   const chipClass = (active: boolean) =>
     `px-3 py-2.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer text-left w-full ${
       active
-        ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-        : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50"
+        ? "bg-primary/10 border-primary/40 text-primary"
+        : "bg-slate-50 border-slate-200 text-on-surface-variant hover:border-primary/50"
     }`
 
   if (!isOpen) return null
@@ -208,14 +208,14 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl relative border border-slate-100 dark:border-slate-800 max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl relative border border-slate-100 max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <Droplets className="w-5 h-5 text-sky-500" />
-            <h3 className="text-lg font-black text-on-surface dark:text-slate-100">Wellness & Hydration</h3>
+            <h3 className="text-lg font-black text-on-surface">Wellness & Hydration</h3>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer">
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">
             <X className="w-5 h-5 text-on-surface-variant" />
           </button>
         </div>
@@ -223,14 +223,14 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step indicator */}
         <div className="flex gap-1 mb-5">
           {STEPS.map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? "bg-primary" : "bg-slate-200 dark:bg-slate-700"}`} />
+            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? "bg-primary" : "bg-slate-200"}`} />
           ))}
         </div>
 
         {/* Step: Activity Level */}
         {STEPS[step] === "activity" && (
           <div className="space-y-3">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">🏃 How active are you?</p>
+            <p className="text-sm font-bold text-on-surface">🏃 How active are you?</p>
             <p className="text-[11px] text-on-surface-variant -mt-1">(affects water needs)</p>
             <div className="space-y-1.5">
               {ACTIVITY_LEVELS.map(a => (
@@ -247,7 +247,7 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step: Environment */}
         {STEPS[step] === "environment" && (
           <div className="space-y-3">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">🌡️ What's your environment like?</p>
+            <p className="text-sm font-bold text-on-surface">🌡️ What's your environment like?</p>
             <div className="space-y-1.5">
               {ENVIRONMENTS.map(e => (
                 <button key={e.value} type="button" onClick={() => update("environment", e.value)} className={chipClass(settings.environment === e.value)}>
@@ -263,7 +263,7 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step: Work Hours */}
         {STEPS[step] === "workHours" && (
           <div className="space-y-3">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">🕐 What are your work hours?</p>
+            <p className="text-sm font-bold text-on-surface">🕐 What are your work hours?</p>
             <div className="space-y-1.5">
               {WORK_HOURS.map(w => (
                 <button key={w.value} type="button" onClick={() => update("workHours", w.value)} className={chipClass(settings.workHours === w.value)}>
@@ -278,12 +278,12 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
                 <div className="flex-1">
                   <label className="text-[10px] font-bold text-on-surface-variant">Start hour</label>
                   <input type="number" value={settings.customStartHour} onChange={e => { const v = Number(e.target.value); update("customStartHour", v); update("activeHoursStart", v) }}
-                    min="0" max="23" className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
+                    min="0" max="23" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
                 </div>
                 <div className="flex-1">
                   <label className="text-[10px] font-bold text-on-surface-variant">End hour</label>
                   <input type="number" value={settings.customEndHour} onChange={e => { const v = Number(e.target.value); update("customEndHour", v); update("activeHoursEnd", v) }}
-                    min="0" max="23" className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
+                    min="0" max="23" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
                 </div>
               </div>
             )}
@@ -293,13 +293,13 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step: Water Reminders */}
         {STEPS[step] === "waterReminders" && (
           <div className="space-y-4">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">💧 Water Reminders</p>
-            <div className="bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200/50 dark:border-sky-900/30 rounded-xl p-4 space-y-4">
+            <p className="text-sm font-bold text-on-surface">💧 Water Reminders</p>
+            <div className="bg-sky-50/50 border border-sky-200/50 rounded-xl p-4 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold">Enable reminders</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" checked={settings.waterEnabled} onChange={e => update("waterEnabled", e.target.checked)} className="sr-only peer" />
-                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-checked:bg-sky-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:bg-sky-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
                 </label>
               </div>
               {settings.waterEnabled && (
@@ -307,13 +307,13 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] font-semibold text-on-surface-variant">Interval</span>
                     <input type="number" value={settings.waterInterval} onChange={e => update("waterInterval", Number(e.target.value))}
-                      min="1" className="w-20 h-9 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
+                      min="1" className="w-20 h-9 px-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
                     <span className="text-[11px] font-semibold text-on-surface-variant">min</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] font-semibold text-on-surface-variant">Daily goal</span>
                     <input type="number" value={settings.waterGoalOverride} onChange={e => update("waterGoalOverride", Number(e.target.value))}
-                      min="0" step="0.1" className="w-20 h-9 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
+                      min="0" step="0.1" className="w-20 h-9 px-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
                     <span className="text-[11px] font-semibold text-on-surface-variant">L</span>
                   </div>
                 </>
@@ -325,20 +325,20 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step: Eye Care */}
         {STEPS[step] === "eyeCare" && (
           <div className="space-y-4">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">👁️ Eye Care</p>
-            <div className="bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/50 dark:border-indigo-900/30 rounded-xl p-4 space-y-4">
+            <p className="text-sm font-bold text-on-surface">👁️ Eye Care</p>
+            <div className="bg-indigo-50/50 border border-indigo-200/50 rounded-xl p-4 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold">Enable 20-20-20 reminders</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" checked={settings.eyeCareEnabled} onChange={e => update("eyeCareEnabled", e.target.checked)} className="sr-only peer" />
-                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-checked:bg-indigo-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:bg-indigo-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
                 </label>
               </div>
               {settings.eyeCareEnabled && (
                 <div className="flex items-center gap-3">
                   <span className="text-[11px] font-semibold text-on-surface-variant">Interval</span>
                   <input type="number" value={settings.eyeCareInterval} onChange={e => update("eyeCareInterval", Number(e.target.value))}
-                    min="1" className="w-20 h-9 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
+                    min="1" className="w-20 h-9 px-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
                   <span className="text-[11px] font-semibold text-on-surface-variant">min</span>
                 </div>
               )}
@@ -349,19 +349,19 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step: Active Hours */}
         {STEPS[step] === "activeHours" && (
           <div className="space-y-4">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">🕐 Active Hours</p>
+            <p className="text-sm font-bold text-on-surface">🕐 Active Hours</p>
             <p className="text-[11px] text-on-surface-variant -mt-1">Reminders will only fire during these hours</p>
             <div className="flex items-center gap-4">
               <div className="flex-1">
                 <label className="text-[10px] font-bold text-on-surface-variant">Start</label>
                 <input type="number" value={settings.activeHoursStart} onChange={e => update("activeHoursStart", Number(e.target.value))}
-                  min="0" max="23" className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
+                  min="0" max="23" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
               </div>
               <span className="text-sm text-on-surface-variant mt-5">to</span>
               <div className="flex-1">
                 <label className="text-[10px] font-bold text-on-surface-variant">End</label>
                 <input type="number" value={settings.activeHoursEnd} onChange={e => update("activeHoursEnd", Number(e.target.value))}
-                  min="0" max="23" className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
+                  min="0" max="23" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-center outline-none focus:border-primary" />
               </div>
             </div>
           </div>
@@ -370,7 +370,7 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step: Start Reminders */}
         {STEPS[step] === "start" && (
           <div className="space-y-4">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">Ready to go?</p>
+            <p className="text-sm font-bold text-on-surface">Ready to go?</p>
             <p className="text-[11px] text-on-surface-variant">
               {settings.waterEnabled || settings.eyeCareEnabled
                 ? "Tap the button below to start your reminders."
@@ -389,11 +389,11 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
             {running && (
               <div className="space-y-2">
                 {settings.waterEnabled && (
-                  <div className="flex items-center justify-between px-3.5 py-2.5 bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-900/30 rounded-xl">
+                  <div className="flex items-center justify-between px-3.5 py-2.5 bg-sky-50 border border-sky-200 rounded-xl">
                     <div className="flex items-center gap-2.5">
                       <Droplets className="w-4 h-4 text-sky-500" />
                       <div>
-                        <p className="text-[11px] font-bold text-on-surface dark:text-slate-100">Hydration reminder</p>
+                        <p className="text-[11px] font-bold text-on-surface">Hydration reminder</p>
                         <p className="text-[9px] text-on-surface-variant">Every {settings.waterInterval}min · {settings.activeHoursStart}:00–{settings.activeHoursEnd}:00</p>
                       </div>
                     </div>
@@ -401,11 +401,11 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
                   </div>
                 )}
                 {settings.eyeCareEnabled && (
-                  <div className="flex items-center justify-between px-3.5 py-2.5 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-900/30 rounded-xl">
+                  <div className="flex items-center justify-between px-3.5 py-2.5 bg-indigo-50 border border-indigo-200 rounded-xl">
                     <div className="flex items-center gap-2.5">
                       <Eye className="w-4 h-4 text-indigo-500" />
                       <div>
-                        <p className="text-[11px] font-bold text-on-surface dark:text-slate-100">20-20-20 eye break</p>
+                        <p className="text-[11px] font-bold text-on-surface">20-20-20 eye break</p>
                         <p className="text-[9px] text-on-surface-variant">Every {settings.eyeCareInterval}min</p>
                       </div>
                     </div>
@@ -420,11 +420,11 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step: Quick Add */}
         {STEPS[step] === "quickAdd" && (
           <div className="space-y-4">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">🍶 Quick add water</p>
+            <p className="text-sm font-bold text-on-surface">🍶 Quick add water</p>
             <div className="grid grid-cols-2 gap-2">
               {QUICK_ADD.map(q => (
                 <button key={q.label} type="button" onClick={() => onUpdateWater(q.ml)}
-                  className="h-11 bg-sky-50 dark:bg-sky-950/30 hover:bg-sky-100 dark:hover:bg-sky-950/50 border border-sky-200 dark:border-sky-800 rounded-xl text-xs font-bold text-sky-700 dark:text-sky-300 transition-all cursor-pointer">
+                  className="h-11 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-xl text-xs font-bold text-sky-700 transition-all cursor-pointer">
                   {q.label}
                 </button>
               ))}
@@ -435,10 +435,10 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         {/* Step: Progress */}
         {STEPS[step] === "progress" && (
           <div className="space-y-4">
-            <p className="text-sm font-bold text-on-surface dark:text-slate-100">📊 Progress</p>
-            <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-5 space-y-4">
+            <p className="text-sm font-bold text-on-surface">📊 Progress</p>
+            <div className="bg-slate-50 rounded-xl p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-on-surface dark:text-slate-100">Water intake</span>
+                <span className="text-xs font-bold text-on-surface">Water intake</span>
                 <span className="text-[10px] font-bold text-on-surface-variant">{settings.dayStreak} day streak</span>
               </div>
               {settings.eyeCareEnabled && (
@@ -452,7 +452,7 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
                   <span>{waterLoggedMl / 1000}L / {effectiveGoal / 1000}L</span>
                   <span className="font-bold">{remaining > 0 ? `${(remaining / 1000).toFixed(2)}L left` : "✅ Goal met!"}</span>
                 </div>
-                <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPct}%` }}
@@ -465,12 +465,12 @@ export default function WellnessHydrationModal({ isOpen, onClose, waterLoggedMl,
         )}
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
           <button
             type="button"
             onClick={() => setStep(s => Math.max(0, s - 1))}
             disabled={isFirst}
-            className="flex items-center gap-1.5 px-4 h-10 rounded-xl text-xs font-bold text-on-surface-variant hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all cursor-pointer disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 h-10 rounded-xl text-xs font-bold text-on-surface-variant hover:bg-slate-100 disabled:opacity-30 transition-all cursor-pointer disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-4 h-4" /> Back
           </button>

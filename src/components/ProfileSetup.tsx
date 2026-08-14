@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { User } from "../types";
-import { Coins, RefreshCw, History, Plus, ChevronDown, Check, Search, X, Pencil, Trash2, Bell, Settings, XCircle } from "lucide-react";
+import { Coins, RefreshCw, History, Plus, ChevronDown, Check, Search, X, Pencil, Trash2, Bell, Settings, XCircle, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import MedicationFormModal, { type MedicationFormData } from "./ui/MedicationFormModal";
 import ReminderModal, { type ProfileReminder } from "./ui/ReminderModal";
@@ -242,52 +242,57 @@ export default function ProfileSetup({
       id="profile-setup-view"
     >
       <div className="text-center space-y-2 relative w-full">
+        <button type="button" onClick={onFinishOnboarding}
+          className="absolute left-0 top-0 w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-all cursor-pointer"
+          title="Back">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <button type="button" onClick={() => setShowSettings(true)}
-          className="absolute right-0 top-0 w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-on-surface-variant dark:text-slate-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-all cursor-pointer">
+          className="absolute right-0 top-0 w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-all cursor-pointer">
           <Settings className="w-5 h-5" />
         </button>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-on-surface dark:text-slate-100 tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-on-surface tracking-tight">
           Edit Profile
         </h1>
-        <p className="text-sm text-on-surface-variant dark:text-slate-400">
+        <p className="text-sm text-on-surface-variant">
           Update your personal details, health info, and preferences.
         </p>
       </div>
 
       {/* Card 1: Personal details */}
-      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
-        <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Personal Details</p>
+      <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/40 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
+        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Personal Details</p>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider" htmlFor="full_name">Full Name</label>
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider" htmlFor="full_name">Full Name</label>
           <input type="text" id="full_name" value={fullName} onChange={e => { setFullName(e.target.value); setProfileErrors(p => ({ ...p, fullName: '' })); }}
-            className={`w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.fullName ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`} />
+            className={`w-full h-11 px-4 bg-slate-50 border text-on-surface rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.fullName ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-primary focus:bg-white:bg-slate-900'}`} />
           {profileErrors.fullName && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.fullName}</p>}
         </div>
 
         <div className="flex gap-2.5 flex-wrap sm:flex-nowrap">
           <div className="flex-1 min-w-[140px] space-y-1.5">
-            <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Date of Birth</label>
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Date of Birth</label>
             <input type="date" value={dob} onChange={e => { setDob(e.target.value); setProfileErrors(p => ({ ...p, dob: '' })); }}
-              className={`w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.dob ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`} />
+              className={`w-full h-11 px-4 bg-slate-50 border text-on-surface rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.dob ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-primary'}`} />
             {profileErrors.dob && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.dob}</p>}
           </div>
           <div className="flex-1 min-w-[100px] space-y-1.5">
-            <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Weight (kg)</label>
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Weight (kg)</label>
             <input type="number" value={weightKg} onChange={e => { setWeightKg(e.target.value); setProfileErrors(p => ({ ...p, weightKg: '' })); }} placeholder="70"
-              className={`w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.weightKg ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`} />
+              className={`w-full h-11 px-4 bg-slate-50 border text-on-surface rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.weightKg ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-primary'}`} />
             {profileErrors.weightKg && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.weightKg}</p>}
           </div>
           <div className="flex-1 min-w-[100px] space-y-1.5">
-            <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Height (cm)</label>
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Height (cm)</label>
             <input type="number" value={heightCm} onChange={e => { setHeightCm(e.target.value); setProfileErrors(p => ({ ...p, heightCm: '' })); }} placeholder="170"
-              className={`w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.heightCm ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 dark:border-slate-800 focus:border-primary'}`} />
+              className={`w-full h-11 px-4 bg-slate-50 border text-on-surface rounded-xl focus:outline-none font-semibold text-sm ${profileErrors.heightCm ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-primary'}`} />
             {profileErrors.heightCm && <p className="text-[10px] font-semibold text-rose-500">{profileErrors.heightCm}</p>}
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Gender</label>
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Gender</label>
           <div className="flex gap-2">
             {["Male", "Female", "Other"].map(gen => {
               const active = gender === gen;
@@ -296,7 +301,7 @@ export default function ProfileSetup({
                   className={`flex-1 h-11 rounded-xl border text-sm font-bold transition-all cursor-pointer ${
                     active
                       ? "bg-primary border-primary text-white"
-                      : "bg-transparent border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-300 hover:border-primary/50"
+                      : "bg-transparent border-slate-200 text-on-surface hover:border-primary/50"
                   }`}>{gen}</button>
               );
             })}
@@ -306,11 +311,11 @@ export default function ProfileSetup({
       </div>
 
       {/* Card 2: Diet and goal */}
-      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
-        <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Diet and Goal</p>
+      <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/40 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
+        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Diet and Goal</p>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Diet</label>
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Diet</label>
           <div className="flex flex-wrap gap-1.5">
             {DIET_OPTIONS.map(d => {
               const active = diet === d;
@@ -319,7 +324,7 @@ export default function ProfileSetup({
                   className={`px-4 h-9 rounded-full border text-[11px] font-bold transition-all cursor-pointer ${
                     active
                       ? "bg-primary border-primary text-white"
-                      : "bg-transparent border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-300 hover:border-primary/50"
+                      : "bg-transparent border-slate-200 text-on-surface hover:border-primary/50"
                   }`}>{d}</button>
               );
             })}
@@ -327,7 +332,7 @@ export default function ProfileSetup({
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Goal</label>
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Goal</label>
           <div className="flex flex-wrap gap-1.5">
             {GOAL_OPTIONS.map(g => {
               const active = goal === g;
@@ -336,7 +341,7 @@ export default function ProfileSetup({
                   className={`px-4 h-9 rounded-full border text-[11px] font-bold transition-all cursor-pointer ${
                     active
                       ? "bg-primary border-primary text-white"
-                      : "bg-transparent border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-300 hover:border-primary/50"
+                      : "bg-transparent border-slate-200 text-on-surface hover:border-primary/50"
                   }`}>{g}</button>
               );
             })}
@@ -345,14 +350,14 @@ export default function ProfileSetup({
       </div>
 
       {/* Card 3: Medical history */}
-      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
-        <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Medical History</p>
+      <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/40 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-4">
+        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Medical History</p>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Conditions</label>
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Conditions</label>
           <div ref={diseasesRef} className="relative">
             <button type="button" onClick={() => setShowDiseaseDropdown(!showDiseaseDropdown)}
-              className="w-full h-11 px-4 flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-left text-sm font-semibold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 transition-all cursor-pointer">
+              className="w-full h-11 px-4 flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl text-left text-sm font-semibold text-on-surface-variant hover:border-primary/50 transition-all cursor-pointer">
               <span className="flex-1 truncate">
                 {activeDiseases.length > 0
                   ? `${activeDiseases.length} condition${activeDiseases.length > 1 ? "s" : ""} selected`
@@ -361,22 +366,22 @@ export default function ProfileSetup({
               <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${showDiseaseDropdown ? "rotate-180" : ""}`} />
             </button>
             {showDiseaseDropdown && (
-              <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl overflow-hidden">
-                <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
                   <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <input type="text" value={diseaseSearch} onChange={e => setDiseaseSearch(e.target.value)} placeholder="Search conditions..."
-                    className="flex-1 bg-transparent text-xs font-semibold text-on-surface dark:text-slate-200 outline-none placeholder:text-slate-400" autoFocus />
+                    className="flex-1 bg-transparent text-xs font-semibold text-on-surface outline-none placeholder:text-slate-400" autoFocus />
                 </div>
                 <div className="max-h-52 overflow-y-auto p-1.5 space-y-0.5">
                   {filteredDiseases.map(disease => {
                     const active = activeDiseases.includes(disease);
                     return (
                       <button key={disease} type="button" onClick={() => toggleDisease(disease)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer">
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"}`}>
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50:bg-slate-800 transition-colors text-left cursor-pointer">
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300"}`}>
                           {active && <Check className="w-3 h-3 text-white" />}
                         </div>
-                        <span className="text-xs font-semibold text-on-surface dark:text-slate-200">{disease}</span>
+                        <span className="text-xs font-semibold text-on-surface">{disease}</span>
                       </button>
                     );
                   })}
@@ -384,7 +389,7 @@ export default function ProfileSetup({
                     <div className="flex items-center gap-2 px-3 py-2">
                       <input type="text" value={otherDisease} onChange={e => { setOtherDisease(e.target.value); if (e.target.value.trim() && !activeDiseases.includes(e.target.value.trim())) setActiveDiseases(prev => [...prev, e.target.value.trim()]); }}
                         placeholder="Add custom condition..."
-                        className="flex-1 h-8 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold outline-none focus:border-primary" />
+                        className="flex-1 h-8 px-3 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold outline-none focus:border-primary" />
                     </div>
                   )}
                 </div>
@@ -394,7 +399,7 @@ export default function ProfileSetup({
           {activeDiseases.length > 0 && (
             <div className="flex flex-wrap gap-1.5 pt-1">
               {activeDiseases.map(d => (
-                <span key={d} className="inline-flex items-center gap-1 h-7 px-3 bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-full text-[10px] font-bold text-primary">
+                <span key={d} className="inline-flex items-center gap-1 h-7 px-3 bg-primary/10 border border-primary/30 rounded-full text-[10px] font-bold text-primary">
                   {d}
                   <button type="button" onClick={() => removeDisease(d)} className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer">
                     <X className="w-2.5 h-2.5" />
@@ -406,27 +411,27 @@ export default function ProfileSetup({
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Notes</label>
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Notes</label>
           <textarea ref={textareaRef} value={medicalHistory} onChange={e => { setMedicalHistory(e.target.value); autoResize(); }}
             placeholder="Past conditions, allergies, surgeries"
             rows={2}
-            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-on-surface dark:text-slate-100 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none font-semibold text-sm resize-none overflow-hidden" />
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-xl focus:border-primary focus:bg-white:bg-slate-900 transition-all outline-none font-semibold text-sm resize-none overflow-hidden" />
         </div>
       </div>
 
       {/* Card 4: Medications */}
-      <div className="w-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/40 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-3">
+      <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/40 rounded-2xl shadow-xl shadow-slate-950/5 p-6 space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Medications</p>
+          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Medications</p>
           <button type="button" onClick={openAddMed}
-            className="w-9 h-9 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors cursor-pointer">
+            className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20:bg-primary/30 transition-colors cursor-pointer">
             <Plus className="w-4 h-4" />
           </button>
         </div>
 
         {medications.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-6 text-center">
-            <p className="text-sm text-on-surface-variant dark:text-slate-400 font-medium">No medications added</p>
+            <p className="text-sm text-on-surface-variant font-medium">No medications added</p>
             <button type="button" onClick={openAddMed}
               className="flex items-center gap-1.5 text-xs font-bold text-primary hover:underline cursor-pointer">
               <Plus className="w-3.5 h-3.5" /> Add your first medicine
@@ -439,27 +444,27 @@ export default function ProfileSetup({
               const summary = [med.strength, timingLabel].filter(Boolean).join(", ")
               return (
                 <div key={med.id}>
-                  {i > 0 && <hr className="border-slate-100 dark:border-slate-800" />}
+                  {i > 0 && <hr className="border-slate-100" />}
                   <div className="flex items-center gap-3 py-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-on-surface dark:text-slate-100 truncate">{med.name}</p>
-                      <p className="text-[11px] text-on-surface-variant dark:text-slate-400 truncate">{summary.toLowerCase()}</p>
+                      <p className="text-sm font-bold text-on-surface truncate">{med.name}</p>
+                      <p className="text-[11px] text-on-surface-variant truncate">{summary.toLowerCase()}</p>
                     </div>
                     <button type="button" onClick={() => openReminder(i)}
                       className={`p-2 rounded-lg transition-colors cursor-pointer ${
                         med.reminder
-                          ? "text-primary bg-primary/10 dark:bg-primary/20"
-                          : "text-slate-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800"
+                          ? "text-primary bg-primary/10"
+                          : "text-slate-400 hover:text-primary hover:bg-slate-100:bg-slate-800"
                       }`}
                       title={med.reminder ? "Edit reminder" : "Set reminder"}>
                       <Bell className="w-4 h-4" />
                     </button>
                     <button type="button" onClick={() => openEditMed(i)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-on-surface dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                      className="p-2 rounded-lg text-slate-400 hover:text-on-surface:text-slate-200 hover:bg-slate-100:bg-slate-800 transition-colors cursor-pointer">
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button type="button" onClick={() => deleteMed(i)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer">
+                      className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50:bg-rose-950/30 transition-colors cursor-pointer">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -484,35 +489,35 @@ export default function ProfileSetup({
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 30 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden max-h-[90vh] overflow-y-auto"
             >
               <div className="p-6 space-y-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <Settings className="w-5 h-5 text-primary" />
-                    <h3 className="text-base font-bold text-on-surface dark:text-slate-100">Settings</h3>
+                    <h3 className="text-base font-bold text-on-surface">Settings</h3>
                   </div>
                   <button type="button" onClick={() => setShowSettings(false)}
-                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors cursor-pointer">
+                    className="p-1.5 hover:bg-slate-100:bg-slate-800 rounded-lg text-slate-400 transition-colors cursor-pointer">
                     <XCircle className="w-5 h-5" />
                   </button>
                 </div>
 
-                <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 rounded-2xl p-5 space-y-4">
+                <div className="bg-amber-50/50 border border-amber-200/50 rounded-2xl p-5 space-y-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-amber-100 dark:bg-amber-950/50 rounded-full flex items-center justify-center text-amber-500 shrink-0">
+                    <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 shrink-0">
                       <Coins className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-on-surface dark:text-slate-100">Swasth AI Credit Center</h4>
-                      <p className="text-[11px] text-on-surface-variant dark:text-slate-400 mt-0.5 leading-relaxed">
+                      <h4 className="font-bold text-sm text-on-surface">Swasth AI Credit Center</h4>
+                      <p className="text-[11px] text-on-surface-variant mt-0.5 leading-relaxed">
                         1 credit deducted per AI Chat request and daily AI diet recommendation.
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between bg-white dark:bg-slate-950 rounded-xl px-4 py-3 border border-slate-200 dark:border-slate-800">
-                    <span className="text-xs font-bold text-on-surface-variant dark:text-slate-400">Available Credits</span>
-                    <span className="text-xl font-black text-amber-600 dark:text-amber-400">{user.credits !== undefined ? user.credits : 120}</span>
+                  <div className="flex items-center justify-between bg-white rounded-xl px-4 py-3 border border-slate-200">
+                    <span className="text-xs font-bold text-on-surface-variant">Available Credits</span>
+                    <span className="text-xl font-black text-amber-600">{user.credits !== undefined ? user.credits : 120}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <button type="button" onClick={() => onRefillCredits && onRefillCredits(50)}
@@ -520,17 +525,17 @@ export default function ProfileSetup({
                       <Plus className="w-3.5 h-3.5" /> Refill 50
                     </button>
                     <button type="button" onClick={() => onRefillCredits && onRefillCredits(100)}
-                      className="h-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-slate-200 dark:border-slate-700">
+                      className="h-10 bg-slate-100 hover:bg-slate-200:bg-slate-700 text-slate-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-slate-200">
                       <Plus className="w-3.5 h-3.5" /> Refill 100
                     </button>
                   </div>
                   <button type="button" onClick={() => { if (!showLogsHistory) fetchLogs(); setShowLogsHistory(!showLogsHistory); }}
-                    className="w-full flex items-center justify-between text-[11px] font-bold text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200 transition-colors cursor-pointer pt-1">
+                    className="w-full flex items-center justify-between text-[11px] font-bold text-on-surface-variant hover:text-on-surface:text-slate-200 transition-colors cursor-pointer pt-1">
                     <span className="flex items-center gap-1.5">
                       <History className="w-3.5 h-3.5" />
                       <span>Transaction Logs</span>
                     </span>
-                    <span className="text-[9px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-[9px] bg-slate-100 px-2 py-0.5 rounded-full font-bold">
                       {showLogsHistory ? "Hide" : `View (${creditLogs.length || 0})`}
                     </span>
                   </button>
@@ -545,10 +550,10 @@ export default function ProfileSetup({
                         creditLogs.map((log: any) => {
                           const isDeduction = log.amount > 0;
                           return (
-                            <div key={log.id} className="p-2.5 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-800 flex justify-between items-center text-[11px]">
+                            <div key={log.id} className="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex justify-between items-center text-[11px]">
                               <div className="space-y-0.5">
-                                <p className="font-bold text-on-surface dark:text-slate-200">{log.reason}</p>
-                                <p className="text-[9px] text-on-surface-variant dark:text-slate-500">{new Date(log.timestamp).toLocaleString()}</p>
+                                <p className="font-bold text-on-surface">{log.reason}</p>
+                                <p className="text-[9px] text-on-surface-variant">{new Date(log.timestamp).toLocaleString()}</p>
                               </div>
                               <span className={`font-extrabold shrink-0 ${isDeduction ? "text-rose-500" : "text-emerald-500"}`}>
                                 {isDeduction ? `-${log.amount}` : `+${Math.abs(log.amount)}`}

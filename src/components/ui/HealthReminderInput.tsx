@@ -78,7 +78,7 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+        <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-1">
           <Bell className="w-3 h-3" />
           Health Reminders
         </label>
@@ -90,12 +90,12 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
 
       <div className="space-y-1">
         {reminders.length === 0 && (
-          <p className="text-[10px] text-on-surface-variant dark:text-slate-500 italic">No health reminders set.</p>
+          <p className="text-[10px] text-on-surface-variant italic">No health reminders set.</p>
         )}
         {reminders.map((rem, i) => {
           const isExpanded = expandedIndex === i
           return (
-            <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+            <div key={i} className="bg-white border border-slate-200 rounded-lg overflow-hidden">
               {isExpanded ? (
                 <div className="p-2.5 space-y-2">
                   <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
                       <span className="text-[9px] font-bold text-primary uppercase">Health Reminder #{i + 1}</span>
                     </div>
                     <button type="button" onClick={() => remove(i)}
-                      className="p-0.5 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded text-slate-400 hover:text-rose-500 transition-colors cursor-pointer">
+                      className="p-0.5 hover:bg-rose-50 rounded text-slate-400 hover:text-rose-500 transition-colors cursor-pointer">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -116,14 +116,14 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Type</label>
                       <select value={rem.type} onChange={e => update(i, "type", e.target.value)}
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
                         {REMINDER_TYPES.map(t => <option key={t} value={t}>{icons[t]} {t}</option>)}
                       </select>
                     </div>
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Frequency</label>
                       <select value={rem.frequency} onChange={e => update(i, "frequency", e.target.value)}
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold">
                         {FREQUENCIES.map(f => <option key={f} value={f}>{f}</option>)}
                       </select>
                     </div>
@@ -133,7 +133,7 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
                     <div className="space-y-0.5">
                       <label className="text-[8px] font-bold text-on-surface-variant uppercase">Custom Label</label>
                       <input type="text" value={rem.customLabel || ""} onChange={e => update(i, "customLabel", e.target.value)} placeholder="e.g. Stretch breaks"
-                        className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
+                        className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
                     </div>
                   )}
 
@@ -143,7 +143,7 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
                       {rem.times.map((t, tIdx) => (
                         <div key={tIdx} className="flex items-center gap-0.5">
                           <input type="time" value={t} onChange={e => updateTime(i, tIdx, e.target.value)}
-                            className="w-[100px] h-7 px-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
+                            className="w-[100px] h-7 px-2 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
                           {rem.times.length > 1 && (
                             <button onClick={() => removeTime(i, tIdx)}
                               className="p-0.5 text-slate-400 hover:text-rose-500 cursor-pointer">
@@ -168,7 +168,7 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
                         const active = rem.repeatDays.includes(d)
                         return (
                           <button key={d} type="button" onClick={() => toggleDay(i, d)}
-                            className={`w-7 h-6 rounded-lg text-[8px] font-bold transition-all cursor-pointer ${active ? "bg-primary/10 border border-primary/40 text-primary" : "bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface-variant dark:text-slate-400"}`}>
+                            className={`w-7 h-6 rounded-lg text-[8px] font-bold transition-all cursor-pointer ${active ? "bg-primary/10 border border-primary/40 text-primary" : "bg-slate-50 border border-slate-200 text-on-surface-variant"}`}>
                             {d}
                           </button>
                         )
@@ -179,7 +179,7 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
                   <div className="space-y-0.5">
                     <label className="text-[8px] font-bold text-on-surface-variant uppercase">Notes <span className="font-normal normal-case">(optional)</span></label>
                     <input type="text" value={rem.notes} onChange={e => update(i, "notes", e.target.value)} placeholder="e.g. 30 min walk after lunch"
-                      className="w-full h-7 px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
+                      className="w-full h-7 px-2.5 bg-slate-50 border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-[10px] font-semibold" />
                   </div>
 
                   <label className="flex items-center gap-1.5 cursor-pointer pt-0.5">
@@ -190,13 +190,13 @@ export function HealthReminderInput({ reminders, onChange }: HealthReminderInput
                 </div>
               ) : (
                 <button type="button" onClick={() => setExpandedIndex(i)}
-                  className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-slate-50 dark:hover:bg-slate-950 transition-colors cursor-pointer text-left">
+                  className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-slate-50 transition-colors cursor-pointer text-left">
                   <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />
                   <span className="text-xs">{icons[rem.type] || "📌"}</span>
-                  <span className="text-[10px] font-semibold text-on-surface dark:text-slate-200 truncate flex-1">
+                  <span className="text-[10px] font-semibold text-on-surface truncate flex-1">
                     {rem.type === "Custom" ? rem.customLabel || "Custom" : rem.type} • {rem.times[0] || "—"}
                   </span>
-                  <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${rem.enabled ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600" : "bg-slate-100 dark:bg-slate-800 text-slate-400"}`}>
+                  <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${rem.enabled ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-400"}`}>
                     {rem.enabled ? "On" : "Off"}
                   </span>
                 </button>

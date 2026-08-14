@@ -102,7 +102,7 @@ export function MedicationInput({
   return (
     <div className="space-y-2.5">
       <div className="flex items-center gap-2">
-        <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">
+        <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
           Current Medications
         </label>
         {medications.length > 0 && (
@@ -113,7 +113,7 @@ export function MedicationInput({
       </div>
 
       {noMedication ? (
-        <div className="text-xs text-on-surface-variant dark:text-slate-500 italic py-1">
+        <div className="text-xs text-on-surface-variant italic py-1">
           Skipped medication details.
         </div>
       ) : (
@@ -133,7 +133,7 @@ export function MedicationInput({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
                   transition={{ duration: 0.2 }}
-                  className="bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden"
+                  className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden"
                 >
                   {isExpanded ? (
                     <div className="p-3 space-y-2.5">
@@ -153,7 +153,7 @@ export function MedicationInput({
                         <button
                           type="button"
                           onClick={() => removeMedication(i)}
-                          className="p-1 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                          className="p-1 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
@@ -163,7 +163,7 @@ export function MedicationInput({
                         <div className="space-y-1">
                           <label className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Medicine Name</label>
                           <input type="text" value={med.name} onChange={e => updateMed(i, "name", e.target.value)} placeholder="Metformin"
-                            className="w-full h-8 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-xs font-semibold" />
+                            className="w-full h-8 px-3 bg-white border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-xs font-semibold" />
                         </div>
                         <div className="space-y-1">
                           <label className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Strength</label>
@@ -176,7 +176,7 @@ export function MedicationInput({
                                 updateMed(i, "strength", val ? `${val} ${unit}` : '');
                               }}
                               placeholder="500"
-                              className="flex-1 min-w-0 h-8 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-xs font-semibold"
+                              className="flex-1 min-w-0 h-8 px-3 bg-white border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-xs font-semibold"
                             />
                             <select
                               value={med.strength.replace(/[\d.\s]/g, '').trim() || 'mg'}
@@ -185,7 +185,7 @@ export function MedicationInput({
                                 const unit = e.target.value;
                                 updateMed(i, "strength", num ? `${num} ${unit}` : `${unit}`);
                               }}
-                              className="w-14 h-8 px-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-xs font-semibold appearance-none"
+                              className="w-14 h-8 px-2 bg-white border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-xs font-semibold appearance-none"
                             >
                               <option value="mg">mg</option>
                               <option value="mcg">mcg</option>
@@ -202,7 +202,7 @@ export function MedicationInput({
                         <div className="space-y-1">
                           <label className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Dosage</label>
                           <select value={med.dosage} onChange={e => updateMed(i, "dosage", e.target.value)}
-                            className="w-full h-8 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-xs font-semibold appearance-none">
+                            className="w-full h-8 px-3 bg-white border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-xs font-semibold appearance-none">
                             <option value="">Select</option>
                             {dosageOptions.map(d => <option key={d} value={d}>{d}</option>)}
                           </select>
@@ -210,7 +210,7 @@ export function MedicationInput({
                         <div className="space-y-1">
                           <label className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Duration</label>
                           <input type="text" value={med.duration} onChange={e => updateMed(i, "duration", e.target.value)} placeholder="6 months"
-                            className="w-full h-8 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-on-surface dark:text-slate-100 rounded-lg focus:border-primary outline-none text-xs font-semibold" />
+                            className="w-full h-8 px-3 bg-white border border-slate-200 text-on-surface rounded-lg focus:border-primary outline-none text-xs font-semibold" />
                         </div>
                       </div>
 
@@ -223,8 +223,8 @@ export function MedicationInput({
                               <button key={t} type="button" onClick={() => toggleTiming(i, t)}
                                 className={`px-2 h-[28px] rounded-lg border text-[9px] font-bold transition-all cursor-pointer whitespace-nowrap ${
                                   active
-                                    ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-on-surface-variant dark:text-slate-400 hover:border-primary/50"
+                                    ? "bg-primary/10 border-primary/40 text-primary"
+                                    : "bg-white border-slate-200 text-on-surface-variant hover:border-primary/50"
                                 }`}>
                                 {t}
                               </button>
@@ -233,7 +233,7 @@ export function MedicationInput({
                         </div>
                       </div>
 
-                      <div className="border-t border-slate-200 dark:border-slate-800 pt-2">
+                      <div className="border-t border-slate-200 pt-2">
                         {med.reminders.length > 0 ? (
                           <ReminderForm
                             reminders={med.reminders}
@@ -243,7 +243,7 @@ export function MedicationInput({
                           />
                         ) : (
                           <button type="button" onClick={() => handleAddReminder(i)}
-                            className="w-full h-8 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-[10px] font-bold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-1 cursor-pointer">
+                            className="w-full h-8 border-2 border-dashed border-slate-300 rounded-lg text-[10px] font-bold text-on-surface-variant hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-1 cursor-pointer">
                             <Bell className="w-3.5 h-3.5" />
                             Add Medication Reminder
                           </button>
@@ -254,11 +254,11 @@ export function MedicationInput({
                     <button
                       type="button"
                       onClick={() => setExpandedIndex(i)}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors cursor-pointer text-left"
+                      className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-slate-100 transition-colors cursor-pointer text-left"
                     >
                       <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       <span className="text-[10px] font-bold text-primary shrink-0">#{i + 1}</span>
-                      <span className="text-xs font-semibold text-on-surface dark:text-slate-200 truncate">
+                      <span className="text-xs font-semibold text-on-surface truncate">
                         {summary || "New medication"}
                       </span>
                       {med.reminders.length > 0 && (
@@ -270,7 +270,7 @@ export function MedicationInput({
                       <button
                         type="button"
                         onClick={e => { e.stopPropagation(); removeMedication(i) }}
-                        className="ml-auto p-1 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg text-slate-400 hover:text-rose-500 transition-colors cursor-pointer shrink-0"
+                        className="ml-auto p-1 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors cursor-pointer shrink-0"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -286,16 +286,16 @@ export function MedicationInput({
               type="checkbox"
               checked={noMedication}
               onChange={e => onNoMedicationChange(e.target.checked)}
-              className="rounded text-primary focus:ring-primary/30 w-3.5 h-3.5 border-slate-300 dark:border-slate-700"
+              className="rounded text-primary focus:ring-primary/30 w-3.5 h-3.5 border-slate-300"
             />
-            <span className="text-[10px] font-semibold text-on-surface-variant dark:text-slate-400">
+            <span className="text-[10px] font-semibold text-on-surface-variant">
               No Current Medication
             </span>
           </label>
           <button
             type="button"
             onClick={addMedication}
-            className="w-full h-9 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full h-9 border-2 border-dashed border-slate-300 rounded-xl text-xs font-bold text-on-surface-variant hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Add Another Medicine

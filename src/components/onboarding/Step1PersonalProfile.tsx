@@ -111,17 +111,17 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-base font-extrabold text-on-surface dark:text-slate-100">
+        <h2 className="text-base font-extrabold text-on-surface">
           Tell us about yourself
         </h2>
-        <p className="text-[11px] text-on-surface-variant dark:text-slate-400">
+        <p className="text-[11px] text-on-surface-variant">
           This helps Swasth AI personalize recommendations.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="space-y-1">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
             Full Name <span className="text-rose-500">*</span>
           </label>
           <input
@@ -129,13 +129,13 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
             value={data.fullName}
             onChange={e => { update("fullName", e.target.value); setErrors(p => ({ ...p, fullName: '' })); }}
             placeholder="Your full name"
-            className={`w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${errors.fullName ? 'border-rose-400' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`}
+            className={`w-full h-10 px-4 bg-slate-50 border text-on-surface rounded-xl focus:outline-none font-semibold text-sm ${errors.fullName ? 'border-rose-400' : 'border-slate-200 focus:border-primary focus:bg-white:bg-slate-900'}`}
           />
           {errors.fullName && <p className="text-[10px] text-rose-500 font-semibold">{errors.fullName}</p>}
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
             Date of Birth <span className="text-rose-500">*</span>
           </label>
           <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
               type="date"
               value={data.dob}
               onChange={e => { update("dob", e.target.value); setErrors(p => ({ ...p, dob: '' })); }}
-              className={`flex-1 h-10 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${errors.dob ? 'border-rose-400' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`}
+              className={`flex-1 h-10 px-4 bg-slate-50 border text-on-surface rounded-xl focus:outline-none font-semibold text-sm ${errors.dob ? 'border-rose-400' : 'border-slate-200 focus:border-primary focus:bg-white:bg-slate-900'}`}
             />
             {data.dob && (
               <span className="text-[11px] font-bold text-primary whitespace-nowrap shrink-0">
@@ -157,7 +157,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="space-y-1">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
             Gender <span className="text-rose-500">*</span>
           </label>
           <div className="grid grid-cols-3 gap-1">
@@ -168,8 +168,8 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
                 onClick={() => { update("gender", gen); setErrors(p => ({ ...p, gender: '' })); }}
                 className={`h-9 flex items-center justify-center rounded-lg border font-bold text-[10px] md:text-xs transition-all cursor-pointer ${
                   data.gender === gen
-                    ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary"
-                    : "border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-slate-200 text-on-surface-variant hover:border-primary/50"
                 }`}
               >
                 {gen}
@@ -180,7 +180,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
             Weight (kg)
           </label>
           <input
@@ -188,13 +188,13 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
             value={data.weight}
             onChange={e => { update("weight", e.target.value); setErrors(p => ({ ...p, weight: '' })); }}
             placeholder="70"
-            className={`w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${errors.weight ? 'border-rose-400' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`}
+            className={`w-full h-10 px-4 bg-slate-50 border text-on-surface rounded-xl focus:outline-none font-semibold text-sm ${errors.weight ? 'border-rose-400' : 'border-slate-200 focus:border-primary focus:bg-white:bg-slate-900'}`}
           />
           {errors.weight && <p className="text-[10px] text-rose-500 font-semibold">{errors.weight}</p>}
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+          <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
             Height (cm)
           </label>
           <input
@@ -202,7 +202,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
             value={data.height}
             onChange={e => { update("height", e.target.value); setErrors(p => ({ ...p, height: '' })); }}
             placeholder="170"
-            className={`w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border text-on-surface dark:text-slate-100 rounded-xl focus:outline-none font-semibold text-sm ${errors.height ? 'border-rose-400' : 'border-slate-200 dark:border-slate-800 focus:border-primary focus:bg-white dark:focus:bg-slate-900'}`}
+            className={`w-full h-10 px-4 bg-slate-50 border text-on-surface rounded-xl focus:outline-none font-semibold text-sm ${errors.height ? 'border-rose-400' : 'border-slate-200 focus:border-primary focus:bg-white:bg-slate-900'}`}
           />
           {errors.height && <p className="text-[10px] text-rose-500 font-semibold">{errors.height}</p>}
         </div>
@@ -210,7 +210,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
 
       {/* Dietary Preference */}
       <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+        <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
           Dietary Preference
         </label>
         <div className="flex flex-wrap gap-1">
@@ -223,8 +223,8 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
               <button key={d} type="button" onClick={() => toggleDiet(d)}
                 className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none ${
                   active
-                    ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                    : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
+                    ? "bg-primary/10 border-primary/40 text-primary"
+                    : "bg-slate-50 border-slate-200 text-on-surface-variant hover:border-primary/50 hover:bg-slate-100:bg-slate-900"
                 }`}>
                 {d}
               </button>
@@ -234,22 +234,22 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
             <button type="button" onClick={() => setShowMoreDiet(!showMoreDiet)}
               className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none ${
                 selectedExtraDietCount > 0
-                  ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                  : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
+                  ? "bg-primary/10 border-primary/40 text-primary"
+                  : "bg-slate-50 border-slate-200 text-on-surface-variant hover:border-primary/50 hover:bg-slate-100:bg-slate-900"
               }`}>
               {selectedExtraDietCount > 0 ? `More (${selectedExtraDietCount})` : "More options"}
             </button>
             {showMoreDiet && (
-              <div className="absolute top-full left-0 mt-1 z-20 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-2 max-h-60 overflow-y-auto">
+              <div className="absolute top-full left-0 mt-1 z-20 w-56 bg-white border border-slate-200 rounded-xl shadow-xl p-2 max-h-60 overflow-y-auto">
                 {extraDietOptions.map(d => {
                   const active = data.dietaryPreferences.includes(d)
                   return (
                     <button key={d} type="button" onClick={() => toggleDiet(d)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer">
-                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"}`}>
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50:bg-slate-800 transition-colors text-left cursor-pointer">
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300"}`}>
                         {active && <Check className="w-3 h-3 text-white" />}
                       </div>
-                      <span className="text-xs font-semibold text-on-surface dark:text-slate-200">{d}</span>
+                      <span className="text-xs font-semibold text-on-surface">{d}</span>
                     </button>
                   )
                 })}
@@ -258,7 +258,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
           </div>
         </div>
         {data.dietaryPreferences.filter(p => p !== "No Preference").length > 0 && (
-          <p className="text-[10px] text-on-surface-variant dark:text-slate-500">
+          <p className="text-[10px] text-on-surface-variant">
             {data.dietaryPreferences.filter(p => p !== "No Preference").length} selected
           </p>
         )}
@@ -266,7 +266,7 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
 
       {/* Goals */}
       <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider px-1">
+        <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider px-1">
           What do you want from Swasth AI?
         </label>
         <div className="flex flex-wrap gap-1">
@@ -276,8 +276,8 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
               <button key={goal} type="button" onClick={() => toggleExtraGoal(goal)}
                 className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none ${
                   active
-                    ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                    : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
+                    ? "bg-primary/10 border-primary/40 text-primary"
+                    : "bg-slate-50 border-slate-200 text-on-surface-variant hover:border-primary/50 hover:bg-slate-100:bg-slate-900"
                 }`}>
                 {goal}
               </button>
@@ -287,22 +287,22 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
             <button type="button" onClick={() => setShowMoreGoals(!showMoreGoals)}
               className={`h-[44px] px-3 rounded-full border font-bold text-xs transition-all cursor-pointer select-none ${
                 selectedExtraGoalCount > 0
-                  ? "bg-primary/10 dark:bg-primary/20 border-primary/40 text-primary"
-                  : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-slate-900"
+                  ? "bg-primary/10 border-primary/40 text-primary"
+                  : "bg-slate-50 border-slate-200 text-on-surface-variant hover:border-primary/50 hover:bg-slate-100:bg-slate-900"
               }`}>
               {selectedExtraGoalCount > 0 ? `Other (${selectedExtraGoalCount})` : "Other"}
             </button>
             {showMoreGoals && (
-              <div className="absolute top-full left-0 mt-1 z-20 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-2 max-h-60 overflow-y-auto">
+              <div className="absolute top-full left-0 mt-1 z-20 w-64 bg-white border border-slate-200 rounded-xl shadow-xl p-2 max-h-60 overflow-y-auto">
                 {extraGoals.map(goal => {
                   const active = data.healthGoals.includes(goal)
                   return (
                     <button key={goal} type="button" onClick={() => toggleExtraGoal(goal)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer">
-                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"}`}>
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50:bg-slate-800 transition-colors text-left cursor-pointer">
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${active ? "bg-primary border-primary" : "border-slate-300"}`}>
                         {active && <Check className="w-3 h-3 text-white" />}
                       </div>
-                      <span className="text-xs font-semibold text-on-surface dark:text-slate-200">{goal}</span>
+                      <span className="text-xs font-semibold text-on-surface">{goal}</span>
                     </button>
                   )
                 })}
@@ -311,13 +311,13 @@ export function Step1PersonalProfile({ data, onChange }: Step1Props) {
           </div>
         </div>
         {selectedMainGoals.length > 0 && (
-          <p className="text-[10px] text-on-surface-variant dark:text-slate-500">
+          <p className="text-[10px] text-on-surface-variant">
             {data.healthGoals.length} selected
           </p>
         )}
       </div>
 
-      <p className="text-[10px] text-on-surface-variant dark:text-slate-500 italic">
+      <p className="text-[10px] text-on-surface-variant italic">
         You can always update these later in your profile.
       </p>
     </div>

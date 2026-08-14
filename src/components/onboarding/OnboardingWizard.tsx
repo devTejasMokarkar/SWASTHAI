@@ -3,11 +3,10 @@ import { LoginButton } from "../LoginButton"
 import { StepIndicator } from "../ui/StepIndicator"
 import "./OnboardingWizard.css"
 
-const totalSteps = 8
+const totalSteps = 7
 
 const initialState = {
   fullName: "",
-  email: "",
   age: "",
   gender: "",
   height: "",
@@ -19,14 +18,13 @@ const initialState = {
 }
 
 const STEPS = [
-  { label: "What’s your full name?", hint: "We’ll use this to personalize your experience." },
-  { label: "How can we reach you?", hint: "We’ll send your health summaries and reminders here." },
+  { label: "What's your full name?", hint: "We'll use this to personalize your experience." },
   { label: "Tell us a bit about you", hint: "This helps us tailor recommendations accurately." },
   { label: "Height & weight", hint: "Used to calculate your baseline health metrics." },
   { label: "What are you hoping to achieve?", hint: "Pick as many as apply — you can change these later." },
   { label: "How active are you?", hint: "A rough weekly average is fine." },
   { label: "Any medical conditions?", hint: "Optional, but it helps us give safer guidance." },
-  { label: "You’re all set", hint: "Here’s a quick summary before we get started." },
+  { label: "You're all set", hint: "Here's a quick summary before we get started." },
 ]
 
 const GOALS = [
@@ -52,10 +50,6 @@ export function OnboardingWizard() {
   const [state, setState] = useState(initialState)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const validateEmail = (value: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-  }
-
   const validateStep = (step: number) => {
     const nextErrors: Record<string, string> = {}
 
@@ -68,14 +62,6 @@ export function OnboardingWizard() {
     }
 
     if (step === 2) {
-      if (!state.email.trim()) {
-        nextErrors.email = "Email is required"
-      } else if (!validateEmail(state.email.trim())) {
-        nextErrors.email = "Please enter a valid email"
-      }
-    }
-
-    if (step === 3) {
       if (!state.age.trim()) {
         nextErrors.age = "Age is required"
       } else {
@@ -89,7 +75,7 @@ export function OnboardingWizard() {
       }
     }
 
-    if (step === 4) {
+    if (step === 3) {
       if (!state.height.trim()) {
         nextErrors.height = "Height is required"
       } else {
@@ -108,13 +94,13 @@ export function OnboardingWizard() {
       }
     }
 
-    if (step === 5) {
+    if (step === 4) {
       if (state.goals.length === 0) {
         nextErrors.goals = "Select at least one goal"
       }
     }
 
-    if (step === 6) {
+    if (step === 5) {
       if (!state.activity) {
         nextErrors.activity = "Choose your activity level"
       }
@@ -186,7 +172,6 @@ export function OnboardingWizard() {
 
   const summaryRows = useMemo(() => [
     ["Name", state.fullName || "—"],
-    ["Email", state.email || "—"],
     ["Age / Gender", `${state.age || "—"} · ${state.gender || "—"}`],
     ["Height / Weight", `${state.height || "—"} cm · ${state.weight || "—"} kg`],
     ["Goals", state.goals.length ? state.goals.join(", ") : "—"],
@@ -229,6 +214,7 @@ export function OnboardingWizard() {
         <StepIndicator currentStep={current} totalSteps={totalSteps} />
 
         <form className="card-stack" autoComplete="off" onSubmit={(e) => e.preventDefault()}>
+          {/* Step 1: Name */}
           <div className={`step ${current === 1 ? "active" : ""}`} data-step="1">
             <h2>{STEPS[0].label}</h2>
             <p className="hint">{STEPS[0].hint}</p>
@@ -237,23 +223,14 @@ export function OnboardingWizard() {
             <div className="spacer" />
           </div>
 
+          {/* Step 2: Age & Gender */}
           <div className={`step ${current === 2 ? "active" : ""}`} data-step="2">
             <h2>{STEPS[1].label}</h2>
             <p className="hint">{STEPS[1].hint}</p>
-            <input type="email" placeholder="you@email.com" value={state.email} onChange={(e) => updateField("email", e.target.value)} />
-            {errors.email && <p className="field-error">{errors.email}</p>}
-            <div className="spacer" />
-          </div>
-
-          <div className={`step ${current === 3 ? "active" : ""}`} data-step="3">
-            <h2>{STEPS[2].label}</h2>
-            <p className="hint">{STEPS[2].hint}</p>
-            <div className="field-row">
-              <div className="field-col">
-                <label>Age</label>
-                <input type="number" placeholder="e.g. 28" value={state.age} onChange={(e) => updateField("age", e.target.value)} />
-                {errors.age && <p className="field-error">{errors.age}</p>}
-              </div>
+            <div className="field-col" style={{ marginBottom: "18px" }}>
+              <label>Age</label>
+              <input type="number" placeholder="e.g. 28" value={state.age} onChange={(e) => updateField("age", e.target.value)} />
+              {errors.age && <p className="field-error">{errors.age}</p>}
             </div>
             <div className="field-col">
               <label>Gender</label>
@@ -267,9 +244,10 @@ export function OnboardingWizard() {
             <div className="spacer" />
           </div>
 
-          <div className={`step ${current === 4 ? "active" : ""}`} data-step="4">
-            <h2>{STEPS[3].label}</h2>
-            <p className="hint">{STEPS[3].hint}</p>
+          {/* Step 3: Height & Weight */}
+          <div className={`step ${current === 3 ? "active" : ""}`} data-step="3">
+            <h2>{STEPS[2].label}</h2>
+            <p className="hint">{STEPS[2].hint}</p>
             <div className="field-row">
               <div className="field-col">
                 <label>Height (cm)</label>
@@ -285,9 +263,10 @@ export function OnboardingWizard() {
             <div className="spacer" />
           </div>
 
-          <div className={`step ${current === 5 ? "active" : ""}`} data-step="5">
-            <h2>{STEPS[4].label}</h2>
-            <p className="hint">{STEPS[4].hint}</p>
+          {/* Step 4: Goals */}
+          <div className={`step ${current === 4 ? "active" : ""}`} data-step="4">
+            <h2>{STEPS[3].label}</h2>
+            <p className="hint">{STEPS[3].hint}</p>
             <div className="chip-grid">
               {GOALS.map((goal) => (
                 <div key={goal} className={`chip ${state.goals.includes(goal) ? "selected" : ""}`} onClick={() => toggleArray("goals", goal)}>{goal}</div>
@@ -297,9 +276,10 @@ export function OnboardingWizard() {
             <div className="spacer" />
           </div>
 
-          <div className={`step ${current === 6 ? "active" : ""}`} data-step="6">
-            <h2>{STEPS[5].label}</h2>
-            <p className="hint">{STEPS[5].hint}</p>
+          {/* Step 5: Activity */}
+          <div className={`step ${current === 5 ? "active" : ""}`} data-step="5">
+            <h2>{STEPS[4].label}</h2>
+            <p className="hint">{STEPS[4].hint}</p>
             <div className="radio-cards">
               {ACTIVITY_LEVELS.map((option) => (
                 <div key={option.value} className={`radio-card ${state.activity === option.value ? "selected" : ""}`} onClick={() => updateField("activity", option.value)}>
@@ -315,9 +295,10 @@ export function OnboardingWizard() {
             <div className="spacer" />
           </div>
 
-          <div className={`step ${current === 7 ? "active" : ""}`} data-step="7">
-            <h2>{STEPS[6].label}</h2>
-            <p className="hint">{STEPS[6].hint}</p>
+          {/* Step 6: Conditions */}
+          <div className={`step ${current === 6 ? "active" : ""}`} data-step="6">
+            <h2>{STEPS[5].label}</h2>
+            <p className="hint">{STEPS[5].hint}</p>
             <div className="chip-grid" style={{ marginBottom: "14px" }}>
               {CONDITIONS.map((condition) => (
                 <div key={condition} className={`chip ${state.conditions.includes(condition) ? "selected" : ""}`} onClick={() => toggleArray("conditions", condition)}>{condition}</div>
@@ -327,9 +308,10 @@ export function OnboardingWizard() {
             <div className="spacer" />
           </div>
 
-          <div className={`step ${current === 8 ? "active" : ""}`} data-step="8">
-            <h2>{STEPS[7].label}</h2>
-            <p className="hint">{STEPS[7].hint}</p>
+          {/* Step 7: Summary */}
+          <div className={`step ${current === 7 ? "active" : ""}`} data-step="7">
+            <h2>{STEPS[6].label}</h2>
+            <p className="hint">{STEPS[6].hint}</p>
             <div className="summary-list">
               {summaryRows.map(([k, v]) => (
                 <div key={k} className="summary-row"><span className="k">{k}</span><span className="v">{v}</span></div>
